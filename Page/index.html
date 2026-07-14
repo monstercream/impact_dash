@@ -13,11 +13,12 @@
     touch-action: none; overscroll-behavior: none;
   }
   #wrap { position: fixed; inset: 0; width: 100vw; height: 100vh; line-height: 0; touch-action: none; }
-  /* 모바일에서 세로로 들고 있으면 화면 전체(캔버스+모든 UI)를 90도 돌려서 항상 가로 모드로 보이게 함.
-     방향 API(screen.orientation.lock)는 풀스크린/설치된 앱이 아니면 대부분 브라우저에서 동작하지
-     않기 때문에, 실제 화면 자체를 CSS로 회전시키는 방식(모바일 웹게임에서 널리 쓰는 방식)을 사용함.
-     터치 좌표 계산도 이 회전을 감안해서 별도로 보정함(JS의 clientToLocalXY 참고) */
-  #wrap.forceLandscape {
+  /* 모바일에서는 항상 세로 모드로 보이게 함. 기기를 눕혀서 가로가 되어 있는 경우에만 화면 전체
+     (캔버스+모든 UI)를 90도 돌려서 세로로 보이게 강제로 되돌림. 방향 API(screen.orientation.lock)는
+     풀스크린/설치된 앱이 아니면 대부분 브라우저에서 동작하지 않기 때문에, 실제 화면 자체를 CSS로
+     회전시키는 방식(모바일 웹게임에서 널리 쓰는 방식)을 사용함. 터치 좌표 계산도 이 회전을 감안해서
+     별도로 보정함(JS의 clientToLocalXY 참고) */
+  #wrap.forcePortrait {
     position: fixed; top: 50%; left: 50%;
     width: 100vh; height: 100vw;
     transform: translate(-50%, -50%) rotate(90deg);
@@ -77,9 +78,15 @@
     text-align: center; color: #eee; padding: 30px 40px; border-radius: 12px;
     background: rgba(20,22,30,0.9); border: 1px solid #444; box-shadow: 0 0 40px rgba(0,0,0,0.6);
   }
+  /* 화면(특히 모바일 세로 화면)이 좁거나 낮아서 패널 내용이 다 안 들어갈 수 있으므로, 패널 자체는
+     항상 화면 안에 들어오도록 상자 크기 계산을 border-box로 하고 넘치는 내용은 세로 스크롤되게 함.
+     실제 최대 폭/높이는 JS의 applyResponsiveLayout()에서 화면 회전을 감안해 정확히 계산해서 넣어줌. */
+  #startPanel, #shopPanel, #resultsPanel, #pausePanel {
+    box-sizing: border-box; overflow-y: auto;
+  }
   #startPanel h1 { margin: 0 0 8px; font-size: 26px; letter-spacing: 2px; text-shadow: 0 0 12px #f0a; }
   #startPanel p { margin: 0 0 16px; font-size: 13px; color: #bbb; }
-  #aiCountButtons, #playerCountButtons { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; }
+  #aiCountButtons, #playerCountButtons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px; }
   #aiCountButtons button, #playerCountButtons button {
     min-width: 46px; height: 46px; border-radius: 8px; border: 1px solid #555; background: #23262f;
     color: #eee; font-size: 14px; font-weight: bold; cursor: pointer; padding: 0 8px;
@@ -252,6 +259,34 @@
   #resumeBtn { background: linear-gradient(90deg,#ffe45b,#ff8c00); color:#221800; border:none; }
   /* 게임패드/키보드로 메뉴를 탐색할 때 현재 포커스된 버튼을 표시 */
   .gpFocused { outline: 3px solid #ffe45b !important; box-shadow: 0 0 14px #ffe45b !important; }
+
+  /* 모바일(터치 기기)에서는 화면이 작아 인게임 UI(플레이어 목록/타이머/코인/알림 등)가
+     상대적으로 크고 답답해 보이므로 살짝 축소해서 보여줌. wrap에 mobileUI 클래스가 붙으면 적용됨. */
+  #wrap.mobileUI #hud { transform: scale(0.78); transform-origin: top left; }
+  #wrap.mobileUI #roundHud { transform: translateX(-50%) scale(0.8); transform-origin: top center; }
+  #wrap.mobileUI #pauseBtn { width: 30px; height: 30px; font-size: 13px; }
+  #wrap.mobileUI #roundAnnounce { font-size: 38px; }
+  #wrap.mobileUI #countdownNum { font-size: 54px; }
+  #wrap.mobileUI #spectateLabel { font-size: 13px; }
+  #wrap.mobileUI #info { font-size: 10px; max-width: 92%; }
+
+  /* 모바일에서는 메뉴/상점/결과/일시정지 패널도 여백과 글자 크기를 줄여서 좁은 화면 안에
+     버튼이 잘리지 않고 다 들어오도록 함 */
+  #wrap.mobileUI #startPanel, #wrap.mobileUI #shopPanel,
+  #wrap.mobileUI #resultsPanel, #wrap.mobileUI #pausePanel { padding: 16px 18px; }
+  #wrap.mobileUI #startPanel h1 { font-size: 19px; }
+  #wrap.mobileUI #startPanel p { font-size: 11px; margin-bottom: 10px; }
+  #wrap.mobileUI #shopPanel h2, #wrap.mobileUI #resultsPanel h2, #wrap.mobileUI #pausePanel h2 { font-size: 17px; }
+  #wrap.mobileUI #aiCountButtons button, #wrap.mobileUI #playerCountButtons button {
+    min-width: 38px; height: 38px; font-size: 12px; padding: 0 6px;
+  }
+  #wrap.mobileUI #modeButtons button, #wrap.mobileUI #teamButtons button,
+  #wrap.mobileUI #roundDurationButtons button { padding: 8px 14px; font-size: 12px; }
+  #wrap.mobileUI #startBtn, #wrap.mobileUI #restartBtn { padding: 10px 24px; font-size: 13px; }
+  #wrap.mobileUI #shopBtn { padding: 8px 20px; font-size: 12px; margin-top: 8px; }
+  #wrap.mobileUI #shopGrid { grid-template-columns: repeat(2, 1fr); gap: 8px; max-width: 100%; }
+  #wrap.mobileUI .skinCard { padding: 8px 6px; }
+  #wrap.mobileUI #shopBackBtn, #wrap.mobileUI #pauseButtons button { padding: 9px 22px; font-size: 12px; }
 </style>
 </head>
 <body>
@@ -440,21 +475,22 @@ function isTouchDevice(){
   // 정확히 알려주는 navigator.maxTouchPoints(포인터 개수, 터치 없으면 0)만으로 판별함.
   return (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
 }
-// 모바일에서 세로로 들고 있으면 true. 이 값에 따라 #wrap 전체(캔버스+UI)를 CSS로 90도 돌려서
-// 항상 가로 화면처럼 보이게 하고, 캔버스 내부 해상도(VIEW_W/VIEW_H)도 그에 맞춰 가로/세로를 바꿔줌.
-let isLandscapeForced = false;
+// 모바일은 항상 세로 화면으로 고정함. 기기를 눕혀서 실제로 가로가 되어 있을 때만 true가 되고,
+// 이 값에 따라 #wrap 전체(캔버스+UI)를 CSS로 90도 돌려서 다시 세로 화면처럼 보이게 하고,
+// 캔버스 내부 해상도(VIEW_W/VIEW_H)도 그에 맞춰 가로/세로를 바꿔줌.
+let isPortraitForced = false;
 function updateOrientationLock(){
-  const portrait = window.innerHeight > window.innerWidth;
-  isLandscapeForced = portrait && isTouchDevice();
+  const landscape = window.innerWidth > window.innerHeight;
+  isPortraitForced = landscape && isTouchDevice();
   const wrap = document.getElementById('wrap');
-  if (wrap) wrap.classList.toggle('forceLandscape', isLandscapeForced);
+  if (wrap) wrap.classList.toggle('forcePortrait', isPortraitForced);
 }
 // 화면이 회전된 상태일 때, 실제 터치/마우스의 clientX/clientY(뷰포트 기준 좌표라 회전의 영향을
 // 받지 않음)를 회전된 화면에 맞는 캔버스 내부 좌표로 변환함. #wrap이 항상 뷰포트 전체를 정확히
 // 덮도록 만들어뒀으므로(회전 시에도 정중앙 기준 rotate) 90도 시계방향 회전의 역변환 공식
 // (x'=clientY, y'=innerWidth-clientX) 하나로 정확한 매핑이 나옴.
 function clientToLocalXY(clientX, clientY){
-  if (isLandscapeForced) return { x: clientY, y: window.innerWidth - clientX };
+  if (isPortraitForced) return { x: clientY, y: window.innerWidth - clientX };
   return { x: clientX, y: clientY };
 }
 // 모바일(터치 기기)에서는 화면이 작아 답답해 보일 수 있으므로 카메라를 살짝 축소(줌아웃)해서
@@ -464,13 +500,53 @@ let camZoom = 1;
 function updateCamZoom(){
   camZoom = isTouchDevice() ? MOBILE_ZOOM_OUT : 1;
 }
+// KO 안내 메시지("OOO에게 당함! (XXX KO)") 등은 닉네임 길이에 따라 텍스트 폭이 크게 달라지는데,
+// 기존엔 폰트 크기가 고정 px라서 화면 폭이 좁은 모바일(특히 세로 고정 이후 캔버스 폭이 훨씬 좁아짐)
+// 에서는 화면 밖으로 삐져나가는 문제가 있었음. 캔버스 실제 픽셀 폭(VIEW_W)을 기준으로 폰트 크기를
+// 비례해서 줄여주고, 최대 폭도 함께 제한해서 항상 화면 안에 들어오도록 함.
+const UI_TEXT_BASE_VIEW_W = 1000; // 폰트 크기를 정할 때 기준으로 삼는 "기본" 화면 폭(기존 데스크톱 캔버스 폭)
+function applyResponsiveTextScale(){
+  const scale = Math.max(0.42, Math.min(1, VIEW_W / UI_TEXT_BASE_VIEW_W));
+  // 아래 DOM 참조들은 이 함수가 resizeCanvas()를 통해 스크립트 최상단(페이지 로드 직후)에서도
+  // 호출되기 때문에, 나중에 선언되는 const 변수(msgEl 등)에 기대지 않고 매번 새로 조회함
+  // (그렇지 않으면 아직 선언 전이라 TDZ 참조 에러가 남)
+  const msgEl = document.getElementById('msg');
+  if (msgEl){
+    msgEl.style.fontSize = Math.round(42 * scale) + 'px';
+    msgEl.style.maxWidth = Math.round(VIEW_W * 0.92) + 'px';
+    msgEl.style.textAlign = 'center';
+    msgEl.style.whiteSpace = 'normal';
+    msgEl.style.wordBreak = 'keep-all';
+    msgEl.style.lineHeight = '1.25';
+  }
+  const roundAnnounceEl = document.getElementById('roundAnnounce');
+  if (roundAnnounceEl){
+    roundAnnounceEl.style.fontSize = Math.round(52 * scale) + 'px';
+    roundAnnounceEl.style.maxWidth = Math.round(VIEW_W * 0.92) + 'px';
+  }
+  const countdownNumEl = document.getElementById('countdownNum');
+  if (countdownNumEl) countdownNumEl.style.fontSize = Math.round(72 * scale) + 'px';
+  const spectateLabelEl = document.getElementById('spectateLabel');
+  if (spectateLabelEl) spectateLabelEl.style.fontSize = Math.round(16 * scale) + 'px';
+
+  // 메뉴/상점/결과/일시정지 패널이 화면(특히 세로로 좁고 낮은 모바일 화면)보다 커서 버튼이
+  // 잘리는 일이 없도록, 실제 로컬 화면 크기(VIEW_W/VIEW_H - 회전 여부와 무관하게 항상 정확함)를
+  // 기준으로 패널의 최대 폭/높이를 직접 계산해서 넣어줌. 넘치는 내용은 CSS overflow-y:auto로 스크롤됨.
+  ['startPanel','shopPanel','resultsPanel','pausePanel'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.maxWidth = Math.round(VIEW_W * 0.94) + 'px';
+    el.style.maxHeight = Math.round(VIEW_H * 0.94) + 'px';
+  });
+}
 function resizeCanvas(){
   updateOrientationLock();
   updateCamZoom();
-  VIEW_W = isLandscapeForced ? window.innerHeight : window.innerWidth;
-  VIEW_H = isLandscapeForced ? window.innerWidth : window.innerHeight;
+  VIEW_W = isPortraitForced ? window.innerHeight : window.innerWidth;
+  VIEW_H = isPortraitForced ? window.innerWidth : window.innerHeight;
   canvas.width = VIEW_W;
   canvas.height = VIEW_H;
+  applyResponsiveTextScale();
 }
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
@@ -878,6 +954,10 @@ function applyMobilePlayerCountLimit(){
 }
 applyMobilePlayerCountLimit();
 
+// ---- 모바일에서는 인게임 UI(플레이어 목록/타이머/코인/알림 등)를 살짝 축소해서 화면이
+// 덜 답답하게 보이도록 함 (위의 #wrap.mobileUI CSS 규칙과 연동) ----
+if (isTouchDevice()) wrapEl.classList.add('mobileUI');
+
 startBtn.addEventListener('click', ()=>{ startGame(selectedAiCount); });
 
 const roundHudEl = document.getElementById('roundHud');
@@ -954,6 +1034,19 @@ function quitToMenu(){
 pauseBtnEl.addEventListener('click', ()=> togglePause());
 resumeBtnEl.addEventListener('click', ()=> resumeGame());
 quitToMenuBtnEl.addEventListener('click', ()=> quitToMenu());
+// 모바일에서는 게임 화면 전체에 걸린 window 레벨 touchstart 핸들러(아래 "모바일 터치 입력" 섹션)가
+// 화면 터치를 전부 가상 조이스틱/조준 입력으로 가로채면서 e.preventDefault()를 호출하기 때문에,
+// 브라우저가 만들어주는 합성 click 이벤트가 발생하지 않아 일시정지 버튼이 눌리지 않는 문제가 있었음.
+// 버튼 자신에게 별도 touchstart/touchend 리스너를 달고 stopPropagation()으로 window 핸들러까지
+// 이벤트가 전파되지 않게 막은 뒤, 여기서 직접 동작을 실행해줌 (타이틀 화면의 터치 처리와 같은 방식).
+function bindTapButton(el, handler){
+  if (!el) return;
+  el.addEventListener('touchstart', e=>{ e.stopPropagation(); }, { passive:false });
+  el.addEventListener('touchend', e=>{ e.preventDefault(); e.stopPropagation(); handler(); }, { passive:false });
+}
+bindTapButton(pauseBtnEl, togglePause);
+bindTapButton(resumeBtnEl, resumeGame);
+bindTapButton(quitToMenuBtnEl, quitToMenu);
 window.addEventListener('keydown', e=>{
   if (e.key === 'Escape') togglePause();
 });
@@ -1049,19 +1142,31 @@ const aimKnobEl = aimStickEl.querySelector('.virtualStickKnob');
 
 function getWrapPoint(touch){
   const p = clientToLocalXY(touch.clientX, touch.clientY); // 화면 회전 상태를 감안한 좌표 변환
-  const w = isLandscapeForced ? window.innerHeight : window.innerWidth; // 회전 시 가로/세로가 바뀜
+  const w = isPortraitForced ? window.innerHeight : window.innerWidth; // 회전 시 가로/세로가 바뀜
   return { x: p.x, y: p.y, w };
 }
 
 function touchControlsEnabled(){
-  return gameStarted && roundActive;
+  // 일시정지 중에는 조이스틱/조준 등 가상 터치 입력을 완전히 꺼서, 일시정지 화면의 "이어하기"/
+  // "모드 선택으로" 버튼을 누를 때 화면 터치가 게임 입력으로 가로채이지 않게 함
+  return gameStarted && roundActive && !isPaused;
 }
+
+// ---- 관전 모드(죽어서 다른 캐릭터를 보고 있을 때) 터치로 좌/우 캐릭터 전환 ----
+// 짧게 톡 건드리는(탭) 터치만 전환으로 인정하고, 드래그(조이스틱/조준 조작)로 이어지면 무시함.
+// 탭이 시작된 지점(왼쪽/오른쪽 절반)에 따라 이전/다음 캐릭터로 넘어감. 1인용(모바일)에서만
+// 의미 있는 slot 0(=player)의 관전 상태만 다룸.
+const TAP_MAX_TIME = 350;  // ms 이내에 떼야 탭으로 인정
+const TAP_MAX_MOVE = 16;   // 시작 지점에서 이만큼(px) 이상 움직였으면 탭이 아니라 드래그로 간주
+const touchTapTrack = new Map(); // touch identifier -> {x,y,t,isLeft}
+let pendingSpectateNav = 0; // 다음 프레임에 소비될 관전 전환량(-1=이전, +1=다음), updateSlotCamera에서 소비 후 리셋됨
 
 window.addEventListener('touchstart', e=>{
   if (!touchControlsEnabled()) return;
   for (const t of e.changedTouches){
     const p = getWrapPoint(t);
     const isLeft = p.x < p.w/2;
+    touchTapTrack.set(t.identifier, { x: p.x, y: p.y, t: performance.now(), isLeft });
     if (isLeft && !joystick.active){
       joystick.active = true; joystick.id = t.identifier;
       joystick.anchorX = p.x; joystick.anchorY = p.y;
@@ -1089,6 +1194,9 @@ window.addEventListener('touchmove', e=>{
         touchAim.hasVector = true;
       }
     }
+    // 탭 판정용 추적 좌표도 갱신 - 시작점에서 너무 멀어지면 아래 endTouch에서 탭으로 인정하지 않음
+    const track = touchTapTrack.get(t.identifier);
+    if (track){ track.curX = p.x; track.curY = p.y; }
   }
   e.preventDefault();
 }, { passive:false });
@@ -1101,6 +1209,15 @@ function endTouch(e){
     if (touchAim.active && t.identifier === touchAim.id){
       touchAim.active = false; touchAim.id = null;
       touchAim.justReleased = true; // 다음 update()에서 스윙 발동 신호로 소비됨
+    }
+    const track = touchTapTrack.get(t.identifier);
+    if (track){
+      touchTapTrack.delete(t.identifier);
+      const elapsed = performance.now() - track.t;
+      const moved = Math.hypot((track.curX ?? track.x) - track.x, (track.curY ?? track.y) - track.y);
+      if (elapsed <= TAP_MAX_TIME && moved <= TAP_MAX_MOVE && player && player._spectating){
+        pendingSpectateNav += track.isLeft ? -1 : 1;
+      }
     }
   }
 }
@@ -1841,8 +1958,13 @@ function spawnBomb(){
     if (!isNearAnyBrick(x, y, 40)){ pos = {x, y}; break; }
   }
   if (!pos) return;
-  bombs.push({ x: pos.x, y: pos.y, timer: BOMB_FUSE_TIME, maxTimer: BOMB_FUSE_TIME });
+  bombs.push({ x: pos.x, y: pos.y, timer: BOMB_FUSE_TIME, maxTimer: BOMB_FUSE_TIME, ringAngle: 0 });
 }
+
+// 점선 범위 링의 회전 속도(초당 라디안): 터지기까지 남은 시간이 적을수록(tRatio가 클수록)
+// 점점 더 빨리 돌지만, 그리 어지럽지 않도록 최고 속도를 완만하게 제한함
+const BOMB_RING_SPIN_MIN = 0.9;  // 방금 놓였을 때 회전 속도
+const BOMB_RING_SPIN_MAX = 3.2;  // 터지기 직전 회전 속도 (너무 빠르지 않게 제한)
 
 function sfxExplosion(){
   playNoise(0.35, 0.32, 700);
@@ -1953,6 +2075,11 @@ function updateBombs(dt){
   for (let i=bombs.length-1;i>=0;i--){
     const b = bombs[i];
     b.timer -= dt;
+    // 폭발이 가까워질수록(tRatio가 클수록) 점선 링 회전 속도를 서서히 끌어올림.
+    // dt만큼씩 누적 회전각을 더해가는 방식이라 속도가 바뀌어도 매끄럽게 이어짐(순간적으로 튀지 않음).
+    const tRatio = 1 - Math.max(0, b.timer) / b.maxTimer;
+    const ringSpin = BOMB_RING_SPIN_MIN + (BOMB_RING_SPIN_MAX - BOMB_RING_SPIN_MIN) * tRatio;
+    b.ringAngle = (b.ringAngle || 0) + ringSpin * dt;
     if (b.timer <= 0){
       explodeBomb(b);
       bombs.splice(i,1);
@@ -2857,6 +2984,11 @@ function updateSlotCamera(ch){
       if (leftPressed && !ch._spectatePrevLeft) ch._spectateIndex -= 1;
       if (rightPressed && !ch._spectatePrevRight) ch._spectateIndex += 1;
       ch._spectatePrevLeft = leftPressed; ch._spectatePrevRight = rightPressed;
+      // 모바일 터치 탭(화면 왼쪽/오른쪽 절반을 톡 건드림)으로도 전환 - slot 0에서만 의미가 있음
+      if (ch.slotIndex === 0 && pendingSpectateNav !== 0){
+        ch._spectateIndex += pendingSpectateNav;
+        pendingSpectateNav = 0;
+      }
       ch._spectateIndex = ((ch._spectateIndex % aliveOthers.length) + aliveOthers.length) % aliveOthers.length;
       const target = aliveOthers[ch._spectateIndex];
       camTargetX = target.x; camTargetY = target.y;
@@ -2874,7 +3006,8 @@ function updateSlotCamera(ch){
     if (ch.dead){
       respawnOverlayEl.style.opacity = 1;
       spectateLabelEl.style.display = spectating ? 'block' : 'none';
-      if (spectating) spectateLabelEl.textContent = '관전 모드: ' + (ch._spectateLabel||'') + ' (A/D로 전환)';
+      if (spectating) spectateLabelEl.textContent = '관전 모드: ' + (ch._spectateLabel||'') +
+        (isTouchDevice() ? ' (화면 좌/우 터치로 전환)' : ' (A/D로 전환)');
       if (ch.deadTimer <= COUNTDOWN_START){
         countdownNumEl.style.display = 'block';
         countdownNumEl.textContent = String(Math.max(1, Math.ceil(ch.deadTimer)));
@@ -3311,27 +3444,33 @@ function renderPane(){
     }
   });
 
-  // 폭탄: 은은한 채움 원 + 테두리 선으로 범위를 표시하고, 그 원이 살짝 작았다 커졌다 하는
-  // 느린 펄스 애니메이션을 줌. 터지는 시간이 가까워질수록 펄스가 조금 더 빠르고 크게 뛰고,
-  // 색도 하양/주황 -> 빨강으로 뜨거워짐.
+  // 폭탄: 은은한 채움 원 + 회전하는 점선 테두리로 범위를 표시함. 크기가 커졌다 작아졌다 하는
+  // 펄스 애니메이션은 없애고, 대신 점선 링이 계속 회전하며 터지는 시간이 가까워질수록
+  // (너무 어지럽지 않은 선에서) 조금씩 더 빨리 돎. 색도 하양/주황 -> 빨강으로 뜨거워짐.
   bombs.forEach(b=>{
     const s = worldToScreen(b.x, b.y);
     const tRatio = 1 - Math.max(0, b.timer) / b.maxTimer; // 0(방금 놓임) -> 1(터지기 직전)
-    const pulseSpeed = 0.5 + tRatio * 1.1;    // 초당 맥동 횟수: 0.5회 -> 최대 1.6회로 아주 천천히 빨라짐
-    const pulseAmount = 0.035 + tRatio * 0.055; // 폭발이 가까울수록 커졌다 작아지는 폭도 살짝 커짐
-    const pulse = 1 + Math.sin(performance.now()/1000 * Math.PI*2 * pulseSpeed) * pulseAmount;
-    const radius = BOMB_RADIUS * pulse;
+    const radius = BOMB_RADIUS; // 크기 고정 - 더 이상 펄스로 커졌다 작아졌다 하지 않음
     const g = Math.max(0, Math.round(190 - tRatio*190));
     const bl = Math.max(0, Math.round(60 - tRatio*60));
 
-    // 폭발 범위 표시: 반투명 채움 + 테두리 선, 둘 다 같은 반지름의 원 하나에서만 그려서 겹쳐 보이지 않게 함
+    // 폭발 범위 표시: 반투명 채움(고정 크기) + 회전하는 점선 테두리
     ctx.beginPath();
     ctx.arc(s.x, s.y, radius, 0, Math.PI*2);
     ctx.fillStyle = `rgba(255,${g},${bl},${0.08 + tRatio*0.1})`;
     ctx.fill();
+
+    ctx.save();
+    ctx.translate(s.x, s.y);
+    ctx.rotate(b.ringAngle || 0);
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, Math.PI*2);
+    ctx.setLineDash([14, 10]);
     ctx.strokeStyle = `rgba(255,${g},${bl},${0.55 + tRatio*0.4})`;
     ctx.lineWidth = 2 + tRatio*2;
     ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
 
     // 폭탄 본체
     ctx.beginPath();
