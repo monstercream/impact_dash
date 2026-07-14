@@ -1,0 +1,3503 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Impact Dash 2.0</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; background: #05070c; color: #eee;
+    font-family: "Malgun Gothic", "Segoe UI", sans-serif;
+    overflow: hidden; height: 100%; width: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    touch-action: none; overscroll-behavior: none;
+  }
+  #wrap { position: fixed; inset: 0; width: 100vw; height: 100vh; line-height: 0; touch-action: none; }
+  canvas {
+    background: #05070c; display: block; border: none; box-shadow: none;
+    width: 100vw; height: 100vh; touch-action: none;
+  }
+  #hud {
+    position: absolute; top: 0; left: 0; width: 100%; padding: 10px 20px;
+    box-sizing: border-box; display: flex; justify-content: space-between;
+    pointer-events: none; font-size: 14px;
+  }
+  .hpbox { width: 260px; }
+  .hpbox .name { font-weight: bold; margin-bottom: 3px; text-shadow: 0 0 4px #000; }
+  .hpbar-bg { width: 100%; height: 16px; background: rgba(0,0,0,0.5); border: 1px solid #444; border-radius: 3px; overflow:hidden;}
+  .hpbar-fill { height: 100%; transition: width 0.15s linear; }
+  .kocount { font-size: 11px; color: #ccc; margin-top: 3px; text-shadow: 0 0 4px #000; }
+  #hudList { display: flex; flex-direction: column; gap: 8px; }
+  .hudRow { width: 220px; background: rgba(0,0,0,0.28); border-radius: 6px; padding: 6px 8px; box-sizing: border-box; }
+  .hudRow.hudRowSelf { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.35); }
+  .hudName { font-weight: bold; font-size: 12px; margin-bottom: 3px; text-shadow: 0 0 4px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px; color: #fff; }
+  .colorDot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; box-shadow: 0 0 4px rgba(0,0,0,0.8); flex-shrink: 0; }
+  .hudMeta { font-size: 10px; color: #ccc; margin-top: 2px; text-shadow: 0 0 4px #000; display: flex; justify-content: space-between; }
+  #startScreen {
+    position: absolute; inset: 0; background: rgba(5,7,12,0.92);
+    display: flex; align-items: center; justify-content: center; z-index: 20;
+  }
+  #startPanel {
+    text-align: center; color: #eee; padding: 30px 40px; border-radius: 12px;
+    background: rgba(20,22,30,0.9); border: 1px solid #444; box-shadow: 0 0 40px rgba(0,0,0,0.6);
+  }
+  #startPanel h1 { margin: 0 0 8px; font-size: 26px; letter-spacing: 2px; text-shadow: 0 0 12px #f0a; }
+  #startPanel p { margin: 0 0 16px; font-size: 13px; color: #bbb; }
+  #aiCountButtons, #playerCountButtons { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; }
+  #aiCountButtons button, #playerCountButtons button {
+    min-width: 46px; height: 46px; border-radius: 8px; border: 1px solid #555; background: #23262f;
+    color: #eee; font-size: 14px; font-weight: bold; cursor: pointer; padding: 0 8px;
+  }
+  #aiCountButtons button.selected, #playerCountButtons button.selected { background: #ff2d7a; border-color: #ff2d7a; box-shadow: 0 0 12px #ff2d7a; }
+  #modeButtons, #teamButtons, #roundDurationButtons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 16px; }
+  #modeButtons button, #teamButtons button, #roundDurationButtons button {
+    padding: 10px 20px; border-radius: 8px; border: 1px solid #555; background: #23262f;
+    color: #eee; font-size: 14px; font-weight: bold; cursor: pointer;
+  }
+  #modeButtons button.selected { background: #ff2d7a; border-color: #ff2d7a; box-shadow: 0 0 12px #ff2d7a; }
+  #teamButtons button[data-team="0"].selected { background: #ff3b3b; border-color: #ff3b3b; box-shadow: 0 0 12px #ff3b3b; }
+  #teamButtons button[data-team="1"].selected { background: #3b7bff; border-color: #3b7bff; box-shadow: 0 0 12px #3b7bff; }
+  #roundDurationButtons button.selected { background: #ffe45b; border-color: #ffe45b; color:#221800; box-shadow: 0 0 12px #ffe45b; }
+  #startBtn, #restartBtn {
+    padding: 12px 32px; font-size: 15px; font-weight: bold; border-radius: 8px; border: none;
+    background: linear-gradient(90deg,#ffe45b,#ff8c00); color: #221800; cursor: pointer;
+    letter-spacing: 1px;
+  }
+  .virtualStick {
+    position: absolute; width: 90px; height: 90px; margin-left: -45px; margin-top: -45px;
+    border-radius: 50%; background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.25);
+    opacity: 0; pointer-events: none; z-index: 15;
+  }
+  .virtualStickKnob {
+    position: absolute; width: 42px; height: 42px; left: 24px; top: 24px;
+    border-radius: 50%; background: rgba(255,255,255,0.35);
+  }
+  #aimStick { border-color: rgba(255,45,122,0.4); }
+  #aimStick .virtualStickKnob { background: rgba(255,45,122,0.5); }
+  #roundHud {
+    position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 14px; align-items: center; pointer-events: none;
+    background: rgba(0,0,0,0.35); border-radius: 20px; padding: 6px 18px;
+    font-size: 15px; font-weight: bold; text-shadow: 0 0 4px #000;
+  }
+  #roundTimer { color: #fff; }
+  #myKoCount { color: #ffd23d; }
+  #resultsScreen {
+    position: absolute; inset: 0; background: rgba(5,7,12,0.92);
+    display: none; align-items: center; justify-content: center; z-index: 25;
+  }
+  #resultsPanel {
+    text-align: center; color: #eee; padding: 26px 36px; border-radius: 12px; min-width: 280px;
+    background: rgba(20,22,30,0.92); border: 1px solid #444; box-shadow: 0 0 40px rgba(0,0,0,0.6);
+  }
+  #resultsPanel h2 { margin: 0 0 14px; font-size: 22px; letter-spacing: 2px; text-shadow: 0 0 12px #f0a; }
+  #resultsList { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+  .resultRow {
+    display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 6px;
+    background: rgba(255,255,255,0.06); font-size: 13px; text-align: left;
+  }
+  .resultRow.resultSelf { background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.35); }
+  .resultRank { width: 22px; font-weight: bold; color: #ffd23d; }
+  .resultName { flex: 1; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .resultStats { color: #ccc; font-size: 11px; white-space: nowrap; }
+  /* 결과 화면을 좀 더 화려하게: 등장 애니메이션 + 1등 강조 + 컨페티 */
+  .resultRow { opacity: 0; transform: translateY(14px) scale(0.97); transition: opacity 0.35s ease, transform 0.35s ease; }
+  .resultRow.show { opacity: 1; transform: translateY(0) scale(1); }
+  .resultRow.rank1 {
+    background: linear-gradient(90deg, rgba(255,210,61,0.28), rgba(255,140,0,0.14));
+    border: 1px solid rgba(255,210,61,0.7); box-shadow: 0 0 18px rgba(255,210,61,0.45);
+  }
+  .resultRow.rank1 .resultRank { color: #fff; text-shadow: 0 0 8px #ffd23d; }
+  #resultsPanel h2 { transition: transform 0.4s cubic-bezier(.34,1.56,.64,1), opacity 0.4s; }
+  #confettiLayer { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 24; }
+  .confettiPiece { position: absolute; top: -20px; opacity: 0.95; animation: confettiFall linear forwards; }
+  @keyframes confettiFall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(115vh) rotate(600deg); opacity: 0.15; }
+  }
+  /* 라운드 시작/종료 시 화면 중앙에 크게 뜨는 배너 */
+  #roundAnnounce {
+    position: absolute; top: 38%; left: 50%; transform: translate(-50%,-50%) scale(0.55);
+    font-size: 52px; font-weight: 900; letter-spacing: 3px; text-align: center;
+    text-shadow: 0 0 20px currentColor, 0 0 44px rgba(0,0,0,0.85);
+    opacity: 0; pointer-events: none; z-index: 26;
+    transition: opacity 0.22s ease, transform 0.22s cubic-bezier(.34,1.56,.64,1);
+  }
+  #roundAnnounce.show { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  #respawnOverlay {
+    position:absolute; top:20%; left:50%; transform:translate(-50%,-50%);
+    text-align:center; pointer-events:none; opacity:0; transition: opacity 0.25s;
+  }
+  #spectateLabel {
+    font-size:16px; color:#ffd23d; text-shadow:0 0 6px #000; letter-spacing:1px; margin-bottom:8px;
+  }
+  #countdownNum {
+    font-size:72px; font-weight:bold; color:#fff;
+    text-shadow: 0 0 18px #f0a, 0 0 8px #000; line-height:1;
+  }
+  #msg {
+    position:absolute; top:45%; left:50%; transform:translate(-50%,-50%);
+    font-size:42px; font-weight:bold; text-shadow:0 0 12px #000, 0 0 20px #f0a; letter-spacing:2px;
+    pointer-events:none; opacity:0; transition: opacity 0.3s;
+  }
+  #info {
+    position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
+    font-size:12px; color:#aaa; text-align:center; pointer-events:none; text-shadow:0 0 4px #000;
+  }
+  #pauseBtn {
+    position: absolute; top: 8px; right: 12px; width: 38px; height: 38px; border-radius: 50%;
+    background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.35); color:#fff;
+    font-size: 16px; display:none; align-items:center; justify-content:center; cursor:pointer;
+    z-index: 22; user-select:none;
+  }
+  #pauseScreen {
+    position: absolute; inset: 0; background: rgba(5,7,12,0.92);
+    display: none; align-items: center; justify-content: center; z-index: 30;
+  }
+  #pausePanel {
+    text-align: center; color: #eee; padding: 28px 40px; border-radius: 12px;
+    background: rgba(20,22,30,0.92); border: 1px solid #444; box-shadow: 0 0 40px rgba(0,0,0,0.6);
+  }
+  #pausePanel h2 { margin: 0 0 18px; font-size: 22px; letter-spacing: 2px; text-shadow: 0 0 12px #f0a; }
+  #pauseButtons { display: flex; flex-direction: column; gap: 10px; }
+  #pauseButtons button {
+    padding: 12px 30px; font-size: 14px; font-weight: bold; border-radius: 8px; border: 1px solid #555;
+    background: #23262f; color: #eee; cursor: pointer;
+  }
+  #resumeBtn { background: linear-gradient(90deg,#ffe45b,#ff8c00); color:#221800; border:none; }
+  /* 게임패드/키보드로 메뉴를 탐색할 때 현재 포커스된 버튼을 표시 */
+  .gpFocused { outline: 3px solid #ffe45b !important; box-shadow: 0 0 14px #ffe45b !important; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game" width="1000" height="700"></canvas>
+  <div id="pauseBtn">⏸</div>
+  <div id="pauseScreen">
+    <div id="pausePanel">
+      <h2>일시정지</h2>
+      <div id="pauseButtons">
+        <button id="resumeBtn">이어하기</button>
+        <button id="quitToMenuBtn">모드 선택으로</button>
+      </div>
+    </div>
+  </div>
+  <div id="hud" style="display:none;">
+    <div id="hudList"></div>
+  </div>
+  <div id="roundHud" style="display:none;">
+    <span id="roundTimer">60s</span>
+    <span id="myKoCount">내 KO 0</span>
+  </div>
+  <div id="msg"></div>
+  <div id="roundAnnounce"></div>
+  <div id="respawnOverlay">
+    <div id="spectateLabel">관전 모드 (상대 시점)</div>
+    <div id="countdownNum"></div>
+  </div>
+  <div id="info" style="display:none;">이동: W A S D / 왼쪽 화면 터치드래그 / 컨트롤러 왼쪽 스틱&nbsp;&nbsp;|&nbsp;&nbsp; 조준: 마우스 / 오른쪽 화면 터치드래그 / 컨트롤러 오른쪽 스틱&nbsp;&nbsp;|&nbsp;&nbsp; 차징 스윙: 클릭, 오른쪽 터치, 또는 컨트롤러 오른쪽 트리거 (누르고 있다가 떼면 발동)</div>
+  <div id="joystickStick" class="virtualStick"><div class="virtualStickKnob"></div></div>
+  <div id="aimStick" class="virtualStick"><div class="virtualStickKnob"></div></div>
+  <div id="startScreen">
+    <div id="startPanel">
+      <h1>IMPACT DASH 2.0</h1>
+      <p id="gamepadStatusHint" style="color:#8f8;">컨트롤러 연결 확인 중...</p>
+      <p>플레이어 인원수를 선택하세요 (컨트롤러가 부족한 자리는 AI가 대신 조작하다가, 게임 중 컨트롤러를 연결하면 그 자리를 즉시 넘겨받습니다)</p>
+      <div id="playerCountButtons">
+        <button data-pcount="1" class="selected">1인용</button>
+        <button data-pcount="2">2인용</button>
+        <button data-pcount="3">3인용</button>
+        <button data-pcount="4">4인용</button>
+      </div>
+      <p>모드를 선택하세요</p>
+      <div id="modeButtons">
+        <button data-mode="ffa" class="selected">개인전</button>
+        <button data-mode="team">팀전</button>
+      </div>
+      <p id="aiCountLabel">상대할 AI 인원수를 선택하세요 (총원 최대 6명, 1인용은 AI 1명 이상 필요)</p>
+      <div id="aiCountButtons">
+        <button data-count="0" style="display:none;">0</button>
+        <button data-count="1" class="selected">1</button>
+        <button data-count="2">2</button>
+        <button data-count="3">3</button>
+        <button data-count="4">4</button>
+        <button data-count="5">5</button>
+      </div>
+      <div id="teamButtons" style="display:none;"></div>
+      <p>플레이타임을 선택하세요</p>
+      <div id="roundDurationButtons">
+        <button data-minutes="1" class="selected">1분</button>
+        <button data-minutes="2">2분</button>
+        <button data-minutes="3">3분</button>
+      </div>
+      <button id="startBtn">게임 시작</button>
+    </div>
+  </div>
+  <div id="resultsScreen">
+    <div id="confettiLayer"></div>
+    <div id="resultsPanel">
+      <h2>🏆 라운드 종료 🏆</h2>
+      <div id="resultsList"></div>
+      <button id="restartBtn">다시 플레이</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+// ================= 기본 상수 (GDD 명세) =================
+const WORLD_W = 2400, WORLD_H = 2400; // 맵을 더 넓게 (기존 2000 -> 2400)
+const CENTER = { x: WORLD_W/2, y: WORLD_H/2 };
+let VIEW_W = window.innerWidth, VIEW_H = window.innerHeight; // 모니터 해상도에 맞춘 풀스크린 캔버스
+const CAM_LERP = 0.1;
+
+const TILE = 40;
+// 경계(자기장)가 라운드 시작 시엔 넓게 시작해서, 시간이 지날수록 점점 좁아짐(배틀로얄 자기장 방식)
+const BOUND_RADIUS_START = 1050; // 기존 840보다 넓게 시작 (약 25% 확대)
+const BOUND_RADIUS_END = 550;    // 라운드 막판에는 이만큼까지 좁아짐
+const BOUND_THICK = 10; // 실제로 부딪히는 벽이므로 더 두껍게 표현
+// 현재 시점의 경계 반지름/사망 반지름을 계산 (roundProgress()는 아래 폭탄 섹션에 정의되어 있지만
+// 함수 선언은 호이스팅되어 어디서든 참조 가능하고, 실제 호출은 항상 게임 진행 중(런타임)에 일어나므로 안전함)
+function currentBoundRadius(){
+  const progress = roundProgress();
+  return BOUND_RADIUS_START - (BOUND_RADIUS_START - BOUND_RADIUS_END) * progress;
+}
+function currentDeathRadius(){
+  // 예전엔 여기에 +40 여유를 둬서 핑크색 경계선을 넘어가도 40px 정도는 안 죽는 구간이 있었음.
+  // 이제는 시각적으로 보이는 경계선(currentBoundRadius)을 실제로 넘는 순간 바로 사망 처리되도록 일치시킴.
+  return currentBoundRadius();
+}
+
+const CHAR_R = 14;
+const MAX_HP = 100;
+const BASE_VMAX = 672;   // 기존 280의 2배, 추가 20% 증속 (560 -> 672)
+const BASE_ACCEL = 840;  // 기존 350의 2배, 추가 20% 증속 (700 -> 840)
+const FRICTION = 0.988;
+const BOUNCE_RESTITUTION = 0.75; // 벽(벽돌/경계)에 부딪혔을 때 반발계수 - 클수록 세게 튕겨나감
+
+const CHARGE_RATE = 0.85;     // unit/sec (기존 1.5보다 느리게)
+const CHARGE_MAX = 2.0;       // unit (기존 1.5보다 커져서 완충시 더 강력해짐, 약 2.35초 소요)
+const SWING_COOLDOWN = 0.6;   // 기존 0.75 → 더 빠른 연속 교전
+const SWING_DURATION = 0.2;   // 기존 0.25 → 더 스냅있는 스윙
+const SWING_RANGE = 55;
+const SWING_HALF_ANGLE = Math.PI/3; // 60 deg
+
+// 데미지 퍼센트(스매시류) 시스템: 맞을수록 0~100%까지 쌓이고, 퍼센트가 높을수록 더 세게 날아감
+const DAMAGE_MAX_PERCENT = 100;
+const DAMAGE_PER_HIT = 9;          // 파워 1.0 기준 한 대 맞을 때 오르는 퍼센트
+const KNOCKBACK_PERCENT_SCALE = 2.0; // 100% 기준 넉백이 최대 몇 배까지 세지는지 (1 + 1*2.0 = 3배, 피격자 넉백만 3배)
+
+const BRICK_SIZE = 24;
+const BRICK_HP = 3;
+
+const ITEM_SPAWN_INTERVAL = 6.3; // 아이템이 약 30% 더 자주 나오도록 단축 (기존 9초 -> 9*0.7)
+const ITEM_SPAWN_RADIUS = 200;
+const ITEM_MAX_COUNT = 9;        // 아이템 최대 개수도 약 30% 증가 (기존 7개 -> 9개)
+const ITEM_PICK_RADIUS = 24;
+const BUFF_DURATION = 5;
+const HEAL_AMOUNT = 35; // 체력회복 아이템 획득 시 감소시킬 데미지% 양
+const RAM_BUFF_DURATION = 7; // 몸싸움 넉백(램) 아이템 효과 지속시간(초)
+const RANGE_BUFF_DURATION = 6; // 공격범위 확대 아이템 효과 지속시간(초)
+const RANGE_BUFF_MUL = 1.4;    // 공격범위(스윙 사거리) 확대 배율 (40% 증가)
+const RANGE_SCALE_EASE = 6;    // rangeScale이 목표치로 부드럽게 따라가는 속도(값이 클수록 빠르게 수렴)
+
+// ---- 팀전 ----
+const TEAM_COLORS = ['#ff3b3b', '#3b7bff']; // 0=RED팀, 1=BLUE팀
+const TEAM_LABELS = ['RED', 'BLUE'];
+
+// ---- 폭탄 해저드 ----
+const BOMB_SPAWN_INTERVAL = 8;   // 폭탄이 새로 등장하는 기본 주기(초) - 라운드 진행에 따라 더 짧아짐
+const BOMB_MAX_COUNT = 2;        // 라운드 초반 동시 존재 가능한 최대 폭탄 개수 (후반엔 증가)
+const BOMB_FUSE_TIME = 5.0;      // 폭탄이 놓인 뒤 터지기까지 걸리는 시간(초)
+const BOMB_RADIUS = 130;         // 폭발 영향 범위 반지름
+const BOMB_POWER = 3;            // 스윙 100%(완충)에 해당하는 넉백 파워와 동일하게 맞춤
+const BOMB_LATE_ROUND_RATIO = 0.65; // 라운드 진행도가 이 값을 넘으면(막판) 폭탄이 한번에 여러개 터짐
+const BOMB_MAX_COUNT_LATE = 5;      // 라운드 막판 최대 동시 폭탄 개수
+
+const RESPAWN_TIME = 10.0;
+const SPECTATE_DELAY = 2.0;   // 사망 후 이 시간이 지나면 카메라가 살아있는 캐릭터를 관전
+const COUNTDOWN_START = 3;    // 부활 이 시간(초) 전부터 카운트다운 표시
+
+let ROUND_DURATION = 60;      // 한 라운드 길이(초) - 시작화면에서 1/2/3분 선택에 따라 바뀜
+const KO_CREDIT_WINDOW = 2.0; // 맞은 뒤 이 시간 안에 링아웃되어야 때린 사람의 KO로 인정
+
+// ================= 캔버스 세팅 (모니터 해상도에 맞춘 풀스크린) =================
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas(){
+  VIEW_W = window.innerWidth;
+  VIEW_H = window.innerHeight;
+  canvas.width = VIEW_W;
+  canvas.height = VIEW_H;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const fallbackCam = { x: CENTER.x, y: CENTER.y }; // 게임 시작 전(플레이어가 아직 없을 때) 렌더링용 기본 카메라
+let activeCam = fallbackCam; // 렌더링 중 worldToScreen()이 참조하는 "현재" 카메라 (분할화면 렌더 시 매 패널마다 전환됨)
+let viewOwner = null; // 렌더링 중 "이 패널의 주인공"(내 캐릭터 전용 UI 표시용)
+
+// ================= N인 분할화면(로컬 멀티플레이, 최대 4인) =================
+// 시작화면에서 "플레이어 인원수"(1~4)를 고르면 그 수만큼 슬롯이 만들어짐.
+// 각 슬롯은 라운드 중 실제로 컨트롤러가 연결되어 있으면 사람이 조작하고, 연결이 안 되어(또는
+// 끊겨) 있으면 그 슬롯을 AI가 대신 조작함 -> 게임 도중에 컨트롤러를 꽂으면 그 즉시 해당 슬롯의
+// 조작권을 넘겨받고, 뽑으면 다시 AI로 넘어감 (캐릭터/점수/위치는 그대로 유지됨).
+const MAX_PLAYER_SLOTS = 4;
+let selectedPlayerCount = 1; // 시작화면에서 고른 플레이어 슬롯 수
+let playerSlots = [];        // 현재 라운드의 플레이어 슬롯 캐릭터 배열 (길이 = 라운드 시작 시 selectedPlayerCount)
+let player = null;           // playerSlots[0]의 별칭. 기존 코드와의 호환 + HUD "나" 표시 등에 사용
+function isHuman(ch){ return !!ch && playerSlots.indexOf(ch) !== -1; }
+function isSplitScreen(){ return playerSlots.length > 1; }
+// 슬롯이 사람이 조작 중인지(컨트롤러가 붙어있는지) 확인. 1P(슬롯 0)는 키보드/마우스도 있으므로
+// 컨트롤러가 없어도 항상 사람 조작으로 취급함.
+function slotHasLiveController(ch){
+  if (!ch) return false;
+  if (ch.slotIndex === 0) return true;
+  return ch.gamepadIndex !== null && ch.gamepadIndex !== undefined && !!getGamepadByIndex(ch.gamepadIndex);
+}
+// 매 프레임 호출: 끊긴 컨트롤러가 배정돼 있던 슬롯은 배정을 해제하고(다음 프레임부터 AI가 대신 조작),
+// 아직 아무 슬롯에도 배정 안 된 새로 연결된 컨트롤러가 있으면 비어있는 슬롯에 즉시 배정함.
+// -> 게임 도중에 컨트롤러를 꽂거나 뽑아도 그 즉시 반영됨.
+function reconcileGamepadAssignments(){
+  playerSlots.forEach(ch=>{
+    if (ch.gamepadIndex !== null && ch.gamepadIndex !== undefined && !getGamepadByIndex(ch.gamepadIndex)){
+      ch.gamepadIndex = null; // 연결이 끊김 -> 이 슬롯은 다음 프레임부터 AI가 대신 조작
+    }
+  });
+  getConnectedGamepads().forEach(gp=>{
+    const alreadyClaimed = playerSlots.some(ch=> ch.gamepadIndex === gp.index);
+    if (alreadyClaimed) return;
+    const freeSlot = playerSlots.find(ch=> ch.slotIndex !== 0 && (ch.gamepadIndex === null || ch.gamepadIndex === undefined));
+    if (freeSlot) freeSlot.gamepadIndex = gp.index;
+    else if (playerSlots[0] && (playerSlots[0].gamepadIndex === null || playerSlots[0].gamepadIndex === undefined)){
+      playerSlots[0].gamepadIndex = gp.index; // 1P도 아직 컨트롤러가 없었다면 보너스로 배정
+    }
+  });
+}
+
+// ================= 시작 화면 (AI 인원수 선택) =================
+// ================= 메뉴 포커스 내비게이션 (게임패드/키보드로 UI 버튼 탐색) =================
+// 시작화면/결과화면/일시정지화면 등에서 공통으로 쓰는 간단한 1차원 포커스 시스템.
+// d-pad/왼쪽스틱 좌우(위/아래)로 포커스를 옮기고 A버튼으로 현재 포커스된 버튼을 클릭한다.
+const menuNav = { active:false, elements:[], index:0 };
+function setMenuNavElements(elements, startIndex){
+  menuNav.elements = (elements || []).filter(Boolean);
+  menuNav.index = Math.max(0, Math.min(startIndex||0, menuNav.elements.length-1));
+  menuNav.active = menuNav.elements.length > 0;
+  updateMenuFocusVisual();
+}
+function updateMenuFocusVisual(){
+  menuNav.elements.forEach((el, i)=>{
+    if (i === menuNav.index) el.classList.add('gpFocused'); else el.classList.remove('gpFocused');
+  });
+}
+function moveMenuFocus(delta){
+  if (!menuNav.active || menuNav.elements.length === 0) return;
+  menuNav.index = ((menuNav.index + delta) % menuNav.elements.length + menuNav.elements.length) % menuNav.elements.length;
+  updateMenuFocusVisual();
+}
+function activateMenuFocused(){
+  if (!menuNav.active) return;
+  const el = menuNav.elements[menuNav.index];
+  if (el) el.click();
+}
+
+const wrapEl = document.getElementById('wrap');
+const startScreenEl = document.getElementById('startScreen');
+const hudEl = document.getElementById('hud');
+const hudListEl = document.getElementById('hudList');
+const infoEl = document.getElementById('info');
+const aiCountButtons = document.querySelectorAll('#aiCountButtons button');
+const aiCountLabelEl = document.getElementById('aiCountLabel');
+const startBtn = document.getElementById('startBtn');
+let selectedAiCount = 1;
+aiCountButtons.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    if (btn.disabled) return; // 지금 인원수 조합에서 고를 수 없는 값이면 무시
+    selectedAiCount = parseInt(btn.getAttribute('data-count'), 10);
+    aiCountButtons.forEach(b=> b.classList.remove('selected'));
+    btn.classList.add('selected');
+  });
+});
+
+// ---- 총원(플레이어+AI)은 최대 6명. 개인전은 그 안에서 AI 인원수를 자유롭게 고르되, 1인용일 때만
+// "AI 0명"(=상대가 아예 없음)은 메뉴에서 완전히 빼버림. 팀전은 양 팀이 동수로 나뉠 수 있도록
+// 총원이 짝수가 되는 조합만 메뉴에 남김. 조건에 안 맞는 값은 감춰서(disabled가 아니라 display:none)
+// 아예 고를 수 없게 함 ----
+const TOTAL_CHARACTERS_MAX = 6;
+function getValidAiCounts(){
+  const valid = [];
+  for (let ai = 0; ai <= 5; ai++){
+    const total = selectedPlayerCount + ai;
+    if (total > TOTAL_CHARACTERS_MAX) continue; // 총원 최대 6명
+    if (gameMode === 'team'){
+      if (total < 2 || total % 2 !== 0) continue; // 팀전은 최소 2명, 그리고 짝수여야 양 팀이 동수가 됨
+    } else if (selectedPlayerCount === 1 && ai === 0){
+      continue; // 개인전 1인용은 AI 0명(=상대 없음) 선택 불가
+    }
+    valid.push(ai);
+  }
+  return valid;
+}
+function refreshAiCountMenu(){
+  const valid = getValidAiCounts();
+  if (!valid.includes(selectedAiCount)){
+    selectedAiCount = valid.length ? valid[0] : 0;
+  }
+  aiCountButtons.forEach(b=>{
+    const count = parseInt(b.getAttribute('data-count'), 10);
+    const isValid = valid.includes(count);
+    b.style.display = isValid ? '' : 'none';
+    b.disabled = !isValid;
+    b.style.opacity = ''; b.style.cursor = '';
+    b.classList.toggle('selected', isValid && count === selectedAiCount);
+  });
+  if (aiCountLabelEl){
+    aiCountLabelEl.textContent = (gameMode === 'team')
+      ? '팀전은 총원 최대 ' + TOTAL_CHARACTERS_MAX + '명 중 양 팀이 동수로 나뉘는 인원만 고를 수 있습니다'
+      : '상대할 AI 인원수를 선택하세요 (총원 최대 ' + TOTAL_CHARACTERS_MAX + '명' + (selectedPlayerCount === 1 ? ', 1인용은 AI 1명 이상 필요' : '') + ')';
+  }
+}
+
+// ---- 플레이어 인원수(1~4) 선택: 컨트롤러가 부족한 자리는 AI가 대신 조작하다가 게임 중 연결되면 넘겨받음 ----
+const playerCountButtons = document.querySelectorAll('#playerCountButtons button');
+playerCountButtons.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    selectedPlayerCount = parseInt(btn.getAttribute('data-pcount'), 10);
+    playerCountButtons.forEach(b=> b.classList.remove('selected'));
+    btn.classList.add('selected');
+    renderTeamButtonsUI(); // 팀 선택 UI가 플레이어 수에 따라 달라지므로 다시 구성
+    refreshAiCountMenu(); // 인원수 조합이 바뀌었으니 고를 수 있는 AI 인원수 목록도 다시 계산
+    updateGamepadStatusHint();
+    refreshStartScreenNav();
+  });
+});
+
+// 개인전(FFA) / 팀전 모드 선택 + 팀전일 때 각 플레이어 슬롯이 소속될 팀 선택
+const modeButtons = document.querySelectorAll('#modeButtons button');
+const teamButtonsWrap = document.getElementById('teamButtons');
+let gameMode = 'ffa';   // 'ffa' = 개인전, 'team' = 팀전
+let slotTeams = [0, 1, 0, 1]; // 슬롯(1P~4P)별로 고른 팀 (0=RED, 1=BLUE), 팀전일 때만 사용
+modeButtons.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    gameMode = btn.getAttribute('data-mode');
+    modeButtons.forEach(b=> b.classList.remove('selected'));
+    btn.classList.add('selected');
+    teamButtonsWrap.style.display = (gameMode === 'team') ? 'flex' : 'none';
+    refreshAiCountMenu(); // 모드가 바뀌면 고를 수 있는 AI 인원수 조건도 달라짐
+    refreshStartScreenNav(); // 팀 버튼 표시 여부가 바뀌므로 포커스 목록도 다시 구성
+  });
+});
+
+// 플레이어 슬롯 수에 맞춰 "N P: RED/BLUE" 버튼 쌍을 동적으로 구성 (팀전일 때만 보임)
+function renderTeamButtonsUI(){
+  teamButtonsWrap.innerHTML = '';
+  for (let i=0;i<selectedPlayerCount;i++){
+    const row = document.createElement('div');
+    row.style.display = 'flex'; row.style.gap = '6px'; row.style.alignItems = 'center';
+    const label = document.createElement('span');
+    label.textContent = (i===0 ? '1P' : (i+1)+'P') + ':';
+    label.style.fontSize = '12px'; label.style.color = '#ccc'; label.style.marginRight = '2px';
+    row.appendChild(label);
+    [0,1].forEach(teamIdx=>{
+      const b = document.createElement('button');
+      b.setAttribute('data-slot', i);
+      b.setAttribute('data-team', teamIdx);
+      b.textContent = teamIdx === 0 ? 'RED' : 'BLUE';
+      b.style.padding = '6px 12px'; b.style.fontSize = '12px';
+      if (slotTeams[i] === teamIdx) b.classList.add('selected');
+      row.appendChild(b);
+    });
+    teamButtonsWrap.appendChild(row);
+  }
+}
+// 이벤트 위임: 동적으로 새로 그려진 버튼도 항상 클릭이 동작하게 함
+teamButtonsWrap.addEventListener('click', e=>{
+  const btn = e.target.closest('button[data-slot]');
+  if (!btn) return;
+  const slot = parseInt(btn.getAttribute('data-slot'), 10);
+  const teamIdx = parseInt(btn.getAttribute('data-team'), 10);
+  slotTeams[slot] = teamIdx;
+  renderTeamButtonsUI();
+  refreshStartScreenNav();
+});
+renderTeamButtonsUI();
+refreshAiCountMenu(); // 시작화면 로드시 기본 플레이어 인원수(1명)에 맞춰 고를 수 있는 AI 인원수 목록을 바로 구성해둠
+
+// 플레이타임(라운드 길이) 선택: 1/2/3분
+const roundDurationButtons = document.querySelectorAll('#roundDurationButtons button');
+let selectedRoundMinutes = 1;
+roundDurationButtons.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    selectedRoundMinutes = parseInt(btn.getAttribute('data-minutes'), 10);
+    roundDurationButtons.forEach(b=> b.classList.remove('selected'));
+    btn.classList.add('selected');
+  });
+});
+
+// ---- 시작화면에서 지금 몇 개의 컨트롤러가 연결되어 있는지, 그래서 몇 자리가 AI로 채워질지 실시간 표시 ----
+const gamepadStatusHintEl = document.getElementById('gamepadStatusHint');
+function updateGamepadStatusHint(){
+  if (!gamepadStatusHintEl) return;
+  const n = getConnectedGamepads().length;
+  const humanSeats = Math.min(n, selectedPlayerCount);
+  const aiSeats = selectedPlayerCount - humanSeats;
+  let text = '연결된 컨트롤러: ' + n + '개';
+  if (selectedPlayerCount > 1 || n > 0){
+    text += ' → 플레이어 ' + selectedPlayerCount + '명 중 ' + humanSeats + '명 조작';
+    if (aiSeats > 0) text += ', ' + aiSeats + '자리는 AI가 대신 조작(컨트롤러 연결 시 즉시 넘겨받음)';
+  }
+  if (selectedPlayerCount === 1) text += ' (1P는 키보드/마우스로도 조작 가능)';
+  gamepadStatusHintEl.textContent = text;
+}
+updateGamepadStatusHint();
+setInterval(updateGamepadStatusHint, 700); // 컨트롤러 연결 상태를 주기적으로 갱신(시작화면/로비용)
+window.addEventListener('gamepadconnected', updateGamepadStatusHint);
+window.addEventListener('gamepaddisconnected', updateGamepadStatusHint);
+
+// 시작화면에서 현재 보이는 버튼들(플레이어 수/모드/AI 인원수/팀 선택(팀전일 때만)/플레이타임/시작)을
+// 순서대로 모아 게임패드/키보드로 탐색 가능한 포커스 목록을 구성
+function refreshStartScreenNav(){
+  const els = [...playerCountButtons, ...modeButtons, ...aiCountButtons];
+  if (gameMode === 'team') els.push(...teamButtonsWrap.querySelectorAll('button'));
+  els.push(...roundDurationButtons);
+  els.push(startBtn);
+  setMenuNavElements(els, 0);
+}
+refreshStartScreenNav(); // 페이지 로드시 기본으로 보이는 시작화면에 바로 포커스 목록을 구성해둠
+
+startBtn.addEventListener('click', ()=>{ startGame(selectedAiCount); });
+
+const roundHudEl = document.getElementById('roundHud');
+const roundTimerEl = document.getElementById('roundTimer');
+const myKoCountEl = document.getElementById('myKoCount');
+const resultsScreenEl = document.getElementById('resultsScreen');
+const resultsListEl = document.getElementById('resultsList');
+const restartBtn = document.getElementById('restartBtn');
+restartBtn.addEventListener('click', ()=>{ showStartScreen(); });
+const roundAnnounceEl = document.getElementById('roundAnnounce');
+const confettiLayerEl = document.getElementById('confettiLayer');
+let roundAnnounceTimer = null;
+
+// 라운드 시작/종료 등 큰 이벤트 때 화면 중앙에 짧게 문구를 띄움
+function showRoundAnnounce(text, color, holdMs){
+  if (roundAnnounceTimer) clearTimeout(roundAnnounceTimer);
+  roundAnnounceEl.textContent = text;
+  roundAnnounceEl.style.color = color;
+  // 리플로우를 강제해 연속 호출에서도 애니메이션이 다시 재생되게 함
+  roundAnnounceEl.classList.remove('show');
+  void roundAnnounceEl.offsetWidth;
+  roundAnnounceEl.classList.add('show');
+  roundAnnounceTimer = setTimeout(()=>{ roundAnnounceEl.classList.remove('show'); }, holdMs || 900);
+}
+
+// 결과 화면을 화려하게: 알록달록한 종이조각이 위에서 떨어지는 연출
+function spawnConfetti(count){
+  const colors = ['#ffd23d', '#ff5b5b', '#5bd0ff', '#8cff5b', '#ff8cf0', '#ffa64d'];
+  confettiLayerEl.innerHTML = '';
+  const n = count || 60;
+  for (let i=0;i<n;i++){
+    const piece = document.createElement('div');
+    piece.className = 'confettiPiece';
+    const size = 6 + Math.random()*7;
+    piece.style.left = (Math.random()*100) + '%';
+    piece.style.width = size + 'px';
+    piece.style.height = (size*0.4) + 'px';
+    piece.style.background = colors[i % colors.length];
+    piece.style.animationDuration = (1.6 + Math.random()*1.4) + 's';
+    piece.style.animationDelay = (Math.random()*0.6) + 's';
+    confettiLayerEl.appendChild(piece);
+  }
+}
+
+// ---- 일시정지 ----
+let isPaused = false;
+const pauseBtnEl = document.getElementById('pauseBtn');
+const pauseScreenEl = document.getElementById('pauseScreen');
+const resumeBtnEl = document.getElementById('resumeBtn');
+const quitToMenuBtnEl = document.getElementById('quitToMenuBtn');
+
+function togglePause(){
+  if (!gameStarted || !roundActive) return; // 게임 진행 중(라운드 활성)일 때만 일시정지 가능
+  if (isPaused) resumeGame(); else pauseGame();
+}
+function pauseGame(){
+  if (!gameStarted || !roundActive || isPaused) return;
+  isPaused = true;
+  pauseScreenEl.style.display = 'flex';
+  setMenuNavElements([resumeBtnEl, quitToMenuBtnEl], 0);
+}
+function resumeGame(){
+  if (!isPaused) return;
+  isPaused = false;
+  pauseScreenEl.style.display = 'none';
+  menuNav.active = false; // 게임 플레이 중엔 메뉴 포커스 표시가 방해되지 않도록 비활성화
+}
+function quitToMenu(){
+  isPaused = false;
+  pauseScreenEl.style.display = 'none';
+  showStartScreen();
+}
+pauseBtnEl.addEventListener('click', ()=> togglePause());
+resumeBtnEl.addEventListener('click', ()=> resumeGame());
+quitToMenuBtnEl.addEventListener('click', ()=> quitToMenu());
+window.addEventListener('keydown', e=>{
+  if (e.key === 'Escape') togglePause();
+});
+
+// 다시 플레이 시 바로 재시작하지 않고 인원수 선택부터 다시 하도록 시작 화면으로 되돌림
+function showStartScreen(){
+  gameStarted = false;
+  roundActive = false;
+  isPaused = false;
+  pauseScreenEl.style.display = 'none';
+  pauseBtnEl.style.display = 'none';
+  resultsScreenEl.style.display = 'none';
+  confettiLayerEl.innerHTML = '';
+  hudEl.style.display = 'none';
+  roundHudEl.style.display = 'none';
+  infoEl.style.display = 'none';
+  respawnOverlayEl.style.opacity = 0;
+  joystickStickEl.style.opacity = 0;
+  aimStickEl.style.opacity = 0;
+  startScreenEl.style.display = 'flex';
+  refreshStartScreenNav();
+}
+
+// ================= 입력 =================
+const keys = {};
+window.addEventListener('keydown', e=>{
+  keys[e.key.toLowerCase()] = true;
+  if (['arrowup','arrowdown','arrowleft','arrowright',' '].includes(e.key.toLowerCase())) e.preventDefault();
+});
+window.addEventListener('keyup', e=>{ keys[e.key.toLowerCase()] = false; });
+// 창 포커스를 잃으면(alt-tab, 다이얼로그, 리스폰 연출 중 다른 곳을 건드리는 등) keyup을 못 받아
+// 방향키가 눌린 채로 "고정"되어 캐릭터가 계속 이동하는 버그가 생길 수 있으므로, 포커스를 잃는
+// 순간 모든 입력 상태를 강제로 초기화한다.
+window.addEventListener('blur', ()=>{
+  for (const k in keys) keys[k] = false;
+  mouse.down = false;
+  joystick.active = false;
+  touchAim.active = false;
+});
+document.addEventListener('visibilitychange', ()=>{
+  if (document.hidden){
+    for (const k in keys) keys[k] = false;
+    mouse.down = false;
+    joystick.active = false;
+    touchAim.active = false;
+  }
+});
+
+const mouse = { x: VIEW_W/2, y: VIEW_H/2, down: false };
+canvas.addEventListener('mousemove', e=>{
+  const rect = canvas.getBoundingClientRect();
+  mouse.x = (e.clientX - rect.left) * (canvas.width/rect.width);
+  mouse.y = (e.clientY - rect.top) * (canvas.height/rect.height);
+  // 실제로 마우스를 움직였다면 게임패드 조준 고정 상태를 풀어서 마우스 조준으로 전환
+  if (player) player._lastAimWasGamepad = false;
+});
+canvas.addEventListener('mousedown', e=>{
+  if (e.button === 0){ mouse.down = true; e.preventDefault(); }
+});
+window.addEventListener('mouseup', e=>{
+  if (e.button === 0) mouse.down = false;
+});
+canvas.addEventListener('contextmenu', e=> e.preventDefault());
+
+// ================= 모바일 터치 입력 (가상 조이스틱 + 오른쪽 조준/스윙) =================
+// 화면 왼쪽 어디를 터치하든 그 자리에 가상 조이스틱이 생기고 드래그로 이동.
+// 화면 오른쪽을 터치하면 드래그 방향으로 조준하고, 누르고 있는 동안 스윙을 모으다가 떼면 발동.
+const JOY_MAX_R = 45;   // 조이스틱 최대 반경(px, 화면 CSS 좌표 기준)
+const JOY_DEADZONE = 6; // 이 이상 움직여야 방향으로 인정
+
+const joystick = { active:false, id:null, anchorX:0, anchorY:0, curX:0, curY:0 };
+const touchAim = { active:false, id:null, anchorX:0, anchorY:0, curX:0, curY:0, hasVector:false, justReleased:false };
+
+const joystickStickEl = document.getElementById('joystickStick');
+const aimStickEl = document.getElementById('aimStick');
+const joystickKnobEl = joystickStickEl.querySelector('.virtualStickKnob');
+const aimKnobEl = aimStickEl.querySelector('.virtualStickKnob');
+
+function getWrapPoint(touch){
+  const rect = wrapEl.getBoundingClientRect();
+  return { x: touch.clientX - rect.left, y: touch.clientY - rect.top, w: rect.width };
+}
+
+function touchControlsEnabled(){
+  return gameStarted && roundActive;
+}
+
+window.addEventListener('touchstart', e=>{
+  if (!touchControlsEnabled()) return;
+  for (const t of e.changedTouches){
+    const p = getWrapPoint(t);
+    const isLeft = p.x < p.w/2;
+    if (isLeft && !joystick.active){
+      joystick.active = true; joystick.id = t.identifier;
+      joystick.anchorX = p.x; joystick.anchorY = p.y;
+      joystick.curX = p.x; joystick.curY = p.y;
+    } else if (!isLeft && !touchAim.active){
+      touchAim.active = true; touchAim.id = t.identifier;
+      touchAim.anchorX = p.x; touchAim.anchorY = p.y;
+      touchAim.curX = p.x; touchAim.curY = p.y;
+      touchAim.hasVector = false;
+    }
+  }
+  e.preventDefault();
+}, { passive:false });
+
+window.addEventListener('touchmove', e=>{
+  if (!touchControlsEnabled()) return;
+  for (const t of e.changedTouches){
+    const p = getWrapPoint(t);
+    if (joystick.active && t.identifier === joystick.id){
+      joystick.curX = p.x; joystick.curY = p.y;
+    }
+    if (touchAim.active && t.identifier === touchAim.id){
+      touchAim.curX = p.x; touchAim.curY = p.y;
+      if (Math.hypot(touchAim.curX-touchAim.anchorX, touchAim.curY-touchAim.anchorY) > JOY_DEADZONE){
+        touchAim.hasVector = true;
+      }
+    }
+  }
+  e.preventDefault();
+}, { passive:false });
+
+function endTouch(e){
+  for (const t of e.changedTouches){
+    if (joystick.active && t.identifier === joystick.id){
+      joystick.active = false; joystick.id = null;
+    }
+    if (touchAim.active && t.identifier === touchAim.id){
+      touchAim.active = false; touchAim.id = null;
+      touchAim.justReleased = true; // 다음 update()에서 스윙 발동 신호로 소비됨
+    }
+  }
+}
+window.addEventListener('touchend', endTouch, { passive:false });
+window.addEventListener('touchcancel', endTouch, { passive:false });
+
+// 매 프레임 조이스틱/조준 UI(원+노브)의 화면 위치를 갱신
+function updateTouchUI(){
+  if (joystick.active){
+    joystickStickEl.style.opacity = 1;
+    joystickStickEl.style.left = joystick.anchorX + 'px';
+    joystickStickEl.style.top = joystick.anchorY + 'px';
+    const dx = joystick.curX - joystick.anchorX, dy = joystick.curY - joystick.anchorY;
+    const d = Math.hypot(dx, dy);
+    const cl = Math.min(d, JOY_MAX_R);
+    const kx = d > 0.001 ? dx/d*cl : 0, ky = d > 0.001 ? dy/d*cl : 0;
+    joystickKnobEl.style.transform = `translate(${kx}px, ${ky}px)`;
+  } else {
+    joystickStickEl.style.opacity = 0;
+  }
+  if (touchAim.active){
+    aimStickEl.style.opacity = 1;
+    aimStickEl.style.left = touchAim.anchorX + 'px';
+    aimStickEl.style.top = touchAim.anchorY + 'px';
+    const dx = touchAim.curX - touchAim.anchorX, dy = touchAim.curY - touchAim.anchorY;
+    const d = Math.hypot(dx, dy);
+    const cl = Math.min(d, JOY_MAX_R);
+    const kx = d > 0.001 ? dx/d*cl : 0, ky = d > 0.001 ? dy/d*cl : 0;
+    aimKnobEl.style.transform = `translate(${kx}px, ${ky}px)`;
+  } else {
+    aimStickEl.style.opacity = 0;
+  }
+}
+
+// ================= 게임패드(컨트롤러) 입력 =================
+// 왼쪽 스틱: 이동 / 오른쪽 스틱: 캐릭터 정면(조준) / 오른쪽 트리거(RT, 표준 매핑 buttons[7]):
+// 누르고 있으면 스윙을 모으고, 떼는 순간 스윙 발동. 표준 게임패드 매핑을 사용하는 기기 기준.
+const GAMEPAD_STICK_DEADZONE = 0.18;
+const GAMEPAD_TRIGGER_THRESHOLD = 0.15;
+
+function getActiveGamepad(){
+  if (typeof navigator === 'undefined' || !navigator.getGamepads) return null;
+  const pads = navigator.getGamepads();
+  if (!pads) return null;
+  for (let i=0;i<pads.length;i++){
+    if (pads[i]) return pads[i];
+  }
+  return null;
+}
+
+// 현재 연결된 모든 게임패드를 인덱스 순서대로 반환 (2인 플레이용 컨트롤러 감지에 사용)
+function getConnectedGamepads(){
+  if (typeof navigator === 'undefined' || !navigator.getGamepads) return [];
+  const pads = navigator.getGamepads();
+  if (!pads) return [];
+  const list = [];
+  for (let i=0;i<pads.length;i++){
+    if (pads[i]) list.push(pads[i]);
+  }
+  return list;
+}
+
+// 특정 인덱스에 연결된 게임패드를 가져옴 (2인 플레이에서 각 플레이어에게 고정 배정된 컨트롤러를 읽기 위함)
+function getGamepadByIndex(idx){
+  if (idx === null || idx === undefined) return null;
+  if (typeof navigator === 'undefined' || !navigator.getGamepads) return null;
+  const pads = navigator.getGamepads();
+  if (!pads) return null;
+  return pads[idx] || null;
+}
+
+// 매 프레임 특정 게임패드의 입력 상태를 읽어서 반환 (연결 안됐으면 전부 비활성 상태로).
+// gp를 명시하지 않으면(단일 플레이 모드) 기존처럼 "연결된 첫 번째 컨트롤러"를 자동으로 사용함.
+function readGamepadInput(gp){
+  if (gp === undefined) gp = getActiveGamepad();
+  const result = { connected:false, hasMove:false, moveX:0, moveY:0, hasAim:false, aimX:0, aimY:0, triggerHeld:false };
+  if (!gp) return result;
+  result.connected = true;
+
+  const lx = gp.axes[0] || 0, ly = gp.axes[1] || 0;
+  if (Math.hypot(lx, ly) > GAMEPAD_STICK_DEADZONE){
+    result.hasMove = true; result.moveX = lx; result.moveY = ly;
+  }
+  const rx = gp.axes[2] || 0, ry = gp.axes[3] || 0;
+  if (Math.hypot(rx, ry) > GAMEPAD_STICK_DEADZONE){
+    result.hasAim = true; result.aimX = rx; result.aimY = ry;
+  }
+  const rt = gp.buttons && gp.buttons[7];
+  result.triggerHeld = !!(rt && (rt.pressed || rt.value > GAMEPAD_TRIGGER_THRESHOLD));
+  return result;
+}
+
+// ---- 게임패드로 메뉴(시작화면/결과화면/일시정지) 탐색: d-pad 또는 왼쪽 스틱으로 포커스 이동,
+// A버튼(표준 매핑 buttons[0])으로 현재 포커스된 버튼을 선택. 매 프레임 폴링하며 엣지(누른 순간)만 반응.
+let gpMenuNavPrev = { back:false, next:false, confirm:false };
+function pollMenuNavGamepad(){
+  if (!menuNav.active) return;
+  const gp = getActiveGamepad();
+  if (!gp) return;
+
+  const dpadUp = !!(gp.buttons[12] && gp.buttons[12].pressed);
+  const dpadDown = !!(gp.buttons[13] && gp.buttons[13].pressed);
+  const dpadLeft = !!(gp.buttons[14] && gp.buttons[14].pressed);
+  const dpadRight = !!(gp.buttons[15] && gp.buttons[15].pressed);
+  const stickX = gp.axes[0] || 0, stickY = gp.axes[1] || 0;
+  const stickUp = stickY < -GAMEPAD_STICK_DEADZONE;
+  const stickDown = stickY > GAMEPAD_STICK_DEADZONE;
+  const stickLeft = stickX < -GAMEPAD_STICK_DEADZONE;
+  const stickRight = stickX > GAMEPAD_STICK_DEADZONE;
+
+  const back = dpadUp || dpadLeft || stickUp || stickLeft;
+  const next = dpadDown || dpadRight || stickDown || stickRight;
+  const confirm = !!(gp.buttons[0] && gp.buttons[0].pressed); // A / Cross
+
+  if (back && !gpMenuNavPrev.back) moveMenuFocus(-1);
+  if (next && !gpMenuNavPrev.next) moveMenuFocus(1);
+  if (confirm && !gpMenuNavPrev.confirm) activateMenuFocused();
+
+  gpMenuNavPrev = { back, next, confirm };
+}
+
+// ---- 게임패드 Start/Options 버튼(표준 매핑 buttons[9])으로 일시정지 토글 ----
+let gpPausePrev = false;
+function pollPauseGamepad(){
+  // 분할화면일 때는 연결된 컨트롤러 중 어느 것의 Start 버튼을 눌러도 일시정지되게 함
+  const pads = isSplitScreen() ? getConnectedGamepads() : [getActiveGamepad()].filter(Boolean);
+  const startBtnPressed = pads.some(gp=> !!(gp.buttons[9] && gp.buttons[9].pressed));
+  if (startBtnPressed && !gpPausePrev) togglePause();
+  gpPausePrev = startBtnPressed;
+}
+
+// ================= 사운드 엔진 (외부 파일 없이 절차적 생성) =================
+let audioCtx = null;
+function getAudioCtx(){
+  if (!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+// 사용자의 첫 클릭에서 오디오 컨텍스트를 깨워둠(브라우저 자동재생 정책 대응)
+window.addEventListener('mousedown', ()=>{ try{ getAudioCtx(); }catch(e){} }, { once:true });
+
+function playTone(freq, duration, type, gainStart, freqEnd){
+  try{
+    const ac = getAudioCtx();
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, ac.currentTime);
+    if (freqEnd) osc.frequency.exponentialRampToValueAtTime(Math.max(20,freqEnd), ac.currentTime + duration);
+    gain.gain.setValueAtTime(gainStart, ac.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + duration);
+    osc.connect(gain); gain.connect(ac.destination);
+    osc.start(); osc.stop(ac.currentTime + duration);
+  }catch(e){}
+}
+function playNoise(duration, gainStart, filterFreq){
+  try{
+    const ac = getAudioCtx();
+    const bufferSize = Math.floor(ac.sampleRate * duration);
+    const buffer = ac.createBuffer(1, bufferSize, ac.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i=0;i<bufferSize;i++) data[i] = (Math.random()*2-1) * (1 - i/bufferSize);
+    const src = ac.createBufferSource();
+    src.buffer = buffer;
+    const filter = ac.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = filterFreq || 2000;
+    const gain = ac.createGain();
+    gain.gain.setValueAtTime(gainStart, ac.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + duration);
+    src.connect(filter); filter.connect(gain); gain.connect(ac.destination);
+    src.start(); src.stop(ac.currentTime + duration);
+  }catch(e){}
+}
+
+function sfxSwing(power){
+  // 휙 소리: 파워가 셀수록 더 낮고 굵게
+  playNoise(0.16, 0.18, 1800 - power*300);
+  playTone(500 - power*60, 0.12, 'sawtooth', 0.05, 200);
+}
+function sfxHit(power){
+  // 타격 임팩트: 파워에 비례해 더 크고 낮게
+  playTone(180 - power*20, 0.14, 'square', Math.min(0.35, 0.14 + power*0.06), 60);
+  playNoise(0.12, Math.min(0.3, 0.1 + power*0.05), 900);
+}
+function sfxBrickBreak(){
+  playNoise(0.18, 0.22, 3000);
+  playTone(300, 0.08, 'triangle', 0.12, 120);
+}
+function sfxBrickCrack(){
+  playNoise(0.06, 0.1, 4500);
+}
+function sfxItemPickup(){
+  playTone(660, 0.1, 'sine', 0.15, 900);
+}
+function sfxRingOut(){
+  playTone(220, 0.5, 'sawtooth', 0.25, 40);
+  playNoise(0.4, 0.2, 500);
+}
+// 라운드 시작: 올라가는 3음 아르페지오로 "시작!" 느낌
+function sfxRoundStart(){
+  playTone(440, 0.12, 'triangle', 0.22, 660);
+  setTimeout(()=> playTone(660, 0.12, 'triangle', 0.24, 880), 90);
+  setTimeout(()=> playTone(880, 0.2, 'triangle', 0.28, 1180), 180);
+}
+// 라운드 종료: 낮게 깔리는 부저음 + 노이즈로 "끝!" 느낌
+function sfxRoundEnd(){
+  playTone(320, 0.4, 'sawtooth', 0.3, 90);
+  playTone(160, 0.45, 'square', 0.18, 60);
+  playNoise(0.3, 0.22, 700);
+}
+// 결과 화면용 팡파레(승리 팬파레 느낌의 상승 아르페지오)
+function sfxVictoryFanfare(){
+  const notes = [523, 659, 784, 1046];
+  notes.forEach((f, i)=> setTimeout(()=> playTone(f, 0.24, 'triangle', 0.24, f*1.15), i*110));
+}
+
+// ================= 히트스탑 & 화면 흔들림 (타격감 연출) =================
+let hitStopTime = 0;      // 남은 정지 시간(초, 실시간 기준)
+const screenShake = { time: 0, duration: 0, magnitude: 0 };
+// 라운드 시작/종료 같은 큰 이벤트에서 화면 전체를 잠깐 색으로 확 밝혔다가 가라앉히는 연출용
+const screenFlash = { time: 0, duration: 0, color: '#ffffff' };
+function triggerScreenFlash(color, duration){
+  screenFlash.color = color;
+  screenFlash.duration = duration;
+  screenFlash.time = duration;
+}
+
+// 히트스탑(타격 정지 연출)이 너무 길면 KO/타격 시 게임이 "끊기는" 것처럼 느껴지므로
+// 아무리 강한 타격/사망 이벤트라도 최대 이 시간(초) 이상은 멈추지 않도록 상한을 둠
+const HITSTOP_MAX = 0.07;
+function triggerHitStop(seconds){
+  hitStopTime = Math.max(hitStopTime, Math.min(seconds, HITSTOP_MAX));
+}
+function triggerShake(magnitude, duration){
+  screenShake.magnitude = Math.max(screenShake.magnitude, magnitude);
+  screenShake.duration = Math.max(screenShake.duration, duration);
+  screenShake.time = screenShake.duration;
+}
+
+// ================= 캐릭터 팩토리 =================
+function makeCharacter(x, y, color, isAI){
+  return {
+    x, y, vx:0, vy:0, angle:0,
+    radius: CHAR_R, color, isAI,
+    charging:false, chargeAmount:0,
+    swingCooldownTimer:0, swinging:false, swingTimer:0, swingAngle:0,
+    dead:false, deadTimer:0, invincible:false,
+    buffSpeed:0, buffPower:0, buffRam:0, buffRange:0, rangeScale:1,
+    damagePercent:0, hitFlashTimer:0,
+    aiState:'patrol', aiChaseAngle:0, aiDecisionTimer:0,
+    deathCount:0, knockbackTimer:0,
+    skill: 1, label: '', team: null,
+    koScore: 0, lastHitBy: null, lastHitRecency: 0
+  };
+}
+
+// ================= 참가자(플레이어 슬롯들 + AI들) 관리 =================
+let aiList = [];           // AI 캐릭터 목록
+let characters = [];       // 렌더/충돌/사망판정 등에서 순회할 전체 캐릭터 목록 (playerSlots + aiList)
+let gameStarted = false;
+let roundActive = false;   // 라운드 진행 중 여부 (60초 타이머)
+let roundTimeLeft = ROUND_DURATION;
+let lastAiCount = 1;       // 다시 플레이시 재사용할 AI 인원수
+let isSpectatingNow = false; // (레거시) 게임 시작 전 기본값 렌더용
+
+const AI_COLORS = ['#3b7bff', '#3bffa0', '#ffb03b', '#c060ff', '#ff5fc0'];
+const AI_LABELS = ['AI 1', 'AI 2', 'AI 3', 'AI 4', 'AI 5'];
+const PLAYER_COLORS = ['#ff3b3b', '#3bd0ff', '#8cff5b', '#ffb84d']; // 개인전일 때 1P~4P 기본 색
+
+// 캐릭터 수에 맞춰 중심 주위에 고르게 배치될 스폰 좌표를 만들어줌
+function spawnCirclePositions(n){
+  const positions = [];
+  const r = n <= 2 ? 70 : 60 + n*22;
+  for (let i=0;i<n;i++){
+    const a = (i / n) * Math.PI * 2 - Math.PI/2;
+    positions.push({ x: CENTER.x + Math.cos(a)*r, y: CENTER.y + Math.sin(a)*r });
+  }
+  return positions;
+}
+
+function startGame(aiCount){
+  aiCount = Math.max(0, Math.min(5, aiCount|0));
+  lastAiCount = aiCount;
+
+  const playerCount = Math.max(1, Math.min(MAX_PLAYER_SLOTS, selectedPlayerCount|0));
+  const connectedPads = getConnectedGamepads();
+
+  const total = aiCount + playerCount;
+  const positions = spawnCirclePositions(total);
+  const isTeamMode = (gameMode === 'team');
+  ROUND_DURATION = Math.max(1, Math.min(3, selectedRoundMinutes|0)) * 60; // 선택한 플레이타임(1/2/3분) 반영
+
+  // ---- 플레이어 슬롯 생성: 슬롯 0(1P)은 항상 키보드/마우스/터치로도 조작 가능하고, 나머지 슬롯은
+  // 시작 시점에 연결된 컨트롤러를 순서대로 배정받되, 연결이 없으면 사람이 붙을 때까지 AI가 대신 조작함 ----
+  playerSlots = [];
+  for (let i=0;i<playerCount;i++){
+    const color = isTeamMode ? TEAM_COLORS[slotTeams[i]] : PLAYER_COLORS[i % PLAYER_COLORS.length];
+    const ch = makeCharacter(positions[i].x, positions[i].y, color, false);
+    ch.label = (i === 0) ? 'PLAYER' : ('PLAYER ' + (i+1));
+    ch.slotIndex = i;
+    ch.cam = { x: positions[i].x, y: positions[i].y };
+    ch.gamepadIndex = connectedPads[i] ? connectedPads[i].index : null;
+    ch._spectateIndex = 0; ch._spectatePrevLeft = false; ch._spectatePrevRight = false;
+    ch.skill = 0.8; // AI 대체 조작일 때 쓰일 실력치(꽤 잘하는 편으로)
+    if (isTeamMode) ch.team = slotTeams[i];
+    playerSlots.push(ch);
+  }
+  player = playerSlots[0];
+
+  // 팀전일 때 AI는 플레이어 슬롯들이 이미 고른 팀과 균형을 맞춰 나머지 팀에 최대한 고르게 배분
+  const teamCounts = [0, 0];
+  if (isTeamMode) playerSlots.forEach(ch=> teamCounts[ch.team]++);
+
+  aiList = [];
+  for (let i=0;i<aiCount;i++){
+    let color, team = null;
+    if (isTeamMode){
+      team = teamCounts[0] <= teamCounts[1] ? 0 : 1; // 인원이 적은 팀으로 배정해 균형을 맞춤
+      teamCounts[team]++;
+      color = TEAM_COLORS[team];
+    } else {
+      color = AI_COLORS[i % AI_COLORS.length];
+    }
+    const ai = makeCharacter(positions[i+playerCount].x, positions[i+playerCount].y, color, true);
+    ai.label = AI_LABELS[i % AI_LABELS.length];
+    ai.team = team;
+    ai.skill = Math.random(); // 0(허당) ~ 1(고수) 랜덤 실력 - AI마다 다르게 부여
+    aiList.push(ai);
+  }
+  characters = [...playerSlots, ...aiList];
+
+  // 벽돌/아이템/폭탄도 새 라운드에 맞춰 새로 배치
+  buildBricks();
+  items = [];
+  itemSpawnTimer = 0;
+  bombs = [];
+  bombSpawnTimer = 0;
+
+  buildHud();
+  gameStarted = true;
+  roundActive = true;
+  roundTimeLeft = ROUND_DURATION;
+  isPaused = false;
+  pauseScreenEl.style.display = 'none';
+  menuNav.active = false; // 실제 플레이 중에는 메뉴 포커스 표시를 꺼둠
+
+  // 각 플레이어 슬롯의 카메라를 시작 위치로 초기화
+  playerSlots.forEach(ch=>{ ch.cam.x = ch.x; ch.cam.y = ch.y; });
+
+  startScreenEl.style.display = 'none';
+  resultsScreenEl.style.display = 'none';
+  hudEl.style.display = 'flex';
+  infoEl.style.display = isSplitScreen() ? 'none' : 'block'; // 분할화면에서는 화면이 좁아지므로 조작 안내 문구는 생략
+  roundHudEl.style.display = 'flex';
+  pauseBtnEl.style.display = 'flex';
+  // 분할화면일 때는 단일 관전 오버레이(DOM)를 쓰지 않고 각 패널에 직접 캔버스로 그림
+  respawnOverlayEl.style.opacity = 0;
+
+  // 라운드 시작 연출: 상승 아르페지오 사운드 + 화면 플래시 + 중앙 배너
+  sfxRoundStart();
+  triggerScreenFlash('#ffe45b', 0.35);
+  showRoundAnnounce('ROUND START!', '#ffe45b', 900);
+}
+
+// 라운드 종료: 시간 종료 사운드+플래시+배너를 먼저 보여준 뒤, 배너가 다 사라질 때까지 충분히 기다렸다가 결과 화면을 표시함
+function endRound(){
+  roundActive = false;
+  roundTimeLeft = 0;
+
+  // 라운드가 끝나는 순간 화면에 남아있을 수 있는 KO 안내 문구 등은 바로 지움 (update()가 멈추면서
+  // 타이머가 더 안 줄어들어 글자가 계속 남아있던 문제 수정)
+  msgTimer = 0;
+  msgEl.style.opacity = 0;
+
+  sfxRoundEnd();
+  triggerScreenFlash('#ff5b5b', 0.5);
+  showRoundAnnounce('TIME UP!', '#ff5b5b', 1300);
+
+  setTimeout(showResultsScreen, 1800);
+}
+
+// 각자의 KO수(상대를 링아웃시킨 횟수)와 사망수를 집계해 순위를 매기고 결과 화면을 화려하게 보여줌
+function showResultsScreen(){
+  resultsListEl.innerHTML = '';
+
+  if (gameMode === 'team'){
+    // 팀전: 개인 기록이 아니라 팀 단위로 KO/사망을 합산해서 팀 순위를 보여줌
+    const teamStats = [0, 1].map(t=>{
+      const members = characters.filter(c=> c.team === t);
+      const koSum = members.reduce((s,c)=> s + (c.koScore||0), 0);
+      const deathSum = members.reduce((s,c)=> s + (c.deathCount||0), 0);
+      return { team: t, koSum, deathSum };
+    });
+    teamStats.sort((a, b)=>{
+      if (b.koSum !== a.koSum) return b.koSum - a.koSum; // 팀 KO 합산 많은 순
+      return a.deathSum - b.deathSum; // 동점이면 팀 사망 합산 적은 쪽이 위
+    });
+    teamStats.forEach((t, i)=>{
+      const isMyTeam = playerSlots.some(p=> p.team === t.team);
+      const color = TEAM_COLORS[t.team];
+      const row = document.createElement('div');
+      row.className = 'resultRow' + (isMyTeam ? ' resultSelf' : '') + (i === 0 ? ' rank1' : '');
+      row.style.borderLeft = '4px solid ' + color;
+      row.innerHTML =
+        '<div class="resultRank">' + RANK_MEDALS[i] + '</div>' +
+        '<span class="colorDot" style="background:' + color + ';"></span>' +
+        '<div class="resultName" style="color:' + color + ';">' + TEAM_LABELS[t.team] + '팀' + (isMyTeam ? ' (내 팀)' : '') + '</div>' +
+        '<div class="resultStats">팀 KO ' + t.koSum + ' · 팀 사망 ' + t.deathSum + '</div>';
+      resultsListEl.appendChild(row);
+    });
+  } else {
+    // 개인전: 기존처럼 개인별 순위
+    const ranked = characters.slice().sort((a, b)=>{
+      if (b.koScore !== a.koScore) return b.koScore - a.koScore; // KO 많은 순
+      return (a.deathCount||0) - (b.deathCount||0); // 동점이면 적게 죽은 쪽이 위
+    });
+    ranked.forEach((ch, i)=>{
+      const row = document.createElement('div');
+      row.className = 'resultRow' + (isHuman(ch) ? ' resultSelf' : '') + (i === 0 ? ' rank1' : '');
+      row.style.borderLeft = '4px solid ' + ch.color;
+      row.innerHTML =
+        '<div class="resultRank">' + RANK_MEDALS[i] + '</div>' +
+        '<span class="colorDot" style="background:' + ch.color + ';"></span>' +
+        '<div class="resultName" style="color:' + ch.color + ';">' + ch.label + (isHuman(ch) ? ' (나)' : '') + '</div>' +
+        '<div class="resultStats">KO ' + (ch.koScore||0) + ' · 사망 ' + (ch.deathCount||0) + '</div>';
+      resultsListEl.appendChild(row);
+    });
+  }
+
+  resultsScreenEl.style.display = 'flex';
+  pauseBtnEl.style.display = 'none'; // 결과 화면에서는 일시정지 버튼이 필요 없음
+  setMenuNavElements([restartBtn], 0);
+
+  // 결과 화면을 화려하게: 컨페티 + 승리 팡파레 + 순위 줄들이 하나씩 순서대로 튀어나오는 연출
+  spawnConfetti(70);
+  sfxVictoryFanfare();
+  const rows = resultsListEl.querySelectorAll('.resultRow');
+  rows.forEach(r=> r.classList.remove('show'));
+  rows.forEach((r, i)=>{
+    setTimeout(()=> r.classList.add('show'), 90 + i*90);
+  });
+}
+// 순위별 메달 표시(1~3등은 메달 이모지, 4등 이후는 숫자)
+const RANK_MEDALS = ['🥇', '🥈', '🥉', '4', '5', '6'];
+
+// 팀전일 때 서로 다른 팀인지(=공격 가능한 적인지) 판정. 개인전(FFA)에서는 항상 적으로 취급.
+function isEnemy(a, b){
+  // 1P/2P도 다른 캐릭터와 동일한 규칙을 따름: 개인전(FFA)이면 서로도 적으로 싸울 수 있고,
+  // 팀전이면 같은 팀을 골랐을 때만(현재는 2P가 1P와 같은 팀으로 배정됨) 서로 공격하지 않음
+  if (gameMode !== 'team') return true;
+  if (a.team === null || b.team === null) return true;
+  return a.team !== b.team;
+}
+
+// AI가 노릴 타겟(가장 가까운 살아있는 "적" 캐릭터)을 찾음.
+// 개인전(FFA)에서는 플레이어 포함 누구든 적이고, 팀전에서는 다른 팀만 타겟으로 삼음.
+function findNearestTarget(ai){
+  let best = null, bestD = Infinity;
+  for (let i=0;i<characters.length;i++){
+    const c = characters[i];
+    if (c === ai || c.dead) continue;
+    if (!isEnemy(ai, c)) continue;
+    const d = dist(ai.x, ai.y, c.x, c.y);
+    if (d < bestD){ bestD = d; best = c; }
+  }
+  return best;
+}
+
+// ================= 벽돌 생성 =================
+let bricks = [];
+
+function addBrick(cx, cy){
+  bricks.push({ x: cx - BRICK_SIZE/2, y: cy - BRICK_SIZE/2, w: BRICK_SIZE, h: BRICK_SIZE, hp: BRICK_HP });
+}
+
+function rotateOffset(ix, iy, rotate){
+  let rx = ix, ry = iy;
+  for (let k=0;k<rotate;k++){ const t = rx; rx = -ry; ry = t; }
+  return [rx, ry];
+}
+
+// 벽돌을 완전 랜덤 스캐터가 아니라 중심 대칭 패턴(풍차형 스포크 + 끊어진 원형 고리 +
+// 바깥쪽 십자 배치)으로 규칙적으로 배치해서 "누가 설계한 맵" 같은 느낌을 줌.
+// 다만 같은 배치가 매번 반복되면 지루하므로, 전체 회전 각도/통로 위치/스포크·십자 개수 등을
+// 라운드마다 랜덤하게 바꿔서 같은 스타일이지만 매번 조금씩 다른 맵이 나오게 함.
+function buildBricks(){
+  bricks = [];
+
+  const globalRotation = Math.random() * Math.PI * 2; // 패턴 전체를 라운드마다 랜덤 회전
+
+  // 1) 중심 주위의 스포크(풍차) 벽 - 예전엔 전부 같은 반지름/같은 길이로 시작해서 회전만 다르면
+  // 결국 비슷해 보였음. 이제 반지름/스포크 개수뿐 아니라 스포크마다 길이도 제각각 랜덤이라
+  // 매 라운드 실루엣 자체가 달라짐.
+  const SPOKE_COUNT = 4 + Math.floor(Math.random()*5); // 4~8개로 라운드마다 다르게
+  const SPOKE_R_START = 170 + Math.random()*110;        // 170~280 사이로 랜덤화
+  const spokeSkew = Math.random() * Math.PI * 2;         // 풍차 기울기도 완전 랜덤
+  for (let s=0; s<SPOKE_COUNT; s++){
+    const angle = (s / SPOKE_COUNT) * Math.PI * 2 + spokeSkew + globalRotation;
+    const dirX = Math.cos(angle), dirY = Math.sin(angle);
+    const spokeLen = 2 + Math.floor(Math.random()*4); // 스포크마다 개별적으로 2~5칸
+    for (let i=0;i<spokeLen;i++){
+      const r = SPOKE_R_START + i*BRICK_SIZE;
+      addBrick(CENTER.x + dirX*r, CENTER.y + dirY*r);
+    }
+  }
+
+  // 2) 중간 반경에 끊어진 원형 고리 벽 (틈새가 통로 역할).
+  // 반지름/칸 수/통로 위치를 모두 랜덤화하고, 통로도 규칙적인 한 칸 건너뛰기 대신
+  // 확률 기반으로 뚫어서 통로 폭과 개수가 라운드마다 다르게 나오게 함.
+  const RING_R = 360 + Math.random()*120;               // 360~480 사이로 랜덤화
+  const RING_SEGMENTS = 12 + Math.floor(Math.random()*10); // 12~21칸으로 랜덤화
+  const ringGapChance = 0.35 + Math.random()*0.25;       // 35~60% 확률로 칸을 비워 통로를 만듦
+  for (let i=0;i<RING_SEGMENTS;i++){
+    if (Math.random() < ringGapChance) continue;
+    const angle = (i / RING_SEGMENTS) * Math.PI * 2 + globalRotation;
+    addBrick(CENTER.x + Math.cos(angle)*RING_R, CENTER.y + Math.sin(angle)*RING_R);
+  }
+
+  // 3) 바깥쪽 반경에 십자(+) 모양 구조물을 대칭 배치 (반지름/개수/팔 길이까지 랜덤화)
+  const CROSS_R = 560 + Math.random()*120;               // 560~680 사이로 랜덤화
+  const CROSS_COUNT = 4 + Math.floor(Math.random()*5);   // 4~8개로 랜덤화
+  const crossPhase = Math.random() * Math.PI * 2;
+  for (let i=0;i<CROSS_COUNT;i++){
+    const angle = (i / CROSS_COUNT) * Math.PI * 2 + crossPhase + globalRotation;
+    const cx = CENTER.x + Math.cos(angle)*CROSS_R;
+    const cy = CENTER.y + Math.sin(angle)*CROSS_R;
+    const armLen = Math.random() < 0.4 ? 2 : 1; // 가끔 팔이 더 긴 십자가 나오게
+    addBrick(cx, cy);
+    for (let a=1; a<=armLen; a++){
+      addBrick(cx+BRICK_SIZE*a, cy);
+      addBrick(cx-BRICK_SIZE*a, cy);
+      addBrick(cx, cy+BRICK_SIZE*a);
+      addBrick(cx, cy-BRICK_SIZE*a);
+    }
+  }
+
+  // 4) 완전히 불규칙한 작은 벽돌 무더기를 몇 군데 흩뿌려서, 회전 대칭만으로는 안 나오는
+  // 비대칭적인 변화도 라운드마다 생기게 함 (중심 근처 스폰 지점은 피함)
+  const CLUSTER_COUNT = 2 + Math.floor(Math.random()*4); // 2~5개 무더기
+  for (let c=0; c<CLUSTER_COUNT; c++){
+    const angle = Math.random() * Math.PI * 2;
+    const r = 300 + Math.random() * 550;
+    const baseX = CENTER.x + Math.cos(angle)*r, baseY = CENTER.y + Math.sin(angle)*r;
+    const clusterSize = 2 + Math.floor(Math.random()*3); // 2~4개 벽돌
+    for (let k=0;k<clusterSize;k++){
+      const ox = (Math.random()-0.5) * BRICK_SIZE * 3;
+      const oy = (Math.random()-0.5) * BRICK_SIZE * 3;
+      addBrick(baseX+ox, baseY+oy);
+    }
+  }
+}
+buildBricks();
+
+// ================= 아이템 =================
+let items = [];
+let itemSpawnTimer = 0;
+
+function isNearAnyBrick(x, y, margin){
+  for (let i=0;i<bricks.length;i++){
+    const b = bricks[i];
+    const cx = b.x + b.w/2, cy = b.y + b.h/2;
+    const halfW = b.w/2 + margin, halfH = b.h/2 + margin;
+    if (Math.abs(x-cx) < halfW && Math.abs(y-cy) < halfH) return true;
+  }
+  return false;
+}
+
+function spawnItem(){
+  if (items.length >= ITEM_MAX_COUNT) return;
+  const margin = 60; // 경계선에서 이만큼 떨어진 안쪽까지만 스폰
+  let pos = null;
+  for (let attempt=0; attempt<25; attempt++){
+    const angle = Math.random() * Math.PI * 2;
+    const r = Math.random() * (currentBoundRadius() - margin); // 현재(축소 중인) 경계 안쪽에만 스폰
+    const x = CENTER.x + Math.cos(angle) * r;
+    const y = CENTER.y + Math.sin(angle) * r;
+    if (!isNearAnyBrick(x, y, 34)){ pos = {x, y}; break; }
+  }
+  if (!pos) return; // 마땅한 자리를 못 찾으면 다음 타이머에 재시도
+  const roll = Math.random();
+  const type = roll < 0.2 ? 'speed' : (roll < 0.4 ? 'power' : (roll < 0.6 ? 'heal' : (roll < 0.8 ? 'ram' : 'range')));
+  items.push({ x: pos.x, y: pos.y, radius: 10, type });
+  spawnItemSpawnFx(pos.x, pos.y, type); // 아이템이 새로 등장했다는 걸 알 수 있게 등장 이펙트
+}
+
+// ================= 폭탄 해저드 =================
+// 주워서 쓰는 버프 아이템과 달리, 맵 위 벽돌과 겹치지 않는 자리에 랜덤으로 놓이고
+// 퓨즈 시간이 다 되면 스스로 터지는 위험 오브젝트.
+let bombs = [];
+let bombSpawnTimer = 0;
+
+// 라운드 진행도(0~1): 0=시작, 1=종료 직전. 이 값이 커질수록 폭탄이 더 자주, 더 많이 등장.
+function roundProgress(){
+  return 1 - Math.max(0, Math.min(ROUND_DURATION, roundTimeLeft)) / ROUND_DURATION;
+}
+function currentBombSpawnInterval(){
+  const progress = roundProgress();
+  // 막판에는 기본 주기의 최대 70%까지 단축 (최소 2.5초)
+  return Math.max(2.5, BOMB_SPAWN_INTERVAL * (1 - progress * 0.7));
+}
+function currentBombMaxCount(){
+  const progress = roundProgress();
+  if (progress >= BOMB_LATE_ROUND_RATIO){
+    return BOMB_MAX_COUNT_LATE;
+  }
+  // 초반~중반에도 진행도에 따라 서서히 최대 개수 증가
+  return Math.min(BOMB_MAX_COUNT_LATE, BOMB_MAX_COUNT + Math.floor(progress * 3));
+}
+
+function spawnBomb(){
+  if (bombs.length >= currentBombMaxCount()) return;
+  const margin = 70;
+  let pos = null;
+  for (let attempt=0; attempt<25; attempt++){
+    const angle = Math.random() * Math.PI * 2;
+    const r = Math.random() * (currentBoundRadius() - margin); // 현재(축소 중인) 경계 안쪽에만 스폰
+    const x = CENTER.x + Math.cos(angle) * r;
+    const y = CENTER.y + Math.sin(angle) * r;
+    // 폭탄의 폭발 범위 전체가 벽돌과 크게 겹치지 않도록 벽돌 판정 여백을 넉넉히 둠
+    if (!isNearAnyBrick(x, y, 40)){ pos = {x, y}; break; }
+  }
+  if (!pos) return;
+  bombs.push({ x: pos.x, y: pos.y, timer: BOMB_FUSE_TIME, maxTimer: BOMB_FUSE_TIME });
+}
+
+function sfxExplosion(){
+  playNoise(0.35, 0.32, 700);
+  playTone(90, 0.3, 'sawtooth', 0.28, 30);
+  playTone(50, 0.4, 'sine', 0.22, 20);
+}
+
+function explodeBomb(b){
+  sfxExplosion();
+  // 화면 흔들림은 폭발 범위에 플레이어 슬롯 중 누구라도 걸려있을 때만
+  const meCaught = playerSlots.some(ch=> !ch.dead && dist(ch.x, ch.y, b.x, b.y) <= BOMB_RADIUS + ch.radius);
+
+  // 폭발 시각 연출: 큰 충격 링 + 스타 파편(스매시류) + 흔들림
+  spawnHitFx(b.x, b.y, 6);
+  spawnLaunchBurst(b.x, b.y, 0, BOMB_POWER, meCaught);
+  for (let i=0;i<3;i++) spawnDebris(b.x, b.y, '#ff8a3d');
+  // 히트스탑(전체 정지)도 화면 흔들림과 마찬가지로 내가 폭발에 걸렸을 때만 (나와 무관한 곳의
+  // 폭발까지 게임 전체를 멈추면 끊기는 것처럼 느껴짐)
+  if (meCaught){
+    triggerShake(16, 0.35);
+    triggerHitStop(0.12);
+  }
+
+  // 범위 안 벽돌 파괴
+  bricks = bricks.filter(brick=>{
+    const bcx = brick.x + brick.w/2, bcy = brick.y + brick.h/2;
+    if (dist(bcx, bcy, b.x, b.y) <= BOMB_RADIUS){
+      spawnDebris(bcx, bcy, '#9a9aa5');
+      return false;
+    }
+    return true;
+  });
+
+  // 범위 안 캐릭터: 스윙 100%(완충)급 파워로, 폭탄에서 캐릭터를 향하는 각도로 넉백
+  characters.forEach(ch=>{
+    if (ch.dead || ch.invincible) return;
+    const d = dist(ch.x, ch.y, b.x, b.y);
+    if (d > BOMB_RADIUS) return;
+
+    const impactAngle = Math.atan2(ch.y - b.y, ch.x - b.x);
+    const knockMul = 1 + (ch.damagePercent / DAMAGE_MAX_PERCENT) * KNOCKBACK_PERCENT_SCALE;
+    const KNOCKBACK_BASE = 480; // updateCombat의 스윙 넉백 공식과 동일하게 맞춤
+    ch.vx += Math.cos(impactAngle) * BOMB_POWER * KNOCKBACK_BASE * knockMul;
+    ch.vy += Math.sin(impactAngle) * BOMB_POWER * KNOCKBACK_BASE * knockMul;
+    ch.knockbackTimer = Math.max(ch.knockbackTimer||0, 0.28 + (knockMul-1) * 0.55);
+
+    const dmgAdded = BOMB_POWER * DAMAGE_PER_HIT;
+    ch.damagePercent = Math.min(DAMAGE_MAX_PERCENT, ch.damagePercent + dmgAdded);
+    ch.hitFlashTimer = 0.09;
+    ch.lastHitBy = null; // 폭탄은 특정 공격자가 없는 중립 피해라 KO 크레딧을 누구에게도 주지 않음
+
+    spawnFloatingText(ch.x, ch.y - ch.radius - 6, '+' + Math.round(dmgAdded) + '%', '#ff8a3d');
+  });
+}
+
+// ---- 자기장(경계)이 좁아지면서 바깥에 남게 된 벽돌/아이템/폭탄을 파괴 이펙트와 함께 제거 ----
+function pruneOutOfBounds(){
+  const r = currentBoundRadius();
+
+  bricks = bricks.filter(b=>{
+    const bcx = b.x + b.w/2, bcy = b.y + b.h/2;
+    if (dist(bcx, bcy, CENTER.x, CENTER.y) > r){
+      spawnDebris(bcx, bcy, '#9a9aa5');
+      sfxBrickBreak();
+      return false;
+    }
+    return true;
+  });
+
+  items = items.filter(it=>{
+    if (dist(it.x, it.y, CENTER.x, CENTER.y) > r){
+      spawnHitFx(it.x, it.y, 1);
+      spawnDebris(it.x, it.y, '#ffffff');
+      sfxBrickCrack();
+      return false;
+    }
+    return true;
+  });
+
+  bombs = bombs.filter(b=>{
+    if (dist(b.x, b.y, CENTER.x, CENTER.y) > r){
+      spawnHitFx(b.x, b.y, 2);
+      spawnDebris(b.x, b.y, '#ff8a3d');
+      sfxBrickCrack();
+      return false;
+    }
+    return true;
+  });
+}
+
+function updateBombs(dt){
+  bombSpawnTimer += dt;
+  if (bombSpawnTimer >= currentBombSpawnInterval()){
+    bombSpawnTimer = 0;
+    // 라운드 막판에는 한번에 여러 개(버스트)가 동시에 등장
+    const progress = roundProgress();
+    const burst = progress >= BOMB_LATE_ROUND_RATIO ? 2 + Math.floor((progress - BOMB_LATE_ROUND_RATIO) * 5) : 1;
+    for (let i=0; i<burst; i++) spawnBomb();
+  }
+  for (let i=bombs.length-1;i>=0;i--){
+    const b = bombs[i];
+    b.timer -= dt;
+    if (b.timer <= 0){
+      explodeBomb(b);
+      bombs.splice(i,1);
+    }
+  }
+}
+
+// ================= 유틸 =================
+function dist(x1,y1,x2,y2){ return Math.hypot(x2-x1, y2-y1); }
+function clampSpeed(ch, vmax){
+  const speed = Math.hypot(ch.vx, ch.vy);
+  if (speed > vmax){
+    ch.vx = ch.vx/speed*vmax;
+    ch.vy = ch.vy/speed*vmax;
+  }
+}
+
+// ================= 물리 업데이트 =================
+function currentVmax(ch){ return ch.buffSpeed > 0 ? BASE_VMAX*1.5 : BASE_VMAX; }
+function currentAccel(ch){ return ch.buffSpeed > 0 ? BASE_ACCEL*1.5 : BASE_ACCEL; }
+function currentPowerMul(ch){ return ch.buffPower > 0 ? 2.0 : 1.0; }
+// 공격범위(스윙 사거리) 아이템: 즉시 40% 늘어나는 게 아니라 ch.rangeScale이 목표치를 향해
+// 매 프레임 부드럽게(ease) 따라가도록 해서, 버프가 켜질 때/꺼질 때 모두 자연스럽게 커졌다 줄어들게 함.
+function updateRangeScale(ch, dt){
+  const target = ch.buffRange > 0 ? RANGE_BUFF_MUL : 1.0;
+  ch.rangeScale += (target - ch.rangeScale) * Math.min(1, RANGE_SCALE_EASE * dt);
+}
+function currentSwingRange(ch){ return SWING_RANGE * ch.rangeScale; }
+
+function updateMovementInput(ch, dt, ax, ay){
+  const A = currentAccel(ch);
+  const Vmax = currentVmax(ch);
+  ch.vx = (ch.vx + ax * A * dt) * FRICTION;
+  ch.vy = (ch.vy + ay * A * dt) * FRICTION;
+  clampSpeed(ch, Vmax);
+  ch.x += ch.vx * dt;
+  ch.y += ch.vy * dt;
+}
+
+// 넉백(피격) 중인 캐릭터의 물리 처리: 조작 입력을 무시하고 최고속도 제한도 걸지 않아서
+// 맞은 힘 그대로 멀리(경계 밖까지) 날아갈 수 있게 함. 마찰력으로만 서서히 감속됨.
+function updatePhysics(ch, dt, ax, ay){
+  if (ch.knockbackTimer > 0){
+    ch.knockbackTimer -= dt;
+    ch.vx *= FRICTION;
+    ch.vy *= FRICTION;
+    ch.x += ch.vx * dt;
+    ch.y += ch.vy * dt;
+  } else {
+    updateMovementInput(ch, dt, ax, ay);
+  }
+}
+
+function resolveCharacterCollision(a, b){
+  const d = dist(a.x,a.y,b.x,b.y);
+  const limit = a.radius + b.radius;
+  if (d < limit && d > 0.0001){
+    const overlap = (limit - d) / 2;
+    const nx = (b.x - a.x) / d, ny = (b.y - a.y) / d;
+    a.x -= nx*overlap; a.y -= ny*overlap;
+    b.x += nx*overlap; b.y += ny*overlap;
+    a.vx *= 0.8; a.vy *= 0.8;
+    b.vx *= 0.8; b.vy *= 0.8;
+  }
+}
+
+// ---- 몸싸움 넉백(램) 아이템: 버프가 켜진 동안엔 부딪히기만 해도 완충 스윙급 넉백을 입힘 ----
+function tryApplyRam(attacker, target){
+  if (!(attacker.buffRam > 0)) return;
+  if (attacker.dead || target.dead || target.invincible) return;
+  if (!isEnemy(attacker, target)) return; // 같은 팀은 램으로도 무피해
+  // 실제로 몸이 맞닿아 있을 때만 발동해야 하는데 이 거리 체크가 빠져있어서, 램 버프를 먹은
+  // 순간 맵 전체의 모든 캐릭터가 즉시 날아가버리는 버그가 있었음. 두 캐릭터의 반지름 합만큼
+  // 가까이 붙어 충돌 중일 때만 넉백이 발동하도록 거리 체크를 추가함.
+  const d = dist(attacker.x, attacker.y, target.x, target.y);
+  if (d > attacker.radius + target.radius + 2) return;
+  if ((target._ramCooldownTimer||0) > 0) return;
+  target._ramCooldownTimer = 0.5; // 짧은 재적용 쿨다운 (붙어있는 동안 매프레임 연타 방지)
+
+  const impactAngle = Math.atan2(target.y-attacker.y, target.x-attacker.x);
+  const power = 1.0 + CHARGE_MAX; // 완충(풀차지) 스윙과 동일한 파워
+  const knockMul = 1 + (target.damagePercent / DAMAGE_MAX_PERCENT) * KNOCKBACK_PERCENT_SCALE;
+  const KNOCKBACK_BASE = 480;
+  target.vx += Math.cos(impactAngle) * power * KNOCKBACK_BASE * knockMul;
+  target.vy += Math.sin(impactAngle) * power * KNOCKBACK_BASE * knockMul;
+  target.knockbackTimer = Math.max(target.knockbackTimer||0, 0.28 + (knockMul-1) * 0.55);
+
+  const dmgAdded = power * DAMAGE_PER_HIT;
+  target.damagePercent = Math.min(DAMAGE_MAX_PERCENT, target.damagePercent + dmgAdded);
+  target.hitFlashTimer = 0.09;
+  target.lastHitBy = attacker;
+  target.lastHitRecency = KO_CREDIT_WINDOW;
+
+  // 램(몸싸움 넉백)으로 인한 타격은 일반 스윙 히트와 확실히 구분되도록 황금색 충격 링으로 표시
+  spawnHitFx(target.x, target.y, power, '#ffe45b');
+  spawnDebris(target.x, target.y, '#ffe45b');
+  spawnDebris(target.x, target.y, target.color);
+  spawnFloatingText(target.x, target.y - target.radius - 6, 'RAM! +' + Math.round(dmgAdded) + '%', '#ffe45b');
+  sfxHit(power);
+  const involvesMe = (isHuman(attacker) || isHuman(target));
+  // 히트스탑도 화면 흔들림과 동일하게 나와 관련된 충돌일 때만 (다른 캐릭터끼리는 게임을 멈추지 않음)
+  if (involvesMe){
+    triggerHitStop(0.05 + power*0.03);
+    triggerShake(6 + power*3, 0.18 + power*0.05);
+  }
+  spawnLaunchBurst(target.x, target.y, impactAngle, power, involvesMe);
+}
+function handleRamCollision(a, b){
+  tryApplyRam(a, b);
+  tryApplyRam(b, a);
+}
+
+// 경계선(핑크색 벽)은 더 이상 캐릭터를 막지 않음 -> 항상 통과해서 밖으로 날아갈 수 있고,
+// DEATH_RADIUS를 넘어가면 checkDeath()에서 링아웃 처리됨.
+function resolveBoundaryCollision(ch){
+  // 의도적으로 아무 것도 하지 않음 (벽을 막지 않고 항상 통과시킴)
+  return;
+}
+
+function resolveBrickCollision(ch, brick){
+  const dx = Math.max(brick.x, Math.min(ch.x, brick.x + brick.w));
+  const dy = Math.max(brick.y, Math.min(ch.y, brick.y + brick.h));
+  const distSq = (ch.x-dx)*(ch.x-dx) + (ch.y-dy)*(ch.y-dy);
+  if (distSq < ch.radius*ch.radius){
+    const d = Math.sqrt(distSq) || 0.0001;
+    const nx = (ch.x - dx)/d, ny = (ch.y - dy)/d;
+    ch.x = dx + nx*ch.radius;
+    ch.y = dy + ny*ch.radius;
+    const impactSpeed = Math.hypot(ch.vx, ch.vy);
+
+    // 법선 방향 기준 정반사 + 반발계수(BOUNCE_RESTITUTION)로 확실하게 튕겨나가게 함
+    const vn = ch.vx*nx + ch.vy*ny;
+    if (vn < 0){ // 벽 쪽으로 들어오는 성분이 있을 때만 반사
+      ch.vx -= (1 + BOUNCE_RESTITUTION) * vn * nx;
+      ch.vy -= (1 + BOUNCE_RESTITUTION) * vn * ny;
+    }
+
+    if (impactSpeed > 150){
+      brick.hp -= 1;
+      const bcx = brick.x + brick.w/2, bcy = brick.y + brick.h/2;
+      if (brick.hp <= 0){
+        spawnDebris(bcx, bcy, '#9a9aa5');
+        sfxBrickBreak();
+        if (isHuman(ch)) triggerShake(2.5, 0.1); // 화면 흔들림은 내가 부딪혔을 때만
+      } else {
+        sfxBrickCrack();
+      }
+    }
+  }
+}
+
+// ================= 스윙 / 전투 =================
+function tryStartCharge(ch){
+  if (ch.dead) return;
+  if (ch.swinging) return;
+  if (ch.swingCooldownTimer > 0) return;
+  ch.charging = true;
+}
+
+function releaseSwing(ch, dt){
+  ch.charging = false;
+  ch.swinging = true;
+  ch.swingTimer = 0;
+  ch.swingAngle = ch.angle;
+  ch.swingCooldownTimer = SWING_COOLDOWN;
+  ch._hitTargets = new Set(); // 이번 스윙에서 이미 맞춘 상대 기록(한 스윙에 여러 명 동시 타격 가능, 같은 상대는 1회만)
+  const power = (1.0 + ch.chargeAmount) * currentPowerMul(ch);
+  ch.swingPower = power;
+  sfxSwing(power);
+}
+
+// others: ch를 제외한 나머지 캐릭터 배열. 한 번의 스윙으로 사거리/각도 안에 든 상대를 모두(각 1회씩) 타격함(FFA 난전용).
+function updateCombat(ch, others, dt, wantCharge, wantRelease){
+  // 부활 직후 무적 상태에서는 이동 말고는 아무것도 할 수 없음: 차징/스윙을 아예 시작할 수 없고,
+  // 혹시 모아둔 차지가 있었다면(예: 죽기 직전 차징 중이었던 경우) 즉시 취소함
+  if (ch.invincible){
+    ch.charging = false;
+    ch.chargeAmount = 0;
+    return;
+  }
+
+  if (ch.swingCooldownTimer > 0) ch.swingCooldownTimer -= dt;
+
+  if (!ch.swinging){
+    if (wantCharge && !ch.dead){
+      if (!ch.charging && ch.swingCooldownTimer <= 0) ch.charging = true;
+      if (ch.charging){
+        ch.chargeAmount = Math.min(CHARGE_MAX, ch.chargeAmount + CHARGE_RATE*dt);
+        // 게이지가 거의 다 찼을 때(풀차지 임박) 캐릭터 주변에 에너지 스파크를 화려하게 뿌림
+        const chRatio = ch.chargeAmount / CHARGE_MAX;
+        if (chRatio >= 0.85){
+          ch._chargeSparkTimer = (ch._chargeSparkTimer||0) - dt;
+          if (ch._chargeSparkTimer <= 0){
+            spawnChargeSpark(ch.x, ch.y, ch.color);
+            if (chRatio >= 0.98) spawnChargeSpark(ch.x, ch.y, '#fff');
+            ch._chargeSparkTimer = 0.035 + Math.random()*0.03;
+          }
+        }
+      }
+    }
+    if (wantRelease && ch.charging){
+      releaseSwing(ch, dt);
+    }
+  }
+
+  if (ch.swinging){
+    ch.swingTimer += dt;
+    if (ch.swingTimer >= SWING_DURATION){
+      ch.swinging = false;
+      ch.chargeAmount = 0;
+    } else {
+      // 히트 판정: 스윙 지속중 계속 체크하되, 같은 상대는 이번 스윙에서 한 번만 맞도록 _hitTargets로 관리.
+      // 사거리/각도 안에 여러 명이 동시에 있으면 전부(각 1회씩) 타격 가능 (난전 FFA용).
+      const power = (1.0 + ch.chargeAmount) * currentPowerMul(ch);
+      if (!ch._hitTargets) ch._hitTargets = new Set();
+      others.forEach(other=>{
+        if (ch._hitTargets.has(other)) return;
+        if (other.dead || other.invincible) return;
+        const d = dist(ch.x, ch.y, other.x, other.y);
+        if (d >= currentSwingRange(ch)) return;
+        let impactAngle = Math.atan2(other.y-ch.y, other.x-ch.x);
+        let rel = impactAngle - ch.swingAngle;
+        while (rel > Math.PI) rel -= Math.PI*2;
+        while (rel < -Math.PI) rel += Math.PI*2;
+        if (Math.abs(rel) > SWING_HALF_ANGLE) return;
+
+        ch._hitTargets.add(other);
+
+        const knockMul = 1 + (other.damagePercent / DAMAGE_MAX_PERCENT) * KNOCKBACK_PERCENT_SCALE;
+        // 예전에는 매 프레임 이동속도가 Vmax로 강제 클램프되어(clampSpeed) 아무리 KNOCKBACK_BASE를
+        // 키워도 다음 프레임에 바로 최고속도로 눌려버려 넉백이 약하게 느껴졌음.
+        // 이제 피격 시 knockbackTimer 동안은 그 클램프를 건너뛰므로(updatePhysics) 값 자체를
+        // 실제 비행 속도로 재보정함. 데미지%가 높을수록(knockMul) 더 멀리, 더 오래 날아감.
+        const KNOCKBACK_BASE = 480;
+        other.vx += Math.cos(impactAngle) * power * KNOCKBACK_BASE * knockMul;
+        other.vy += Math.sin(impactAngle) * power * KNOCKBACK_BASE * knockMul;
+        // 넉백 중에는 최고속도 제한 없이 날아가도록 지속시간을 부여 (데미지%가 높을수록 더 오래 날아감)
+        other.knockbackTimer = Math.max(other.knockbackTimer||0, 0.28 + (knockMul-1) * 0.55);
+        const dmgAdded = power * DAMAGE_PER_HIT;
+        other.damagePercent = Math.min(DAMAGE_MAX_PERCENT, other.damagePercent + dmgAdded);
+
+        // ---- 타격감 연출 ----
+        spawnHitFx(other.x, other.y, power);
+        spawnDebris(other.x, other.y, other.color);
+        spawnFloatingText(other.x, other.y - other.radius - 6, '+' + Math.round(dmgAdded) + '%',
+          other.damagePercent >= 66 ? '#ff5b3d' : (other.damagePercent >= 33 ? '#ffcc33' : '#fff'));
+        sfxHit(power);
+        // 히트스탑(전체 정지)과 화면 흔들림 모두 내가 때렸거나 내가 맞았을 때만 발생시킴.
+        // (예전엔 히트스탑이 게이팅 없이 항상 걸려서, 나와 무관한 AI끼리의 전투에도 게임 전체가
+        // 멈춰버려 마치 화면이 흔들리거나 끊기는 것처럼 느껴지는 원인이었음)
+        const involvesMe = (isHuman(ch) || isHuman(other));
+        if (involvesMe){
+          triggerHitStop(0.03 + power*0.035);      // 파워가 셀수록 정지시간도 길어짐
+          triggerShake(3 + power*4, 0.12 + power*0.06); // 파워가 셀수록 화면도 더 흔들림
+        }
+
+        // 풀차지에 가까운 강타로 멀리 날려버릴 때는 스매시류 스타 파편 연출을 추가로 터뜨림
+        const chargeRatioAtHit = ch.chargeAmount / CHARGE_MAX;
+        if (chargeRatioAtHit >= 0.85 || power >= 2.3){
+          spawnLaunchBurst(other.x, other.y, impactAngle, power, involvesMe);
+        }
+
+        // 공격자에게도 약한 반동을 줘서 타격의 무게감을 표현
+        ch.vx -= Math.cos(ch.swingAngle) * power * 150;
+        ch.vy -= Math.sin(ch.swingAngle) * power * 150;
+
+        // 피격자 히트 플래시
+        other.hitFlashTimer = 0.09;
+
+        // 이 타격으로 인해 상대가 곧 링아웃되면 나(공격자)의 KO로 인정되도록 기록
+        other.lastHitBy = ch;
+        other.lastHitRecency = KO_CREDIT_WINDOW;
+      });
+    }
+  }
+}
+
+// ================= 이펙트 =================
+let fx = [];         // 타격 링/플래시
+let debris = [];      // 벽돌 파괴 잔해
+let floatingTexts = []; // 데미지 % 팝업 텍스트
+let chargeSparks = []; // 풀차지 중 캐릭터로 빨려들어가는 에너지 스파크
+let stars = [];        // 풀스윙 강타 시 터지는 스타 파편 (스매시류 연출)
+
+function spawnHitFx(x, y, power, color){
+  fx.push({x, y, life:0.28, maxLife:0.28, power: power||1, color: color || '#ffffff'});
+}
+function spawnDebris(x, y, color){
+  const n = 6 + Math.floor(Math.random()*3);
+  for (let i=0;i<n;i++){
+    const a = Math.random()*Math.PI*2;
+    const spd = 60 + Math.random()*160;
+    debris.push({
+      x, y,
+      vx: Math.cos(a)*spd, vy: Math.sin(a)*spd,
+      size: 2 + Math.random()*4,
+      life: 0.4 + Math.random()*0.3, maxLife: 0.7,
+      color: color || '#8a8a92'
+    });
+  }
+}
+function spawnFloatingText(x, y, text, color){
+  floatingTexts.push({ x, y, text, color: color||'#fff', life: 0.9, maxLife: 0.9 });
+}
+// 아이템 획득 시 시각 효과: 종류별 색상의 링 플래시 + 반짝이는 파편 + 안내 문구
+// 아이템이 맵 위에 새로 "등장"했을 때의 이펙트 (주워서 효과가 발동할 때와는 구분되는 은은한 등장 연출)
+function itemColor(type){
+  if (type === 'speed') return '#3dff7a';
+  if (type === 'power') return '#ffd23d';
+  if (type === 'ram') return '#ffe45b';
+  if (type === 'range') return '#ff8cf0';
+  return '#ff6fae'; // heal
+}
+function spawnItemSpawnFx(x, y, type){
+  const color = itemColor(type);
+  spawnHitFx(x, y, 1.6, color);
+  for (let i=0;i<5;i++) spawnDebris(x, y, color);
+}
+
+// 캐릭터가 리스폰(부활)해서 새로 나타났을 때의 등장 이펙트
+function spawnCharacterSpawnFx(ch){
+  spawnHitFx(ch.x, ch.y, 2.2, ch.color);
+  for (let i=0;i<8;i++) spawnDebris(ch.x, ch.y, ch.color);
+  spawnDebris(ch.x, ch.y, '#ffffff');
+}
+
+function spawnItemPickupFx(ch, type){
+  const color = itemColor(type);
+  if (type === 'ram'){
+    // 램(몸싸움 넉백) 아이템: "이제 부딪히기만 해도 상대가 날아간다"는 걸 확실히 알 수 있도록
+    // 훨씬 크고 화려한 황금색 충격파 + 스타 파편으로 다른 아이템과 뚜렷하게 구분되는 연출을 줌
+    spawnHitFx(ch.x, ch.y, 3.2, color);
+    spawnDebris(ch.x, ch.y, color);
+    spawnDebris(ch.x, ch.y, color);
+    spawnLaunchBurst(ch.x, ch.y, 0, 1.5, false); // 화면 흔들림 없이 스타 파편만 화려하게
+  } else {
+    spawnHitFx(ch.x, ch.y, 1.4);
+    spawnDebris(ch.x, ch.y, color);
+  }
+  if (type === 'speed') spawnFloatingText(ch.x, ch.y - ch.radius - 10, 'SPEED UP!', color);
+  else if (type === 'power') spawnFloatingText(ch.x, ch.y - ch.radius - 10, 'POWER UP!', color);
+  else if (type === 'ram') spawnFloatingText(ch.x, ch.y - ch.radius - 10, 'RAM CHARGE! (7초간 충돌 시 상대 발사)', color);
+  else if (type === 'range') spawnFloatingText(ch.x, ch.y - ch.radius - 10, 'RANGE UP!', color);
+  sfxItemPickup();
+}
+// 풀차지(게이지 최대) 상태일 때 캐릭터 주위에서 안쪽으로 빨려들어가는 듯한 에너지 스파크
+function spawnChargeSpark(x, y, color){
+  const a = Math.random()*Math.PI*2;
+  const r = 18 + Math.random()*14;
+  chargeSparks.push({
+    x: x + Math.cos(a)*r, y: y + Math.sin(a)*r,
+    tx: x, ty: y,
+    life: 0.32, maxLife: 0.32,
+    color: color || '#ffe45b'
+  });
+}
+// 풀스윙(강한 파워)으로 상대를 날려버렸을 때 터지는 스타(별) 파편 연출 (스매시류 KO 느낌)
+function spawnLaunchBurst(x, y, angle, power, shakeScreen){
+  const n = 6 + Math.floor(power*2);
+  for (let i=0;i<n;i++){
+    const spreadAngle = angle + (Math.random()-0.5) * 1.1;
+    const spd = 260 + Math.random()*320;
+    stars.push({
+      x, y,
+      vx: Math.cos(spreadAngle)*spd, vy: Math.sin(spreadAngle)*spd,
+      rot: Math.random()*Math.PI*2, rotSpeed: (Math.random()-0.5)*16,
+      size: 6 + Math.random()*7,
+      life: 0.45 + Math.random()*0.35, maxLife: 0.8
+    });
+  }
+  // 화면 흔들림과 히트스탑(전체 정지) 모두 내가 관련된 타격일 때만(shakeScreen).
+  // 스타 파편 연출 자체는 누구든 항상 보여줌 (게임을 멈추지는 않음)
+  if (shakeScreen){
+    triggerShake(9 + power*3, 0.22 + power*0.05);
+    triggerHitStop(0.05 + power*0.03);
+  }
+}
+function updateFx(dt){
+  fx = fx.filter(f=>{ f.life -= dt; return f.life>0; });
+  debris = debris.filter(d=>{
+    d.life -= dt;
+    d.x += d.vx*dt; d.y += d.vy*dt;
+    d.vx *= 0.92; d.vy *= 0.92;
+    return d.life>0;
+  });
+  floatingTexts = floatingTexts.filter(t=>{
+    t.life -= dt;
+    t.y -= 40*dt; // 위로 떠오름
+    return t.life>0;
+  });
+  chargeSparks = chargeSparks.filter(s=>{
+    s.life -= dt;
+    s.x += (s.tx - s.x) * 0.2;
+    s.y += (s.ty - s.y) * 0.2;
+    return s.life > 0;
+  });
+  stars = stars.filter(st=>{
+    st.life -= dt;
+    st.x += st.vx*dt; st.y += st.vy*dt;
+    st.vx *= 0.94; st.vy *= 0.94;
+    st.rot += st.rotSpeed*dt;
+    return st.life > 0;
+  });
+}
+
+// 고속 이동/넉백 중일 때 잔상을 남겨 속도감을 강조 (넉백 비행 중에는 훨씬 화려하게)
+function updateTrail(ch, dt){
+  if (!ch._trail) ch._trail = [];
+  const speed = Math.hypot(ch.vx, ch.vy);
+  const launching = ch.knockbackTimer > 0;
+  if ((speed > 340 || launching) && !ch.dead){
+    ch._trail.push({
+      x: ch.x, y: ch.y,
+      life: launching ? 0.34 : 0.22,
+      maxLife: launching ? 0.34 : 0.22,
+      launch: launching
+    });
+  }
+  ch._trail = ch._trail.filter(t=>{ t.life -= dt; return t.life > 0; });
+
+  // 비행 중 회전 연출(스핀)
+  if (launching){
+    if (ch._flightSpin === undefined) ch._flightSpin = 0;
+    ch._flightSpin += (10 + speed*0.012) * dt;
+  }
+}
+
+// ================= 사망 / 리스폰 =================
+function checkDeath(ch, dt){
+  if (ch.dead){
+    ch.deadTimer -= dt;
+    if (ch.deadTimer <= 0){
+      respawn(ch);
+    }
+    return;
+  }
+  const dC = dist(ch.x, ch.y, CENTER.x, CENTER.y);
+  if (dC > currentDeathRadius()){ // 자기장(경계)이 좁아질수록 사망 반경도 함께 줄어듦
+    triggerDeath(ch);
+  }
+}
+
+function triggerDeath(ch){
+  ch.dead = true;
+  ch.invincible = true;
+  ch.deadTimer = RESPAWN_TIME;
+  ch.vx = 0; ch.vy = 0;
+  ch.deathCount = (ch.deathCount||0) + 1;
+
+  // 화면 흔들림은 내가 날아가서 죽었거나, 내가 상대를 날려서 죽였을 때만
+  const involvesMe = isHuman(ch) || isHuman(ch.lastHitBy);
+
+  // 이 킬을 인정받을 가해자가 있는지(KO_CREDIT_WINDOW 이내에 맞았는지) 먼저 확인해둠(메시지에도 사용)
+  const killer = (ch.lastHitBy && ch.lastHitBy !== ch && ch.lastHitRecency > 0 && !ch.lastHitBy.dead)
+    ? ch.lastHitBy : null;
+  if (killer) killer.koScore = (killer.koScore||0) + 1;
+  ch.lastHitBy = null;
+  ch.lastHitRecency = 0;
+
+  const victimName = ch.label || 'AI';
+  // 메시지 색은 죽은(KO 당한) 캐릭터의 색과 맞춰서, 누가 당했는지 색만 봐도 바로 알 수 있게 함
+  if (isHuman(ch)){
+    showMessage((killer ? (killer.label + '에게 당함! (' + victimName + ' KO)') : (victimName + ' KO!')), ch.color);
+  } else if (isHuman(killer)){
+    showMessage(killer.label + '가 ' + victimName + ' 처치! KO', ch.color);
+  } else {
+    showMessage(victimName + ' KO!', ch.color);
+  }
+
+  sfxRingOut();
+  // 히트스탑도 화면 흔들림처럼 나와 관련된 사망(내가 죽었거나 내가 킬했을 때)일 때만
+  if (involvesMe){
+    triggerShake(10, 0.3);
+    triggerHitStop(0.15);
+  }
+}
+
+function respawn(ch){
+  // 중심 근처의 임의 위치에서 부활 (참가자 수가 가변적이라 고정 좌표 대신 랜덤 배치)
+  const a = Math.random() * Math.PI * 2;
+  const r = 50 + Math.random() * 90;
+  ch.x = CENTER.x + Math.cos(a)*r;
+  ch.y = CENTER.y + Math.sin(a)*r;
+  ch.vx = 0; ch.vy = 0;
+  ch.dead = false;
+  ch.damagePercent = 0;
+  ch.hitFlashTimer = 0;
+  ch.chargeAmount = 0;
+  ch.charging = false;
+  ch.swinging = false;
+  ch.buffSpeed = 0; ch.buffPower = 0; ch.buffRam = 0; ch.buffRange = 0;
+  ch._ramCooldownTimer = 0;
+  ch.invincible = true;
+  ch.patrolTarget = null;
+  ch.aiState = 'patrol';
+  ch._releaseJitter = null;
+  ch._escapeTimer = 0;
+  ch._stuckTimer = 0;
+  ch._trying = false;
+  ch.knockbackTimer = 0;
+  spawnCharacterSpawnFx(ch); // 리스폰(부활)해서 새로 나타났다는 걸 알 수 있게 등장 이펙트
+  setTimeout(()=>{ ch.invincible = false; }, 1200);
+}
+
+// ================= 메시지 =================
+let msgTimer = 0;
+const msgEl = document.getElementById('msg');
+function showMessage(text, color){
+  msgEl.textContent = text;
+  msgEl.style.color = color || '#fff';
+  msgEl.style.opacity = 1;
+  msgTimer = 1.4;
+}
+
+// ================= 관전 / 부활 카운트다운 / 사망 횟수 HUD =================
+const respawnOverlayEl = document.getElementById('respawnOverlay');
+const spectateLabelEl = document.getElementById('spectateLabel');
+const countdownNumEl = document.getElementById('countdownNum');
+
+// 참가자 수(1~6명)에 맞춰 HUD 목록을 동적으로 구성
+function buildHud(){
+  hudListEl.innerHTML = '';
+  characters.forEach((ch, idx)=>{
+    ch._hudIndex = idx;
+    const row = document.createElement('div');
+    row.className = 'hudRow' + (isHuman(ch) ? ' hudRowSelf' : '');
+    row.style.borderLeft = '4px solid ' + ch.color;
+    row.innerHTML =
+      '<div class="hudName"><span class="colorDot" style="background:' + ch.color + ';"></span>' +
+        ch.label + (isHuman(ch) ? ' (나)' : '') +
+        (isHuman(ch) ? ' <span id="hudctl_' + idx + '" style="font-weight:normal;color:#ffb84d;"></span>' : '') +
+      '</div>' +
+      '<div class="hpbar-bg" style="border-color:' + ch.color + ';"><div class="hpbar-fill" id="hpfill_' + idx + '" style="width:0%;"></div></div>' +
+      '<div class="hudMeta"><span id="hppct_' + idx + '">0%</span><span id="hpko_' + idx + '">사망 0회</span></div>';
+    hudListEl.appendChild(row);
+  });
+}
+
+function updateHud(){
+  characters.forEach(ch=>{
+    const idx = ch._hudIndex;
+    const fillEl = document.getElementById('hpfill_' + idx);
+    const pctEl = document.getElementById('hppct_' + idx);
+    const koEl = document.getElementById('hpko_' + idx);
+    if (!fillEl || !pctEl || !koEl) return;
+    const p = Math.max(0, Math.min(DAMAGE_MAX_PERCENT, ch.damagePercent));
+    fillEl.style.width = p + '%';
+    pctEl.textContent = Math.round(p) + '%';
+    let color;
+    if (p < 50) color = 'rgb(' + Math.round(60 + p/50*195) + ', 220, 90)';
+    else color = 'rgb(255, ' + Math.round(220 - (p-50)/50*180) + ', 60)';
+    fillEl.style.background = color;
+    koEl.textContent = '사망 ' + (ch.deathCount||0) + '회';
+    // 플레이어 슬롯인데 컨트롤러가 없어 지금 AI가 대신 조작 중이면 HUD에 표시
+    if (isHuman(ch)){
+      const ctlEl = document.getElementById('hudctl_' + idx);
+      if (ctlEl) ctlEl.textContent = slotHasLiveController(ch) ? '' : '(AI 대행)';
+    }
+  });
+}
+
+// ================= AI FSM =================
+const AI_DETECT_RADIUS = 400;   // 이 범위 안에 들어와야 상대를 "발견"
+const AI_ATTACK_RANGE  = 100;   // 이 범위 안에서 공격 시도
+const AI_SAFE_MARGIN   = 100;   // 순찰 지점이 경계선에 너무 붙지 않도록
+
+// ---- 아이템 인지: 전투 중이 아닐 때(순찰 중) 근처 아이템을 알아채고 주우러 감. 지능(skill)이
+// 높을수록 더 멀리서도 아이템을 알아챔 ----
+const AI_ITEM_DETECT_RADIUS = 260; // 기준 인지 거리 (실력에 따라 이 값에 배율이 곱해짐)
+const ITEM_ARRIVE_RADIUS = 90; // 이 거리 안에 들어오면 속도를 줄이기 시작해서 관성으로 아이템을 지나치지 않게 함
+function findNearestItemForAI(ai, detectRadius){
+  let best = null, bestD = Infinity;
+  for (let i=0;i<items.length;i++){
+    const it = items[i];
+    const d = dist(ai.x, ai.y, it.x, it.y);
+    if (d < detectRadius && d < bestD){ bestD = d; best = it; }
+  }
+  return best;
+}
+
+function lerpAngle(a, b, t){
+  let diff = b - a;
+  while (diff > Math.PI) diff -= Math.PI*2;
+  while (diff < -Math.PI) diff += Math.PI*2;
+  return a + diff * t;
+}
+
+function pickPatrolPoint(){
+  const r = Math.random() * (currentBoundRadius() - AI_SAFE_MARGIN);
+  const a = Math.random() * Math.PI * 2;
+  return { x: CENTER.x + Math.cos(a)*r, y: CENTER.y + Math.sin(a)*r };
+}
+
+// ---- 벽(벽돌) 회피 조향 ----
+const AI_LOOKAHEAD = 160;             // 이 거리 안의 벽돌을 장애물로 인식 (이동속도 2배에 맞춰 확대)
+const AI_AVOID_CONE = Math.PI * 0.65; // 진행방향 기준 이 각도 안쪽 벽돌만 "앞에 있다"고 판단
+const AI_AVOID_WEIGHT = 1.8;          // 회피 힘의 세기
+const AI_STUCK_SPEED = 25;            // 이 속도 이하이면서 이동을 시도중이면 "갇힘" 후보로 판단
+const AI_STUCK_TIME = 0.5;            // 이 시간 이상 갇혀있으면 강제 탈출 발동
+
+// ---- 경계선(핑크 벽) 회피: 밖으로 나가면 즉시 사망이므로 벽돌보다 훨씬 강하게 안쪽으로 밀어냄 ----
+const AI_BOUNDARY_MARGIN = 140; // 경계선으로부터 이 거리 안쪽부터 회피 시작
+const AI_BOUNDARY_WEIGHT = 3.2; // 회피 힘의 세기(벽돌 회피보다 훨씬 강함)
+// 자기장이 계속 좁아지는 도중에는 위의 "부드러운" 회피만으로는 순간적으로 늦게 반응해 밖으로
+// 밀려나가는 경우가 있었음. 실제 사망 판정선(currentDeathRadius)보다 한참 안쪽에 "최후 안전선"을
+// 두고, 이 선을 넘으면 추격/순찰 등 다른 모든 판단을 무시하고 무조건 중심으로 되돌아가게 함.
+const AI_HARD_SAFETY_MARGIN = 60; // currentBoundRadius()에서 이만큼 안쪽부터는 무조건 강제 귀환
+
+// ---- 폭탄 인지/회피: AI마다 실력에 따라 폭탄을 알아챌 확률이 다르고, 알아챈 폭탄만 회피함 ----
+const AI_BOMB_DETECT_RADIUS = 220; // 이 거리 안의 폭탄만 "알아챌 수 있는" 후보가 됨
+const AI_BOMB_AVOID_WEIGHT = 2.4;  // 회피 힘의 세기 (벽돌과 경계선 사이 정도)
+
+// 이 AI가 특정 폭탄을 "알아챘는지"를 폭탄 하나당 한 번만 랜덤으로 결정해서 계속 유지함
+// (매 프레임 다시 굴리면 알아챘다 못 알아챘다 깜빡거리게 되므로 폭탄-AI 쌍마다 한 번만 결정)
+function getBombAwareness(ai, bomb){
+  if (!ai._bombAwareness) ai._bombAwareness = new Map();
+  if (!ai._bombAwareness.has(bomb)){
+    const skill = (ai.skill === undefined) ? 1 : ai.skill;
+    const noticeChance = 0.35 + skill * 0.55; // 실력이 좋을수록 폭탄을 더 잘 알아챔 (35%~90%)
+    ai._bombAwareness.set(bomb, Math.random() < noticeChance);
+  }
+  return ai._bombAwareness.get(bomb);
+}
+
+function computeAvoidance(ai, desiredAngle){
+  let avoidX = 0, avoidY = 0;
+  const bias = ai._avoidBias || 1; // 좌/우 중 한쪽으로 일관되게 돌도록(진동 방지)
+  for (let i=0;i<bricks.length;i++){
+    const b = bricks[i];
+    const bcx = b.x + b.w/2, bcy = b.y + b.h/2;
+    const dx = bcx - ai.x, dy = bcy - ai.y;
+    const d = Math.hypot(dx, dy);
+    const influence = AI_LOOKAHEAD + Math.max(b.w, b.h)/2;
+    if (d >= influence || d < 0.001) continue;
+
+    // 진행 방향 기준으로 벽돌이 "앞쪽"에 있는지 확인 (뒤쪽/옆 멀리는 무시)
+    const angleToBrick = Math.atan2(dy, dx);
+    let angleDiff = angleToBrick - desiredAngle;
+    while (angleDiff > Math.PI) angleDiff -= Math.PI*2;
+    while (angleDiff < -Math.PI) angleDiff += Math.PI*2;
+    if (Math.abs(angleDiff) > AI_AVOID_CONE) continue;
+
+    const strength = (influence - d) / influence; // 가까울수록 강하게
+    const nx = -dx/d, ny = -dy/d;        // 벽돌에서 멀어지는 방향
+    const tx = -ny * bias, ty = nx * bias; // 벽을 타고 흐르는 접선 방향(옆으로 미끄러지듯 회피)
+
+    avoidX += nx*strength*0.8 + tx*strength;
+    avoidY += ny*strength*0.8 + ty*strength;
+  }
+
+  // 폭탄 회피: 알아챈(랜덤으로 인지 성공한) 폭탄에 한해서만 가까울수록 밀려나도록 함
+  for (let i=0;i<bombs.length;i++){
+    const bomb = bombs[i];
+    if (!getBombAwareness(ai, bomb)) continue; // 이 폭탄은 못 알아챘으니 무시하고 그대로 지나감
+    const dx = bomb.x - ai.x, dy = bomb.y - ai.y;
+    const d = Math.hypot(dx, dy);
+    if (d >= AI_BOMB_DETECT_RADIUS || d < 0.001) continue;
+    const strength = (AI_BOMB_DETECT_RADIUS - d) / AI_BOMB_DETECT_RADIUS;
+    const nx = -dx/d, ny = -dy/d; // 폭탄에서 멀어지는 방향
+    avoidX += nx * strength * AI_BOMB_AVOID_WEIGHT;
+    avoidY += ny * strength * AI_BOMB_AVOID_WEIGHT;
+  }
+
+  // 경계선 회피: 죽음으로 직결되므로 진행방향 각도와 무관하게 항상 체크
+  const cdx = ai.x - CENTER.x, cdy = ai.y - CENTER.y;
+  const cd = Math.hypot(cdx, cdy);
+  const boundaryStart = currentBoundRadius() - AI_BOUNDARY_MARGIN; // 자기장이 좁아지는 데 맞춰 회피 시작점도 함께 조정
+  if (cd > boundaryStart){
+    const t = Math.min(1, (cd - boundaryStart) / AI_BOUNDARY_MARGIN);
+    const nx = cd > 0.001 ? -cdx/cd : 0, ny = cd > 0.001 ? -cdy/cd : 0; // 중심(안쪽) 방향
+    avoidX += nx * t * AI_BOUNDARY_WEIGHT;
+    avoidY += ny * t * AI_BOUNDARY_WEIGHT;
+  }
+
+  return { avoidX, avoidY };
+}
+
+// 목표 방향 + 회피 힘을 합쳐서 최종 이동 방향을 계산
+function steerAvoiding(ai, desiredAngle){
+  const { avoidX, avoidY } = computeAvoidance(ai, desiredAngle);
+  let vx = Math.cos(desiredAngle) + avoidX * AI_AVOID_WEIGHT;
+  let vy = Math.sin(desiredAngle) + avoidY * AI_AVOID_WEIGHT;
+  const len = Math.hypot(vx, vy);
+  if (len < 0.001) return desiredAngle;
+  return Math.atan2(vy/len, vx/len);
+}
+
+function updateAI(ai, target, dt){
+  if (ai.dead) return {ax:0, ay:0, wantCharge:false, wantRelease:false};
+
+  const skill = (ai.skill === undefined) ? 1 : ai.skill; // 0(허당)~1(고수), 개체별 랜덤 실력
+
+  if (ai._avoidBias === undefined) ai._avoidBias = Math.random() < 0.5 ? 1 : -1;
+  if (ai._escapeTimer === undefined) ai._escapeTimer = 0;
+  if (ai._stuckTimer === undefined) ai._stuckTimer = 0;
+  if (ai._trying === undefined) ai._trying = false;
+
+  // ---- 최우선 안전 로직: 자기장 밖으로 나가면 죽는다는 걸 인지하고, 위험 반경에 들어서면
+  // 추격/순찰/탈출 등 다른 모든 판단을 무시하고 무조건 중심 방향으로 되돌아감 ----
+  const distFromCenter = dist(ai.x, ai.y, CENTER.x, CENTER.y);
+  const hardSafetyRadius = currentBoundRadius() - AI_HARD_SAFETY_MARGIN;
+  if (distFromCenter > hardSafetyRadius){
+    const toCenterAngle = Math.atan2(CENTER.y - ai.y, CENTER.x - ai.x);
+    ai.angle = lerpAngle(ai.angle, toCenterAngle, 0.35);
+    ai._trying = true;
+    ai.aiState = 'retreat';
+    return { ax: Math.cos(toCenterAngle), ay: Math.sin(toCenterAngle), wantCharge:false, wantRelease:false };
+  }
+
+  // ---- 강제 탈출 모드 진행중이면 다른 판단 없이 탈출부터 ----
+  if (ai._escapeTimer > 0){
+    ai._escapeTimer -= dt;
+    ai.angle = lerpAngle(ai.angle, ai._escapeAngle, 0.3);
+    return { ax: Math.cos(ai._escapeAngle), ay: Math.sin(ai._escapeAngle), wantCharge:false, wantRelease:false };
+  }
+
+  // ---- 갇힘 감지: 이동을 시도중인데 실제 속도가 거의 안 나오면 누적 ----
+  const curSpeed = Math.hypot(ai.vx, ai.vy);
+  if (ai._trying && curSpeed < AI_STUCK_SPEED){
+    ai._stuckTimer += dt;
+  } else {
+    ai._stuckTimer = Math.max(0, ai._stuckTimer - dt*2);
+  }
+
+  if (ai._stuckTimer > AI_STUCK_TIME){
+    // 벽 사이에 낀 것으로 판단 -> 반대 방향 + 랜덤 각도로 강제 탈출
+    ai._avoidBias *= -1; // 다음엔 반대쪽으로 돌도록 성향도 바꿔줌
+    ai._escapeAngle = ai.angle + Math.PI + (Math.random()-0.5) * 1.6;
+    ai._escapeTimer = 0.6 + Math.random()*0.5;
+    ai._stuckTimer = 0;
+    ai.patrolTarget = null; // 탈출 후 새 순찰지점을 다시 잡도록
+    ai.angle = lerpAngle(ai.angle, ai._escapeAngle, 0.4);
+    return { ax: Math.cos(ai._escapeAngle), ay: Math.sin(ai._escapeAngle), wantCharge:false, wantRelease:false };
+  }
+
+  // 상대 타겟이 아예 없어도(예: 상대가 감지 범위 밖이거나 아직 못 찾은 경우) 가만히 있지 않고
+  // 아래의 "타겟을 못 볼 때" 로직(아이템 탐색 -> 순찰)으로 자연스럽게 이어지게 함
+
+  // 실력이 좋을수록 더 멀리서도 상대를 알아챔
+  const detectRadius = AI_DETECT_RADIUS * (0.65 + skill*0.6);
+  const dTarget = target ? dist(ai.x, ai.y, target.x, target.y) : Infinity;
+  const canSeeTarget = !!target && !target.dead && dTarget <= detectRadius;
+
+  let ax = 0, ay = 0;
+  let wantCharge = false, wantRelease = false;
+
+  if (!canSeeTarget){
+    // ---- 아이템 인지: 전투 상대가 안 보일 때는 근처에 아이템이 있는지부터 확인. 지능(skill)이
+    // 높을수록 더 멀리서도 아이템을 알아채고 주우러 감 ----
+    const itemDetectRadius = AI_ITEM_DETECT_RADIUS * (0.4 + skill*0.9); // 허당은 가까이서만, 고수는 훨씬 멀리서도 인지
+    const nearbyItem = findNearestItemForAI(ai, itemDetectRadius);
+
+    if (nearbyItem){
+      ai.aiState = 'item';
+      ai._releaseJitter = null;
+      const dItem = dist(ai.x, ai.y, nearbyItem.x, nearbyItem.y);
+      const desiredAngle = Math.atan2(nearbyItem.y - ai.y, nearbyItem.x - ai.x);
+      const moveAngle = steerAvoiding(ai, desiredAngle);
+      // 아이템에 가까울수록 방향 보정을 더 빠르게 해서(=바로 재조준) 관성으로 인해 아이템을
+      // 지나쳐 빙글빙글 도는 것을 막고, 목표에 정확히 멈춰 서도록 함
+      const nearFactor = Math.max(0, Math.min(1, 1 - dItem / ITEM_ARRIVE_RADIUS));
+      ai.angle = lerpAngle(ai.angle, moveAngle, 0.1 + nearFactor*0.5);
+      // 도착 감속: 가까워질수록 가속 입력을 줄여서 최고 속도로 들이받고 관성으로 지나쳐버리는
+      // 오버슈트(=아이템 주변을 빙글빙글 도는 현상)를 방지
+      const arrive = Math.max(0.2, Math.min(1, dItem / ITEM_ARRIVE_RADIUS));
+      ax = Math.cos(ai.angle) * arrive;
+      ay = Math.sin(ai.angle) * arrive;
+    } else {
+      // ---- 순찰: 상대도 아이템도 안 보일 때 맵 안을 랜덤하게 자연스럽게 순찰 (벽 회피 포함) ----
+      ai.aiState = 'patrol';
+      ai._releaseJitter = null;
+      // 자기장이 좁아지는 도중에 예전에 잡아둔 순찰 목표 지점이 지금은 위험 지역(자기장 밖)이
+      // 되어버렸을 수도 있으므로, 그런 경우에도 목표 지점을 다시 잡도록 함
+      const patrolTargetUnsafe = ai.patrolTarget &&
+        dist(ai.patrolTarget.x, ai.patrolTarget.y, CENTER.x, CENTER.y) > currentBoundRadius() - AI_SAFE_MARGIN;
+      if (!ai.patrolTarget || ai.patrolTimer === undefined || ai.patrolTimer <= 0 ||
+          dist(ai.x, ai.y, ai.patrolTarget.x, ai.patrolTarget.y) < 30 || patrolTargetUnsafe){
+        ai.patrolTarget = pickPatrolPoint();
+        ai.patrolTimer = 4 + Math.random()*3; // 목표 지점당 최대 대기시간(도착 못해도 갱신)
+      }
+      ai.patrolTimer -= dt;
+
+      const desiredAngle = Math.atan2(ai.patrolTarget.y - ai.y, ai.patrolTarget.x - ai.x);
+      const moveAngle = steerAvoiding(ai, desiredAngle);
+      // 순찰 중엔 바라보는 방향 = 이동 방향(자연스럽게)
+      ai.angle = lerpAngle(ai.angle, moveAngle, 0.08);
+      ax = Math.cos(ai.angle);
+      ay = Math.sin(ai.angle);
+    }
+
+  } else {
+    // ---- 교전: 상대를 발견하면 다가가는 동안에도 미리 스윙 게이지를 모아두고,
+    // 정확히 사거리(AI_ATTACK_RANGE) 안에 들어오는 즉시 스윙을 날림.
+    // 실력이 낮을수록 조준이 흔들리고 스윙 타이밍도 들쭉날쭉해짐.
+    ai.aiState = (dTarget <= AI_ATTACK_RANGE) ? 'attack' : 'chase';
+    ai.patrolTarget = null;
+
+    const rawFacing = Math.atan2(target.y - ai.y, target.x - ai.x);
+    const aimNoise = (Math.random()-0.5) * (1 - skill) * 0.35; // 실력이 낮을수록 조준 오차 큼
+    const aimLerp = ai.aiState === 'attack' ? (0.18 + skill*0.35) : (0.08 + skill*0.25);
+    ai.angle = lerpAngle(ai.angle, rawFacing + aimNoise, aimLerp);
+
+    if (!ai.swinging){
+      wantCharge = true; // 접근하는 도중에도 항상 게이지를 미리 모아둠
+      if (dTarget > AI_ATTACK_RANGE * 0.55){
+        const moveAngle = steerAvoiding(ai, rawFacing);
+        ax = Math.cos(moveAngle);
+        ay = Math.sin(moveAngle);
+      }
+      if (ai._releaseJitter === undefined || ai._releaseJitter === null){
+        // 실력이 좋을수록 편차가 작아서 최적 타이밍에 훨씬 안정적으로 스윙함
+        ai._releaseJitter = (Math.random()-0.5) * 0.3 * (1 - skill*0.7);
+      }
+      const proximity = Math.max(0, Math.min(1, dTarget / AI_ATTACK_RANGE)); // 0=바짝 붙음, 1=사거리 끝
+      const requiredRatio = Math.max(0.12, Math.min(0.95, 0.2 + proximity*0.6 + ai._releaseJitter));
+      if (dTarget <= AI_ATTACK_RANGE && ai.chargeAmount >= requiredRatio * CHARGE_MAX){
+        // 정확히 사거리 안에 들어온 순간 스윙 발동 (직전에 각도를 정확히 스냅해서 헛스윙 방지)
+        ai.angle = rawFacing;
+        wantRelease = true;
+        ai._releaseJitter = null;
+      } else if (ai.chargeAmount >= CHARGE_MAX*0.999 && dTarget <= AI_ATTACK_RANGE*1.3){
+        // 완전히 다 찼는데 살짝 사거리 밖이면 충전을 낭비하지 않도록 그냥 발동
+        ai.angle = rawFacing;
+        wantRelease = true;
+        ai._releaseJitter = null;
+      }
+    } else {
+      ai._releaseJitter = null;
+    }
+  }
+
+  ai._trying = (ax !== 0 || ay !== 0);
+  return {ax, ay, wantCharge, wantRelease};
+}
+
+// ================= 아이템 획득 =================
+function updateItemPickup(ch){
+  if (ch.dead || ch.invincible) return; // 부활 직후 무적 상태에서는 아이템도 주울 수 없음(이동만 가능)
+  for (let i = items.length-1; i>=0; i--){
+    const it = items[i];
+    if (dist(ch.x, ch.y, it.x, it.y) < ITEM_PICK_RADIUS){
+      if (it.type === 'speed'){
+        ch.buffSpeed = BUFF_DURATION;
+      } else if (it.type === 'power'){
+        ch.buffPower = BUFF_DURATION;
+      } else if (it.type === 'ram'){
+        ch.buffRam = RAM_BUFF_DURATION; // 몸이 빛나며 부딪히기만 해도 완충 스윙급 넉백을 입힘
+      } else if (it.type === 'range'){
+        ch.buffRange = RANGE_BUFF_DURATION; // 스윙 사거리가 부드럽게 40% 커졌다가 종료 시 다시 줄어듦
+      } else { // heal: 데미지%를 일정량 회복(감소)시켜줌
+        const healed = Math.min(ch.damagePercent, HEAL_AMOUNT);
+        ch.damagePercent = Math.max(0, ch.damagePercent - HEAL_AMOUNT);
+        spawnFloatingText(ch.x, ch.y - ch.radius - 10, '-' + Math.round(healed) + '%', '#ff6fae');
+      }
+      spawnItemPickupFx(ch, it.type);
+      items.splice(i,1);
+    }
+  }
+}
+
+// ================= 메인 루프 =================
+let lastTime = performance.now();
+
+function loop(now){
+  let dt = (now - lastTime) / 1000;
+  lastTime = now;
+  dt = Math.min(dt, 0.05); // 급격한 프레임드랍 방지
+
+  if (isPaused){
+    // 일시정지 중에는 물리/타이머/히트스탑/화면흔들림을 전부 완전히 멈춤 (렌더는 계속)
+  } else if (hitStopTime > 0){
+    // 히트스탑: 짧게 게임을 멈춰서 타격의 무게감을 강조 (렌더는 계속)
+    hitStopTime -= dt;
+  } else {
+    update(dt);
+  }
+
+  if (!isPaused && screenShake.time > 0) screenShake.time -= dt;
+  if (!isPaused && screenFlash.time > 0) screenFlash.time -= dt;
+
+  updateTouchUI();
+  render();
+  pollMenuNavGamepad();
+  pollPauseGamepad();
+
+  requestAnimationFrame(loop);
+}
+
+// 플레이어 슬롯 하나의 카메라를 갱신 (죽어있으면 일정 시간 뒤 살아있는 다른 캐릭터를 관전).
+// 분할화면이 아닐 때(슬롯 0 하나뿐)는 기존 단일 DOM 오버레이(관전 라벨/부활 카운트다운)도 갱신함.
+function updateSlotCamera(ch){
+  let camTargetX, camTargetY;
+  let spectating = false;
+  if (!ch.dead){
+    camTargetX = ch.x; camTargetY = ch.y;
+    ch._spectateIndex = 0; ch._spectatePrevLeft = false; ch._spectatePrevRight = false;
+  } else {
+    const elapsedDead = RESPAWN_TIME - ch.deadTimer;
+    // 팀전에서는 관전 대상도 같은 팀으로만 제한 (상대팀 시점은 볼 수 없음)
+    const aliveOthers = characters.filter(c=> c !== ch && !c.dead && (gameMode !== 'team' || c.team === ch.team));
+    if (elapsedDead >= SPECTATE_DELAY && aliveOthers.length > 0){
+      spectating = true;
+      const gp = (ch.slotIndex === 0 && !isSplitScreen()) ? getActiveGamepad() : getGamepadByIndex(ch.gamepadIndex);
+      const gpLeft = !!(gp && ((gp.buttons[14] && gp.buttons[14].pressed) || (gp.axes[0]||0) < -GAMEPAD_STICK_DEADZONE));
+      const gpRight = !!(gp && ((gp.buttons[15] && gp.buttons[15].pressed) || (gp.axes[0]||0) > GAMEPAD_STICK_DEADZONE));
+      const leftPressed = gpLeft || (ch.slotIndex === 0 && !!(keys['a'] || keys['arrowleft']));
+      const rightPressed = gpRight || (ch.slotIndex === 0 && !!(keys['d'] || keys['arrowright']));
+      if (leftPressed && !ch._spectatePrevLeft) ch._spectateIndex -= 1;
+      if (rightPressed && !ch._spectatePrevRight) ch._spectateIndex += 1;
+      ch._spectatePrevLeft = leftPressed; ch._spectatePrevRight = rightPressed;
+      ch._spectateIndex = ((ch._spectateIndex % aliveOthers.length) + aliveOthers.length) % aliveOthers.length;
+      const target = aliveOthers[ch._spectateIndex];
+      camTargetX = target.x; camTargetY = target.y;
+      ch._spectateLabel = target.label;
+    } else {
+      camTargetX = ch.cam.x; camTargetY = ch.cam.y;
+    }
+  }
+  ch.cam.x += (camTargetX - ch.cam.x) * CAM_LERP;
+  ch.cam.y += (camTargetY - ch.cam.y) * CAM_LERP;
+  ch._spectating = spectating;
+
+  if (ch.slotIndex === 0 && !isSplitScreen()){
+    isSpectatingNow = spectating; // (레거시) render()에서 폴백으로 참조
+    if (ch.dead){
+      respawnOverlayEl.style.opacity = 1;
+      spectateLabelEl.style.display = spectating ? 'block' : 'none';
+      if (spectating) spectateLabelEl.textContent = '관전 모드: ' + (ch._spectateLabel||'') + ' (A/D로 전환)';
+      if (ch.deadTimer <= COUNTDOWN_START){
+        countdownNumEl.style.display = 'block';
+        countdownNumEl.textContent = String(Math.max(1, Math.ceil(ch.deadTimer)));
+      } else {
+        countdownNumEl.style.display = 'none';
+      }
+    } else {
+      respawnOverlayEl.style.opacity = 0;
+    }
+  }
+}
+
+function update(dt){
+  if (!gameStarted || !player) return;
+  if (!roundActive) return; // 라운드가 끝나면(결과 화면 표시 중) 시뮬레이션을 멈춤
+
+  // ---- 컨트롤러 실시간 재배정: 새로 연결된 컨트롤러를 비어있는(=AI가 대신 조작 중인) 슬롯에
+  // 즉시 배정하고, 끊긴 컨트롤러가 배정되어 있던 슬롯은 배정을 해제해 다음 프레임부터 AI로 전환됨 ----
+  reconcileGamepadAssignments();
+
+  // ---- 플레이어 슬롯들의 입력/이동/전투 처리 ----
+  // 슬롯 0(1P): 키보드/마우스/모바일 터치 + (연결돼 있다면) 자신에게 배정된 컨트롤러까지 겸용.
+  // 슬롯 1 이상: 오직 자신에게 배정된 컨트롤러로만 조작하며, 컨트롤러가 없으면(또는 뽑히면)
+  // 그 순간부터 AI가 대신 조작하다가, 컨트롤러가 연결되면 즉시 사람 조작으로 되돌아감.
+  playerSlots.forEach(ch=>{
+    if (ch.slotIndex === 0){
+      const gpInput = readGamepadInput(isSplitScreen() ? getGamepadByIndex(ch.gamepadIndex) : undefined);
+
+      let px = 0, py = 0;
+      if (keys['w'] || keys['arrowup']) py -= 1;
+      if (keys['s'] || keys['arrowdown']) py += 1;
+      if (keys['a'] || keys['arrowleft']) px -= 1;
+      if (keys['d'] || keys['arrowright']) px += 1;
+      const plen = Math.hypot(px,py);
+      if (plen > 0){ px/=plen; py/=plen; }
+
+      // 왼쪽 화면 가상 조이스틱이 눌려있으면 그 드래그 방향이 이동을 대신함
+      if (joystick.active){
+        const jdx = joystick.curX - joystick.anchorX, jdy = joystick.curY - joystick.anchorY;
+        const jd = Math.hypot(jdx, jdy);
+        if (jd > JOY_DEADZONE){ px = jdx/jd; py = jdy/jd; } else { px = 0; py = 0; }
+      }
+
+      // 게임패드 왼쪽 스틱이 기울어져 있으면 그 방향이 최종적으로 이동을 대신함 (컨트롤러 사용 중이라고 판단)
+      if (gpInput.hasMove){
+        const gl = Math.hypot(gpInput.moveX, gpInput.moveY);
+        px = gpInput.moveX / gl; py = gpInput.moveY / gl;
+      }
+
+      // 조준: 게임패드 오른쪽 스틱 > 오른쪽 화면 터치드래그 > 마우스 방향, 순으로 우선순위를 둠
+      const worldMouseX = mouse.x + (ch.cam.x - VIEW_W/2);
+      const worldMouseY = mouse.y + (ch.cam.y - VIEW_H/2);
+      if (!ch.dead){
+        if (gpInput.hasAim){
+          ch.angle = Math.atan2(gpInput.aimY, gpInput.aimX);
+          ch._lastAimWasGamepad = true;
+        } else if (gpInput.connected && ch._lastAimWasGamepad){
+          // 오른쪽 스틱이 데드존 안(중앙 근처)으로 돌아온 상태: 스틱을 놓기 직전의 조준 방향을 유지
+        } else if (touchAim.active && touchAim.hasVector){
+          const tdx = touchAim.curX - touchAim.anchorX, tdy = touchAim.curY - touchAim.anchorY;
+          ch.angle = Math.atan2(tdy, tdx);
+          ch._lastAimWasGamepad = false;
+        } else {
+          ch.angle = Math.atan2(worldMouseY - ch.y, worldMouseX - ch.x);
+          ch._lastAimWasGamepad = false;
+        }
+      }
+
+      // 차징/스윙: 마우스 왼쪽 클릭, 오른쪽 화면 터치, 또는 게임패드 오른쪽 트리거(RT)
+      const wantCharge = !!mouse.down || touchAim.active || gpInput.triggerHeld;
+      const releasedTouch = touchAim.justReleased;
+      const gpTriggerReleased = !!ch._prevGpTrigger && !gpInput.triggerHeld;
+      const wantRelease = (ch._prevMouseDown && !mouse.down) || releasedTouch || gpTriggerReleased;
+      ch._prevMouseDown = !!mouse.down;
+      ch._prevGpTrigger = gpInput.triggerHeld;
+      if (releasedTouch) touchAim.justReleased = false;
+
+      if (!ch.dead) updatePhysics(ch, dt, px, py);
+      updateCombat(ch, characters.filter(c=>c!==ch && isEnemy(ch,c)), dt, wantCharge, wantRelease);
+
+    } else if (slotHasLiveController(ch)){
+      // 컨트롤러가 붙어있는 2P 이상 슬롯: 오직 자기 컨트롤러로만 조작
+      const gpInput = readGamepadInput(getGamepadByIndex(ch.gamepadIndex));
+
+      let px = 0, py = 0;
+      if (gpInput.hasMove){
+        const gl = Math.hypot(gpInput.moveX, gpInput.moveY);
+        px = gpInput.moveX / gl; py = gpInput.moveY / gl;
+      }
+      if (!ch.dead && gpInput.hasAim){
+        ch.angle = Math.atan2(gpInput.aimY, gpInput.aimX);
+      }
+      const wantCharge = gpInput.triggerHeld;
+      const wantRelease = !!ch._prevGpTrigger && !gpInput.triggerHeld;
+      ch._prevGpTrigger = gpInput.triggerHeld;
+
+      if (!ch.dead) updatePhysics(ch, dt, px, py);
+      updateCombat(ch, characters.filter(c=>c!==ch && isEnemy(ch,c)), dt, wantCharge, wantRelease);
+
+    } else {
+      // 컨트롤러가 없는 슬롯: 사람이 연결할 때까지 AI가 대신 조작 (다른 AI와 동일한 FSM 사용)
+      const target = findNearestTarget(ch);
+      const aiInput = updateAI(ch, target, dt);
+      if (!ch.dead) updatePhysics(ch, dt, aiInput.ax, aiInput.ay);
+      updateCombat(ch, characters.filter(c=>c!==ch && isEnemy(ch,c)), dt, aiInput.wantCharge, aiInput.wantRelease);
+    }
+  });
+
+  // ---- AI들: 각자 가장 가까운 살아있는 "적"을 타겟으로 삼아 싸움 (개인전=FFA, 팀전=상대팀만) ----
+  aiList.forEach(ai=>{
+    const target = findNearestTarget(ai);
+    const aiInput = updateAI(ai, target, dt);
+    if (!ai.dead){
+      updatePhysics(ai, dt, aiInput.ax, aiInput.ay);
+    }
+    updateCombat(ai, characters.filter(c=>c!==ai && isEnemy(ai,c)), dt, aiInput.wantCharge, aiInput.wantRelease);
+  });
+
+  // ---- 버프 타이머 ----
+  characters.forEach(ch=>{
+    if (ch.buffSpeed > 0) ch.buffSpeed -= dt;
+    if (ch.buffPower > 0) ch.buffPower -= dt;
+    if (ch.buffRam > 0) ch.buffRam -= dt;
+    if (ch.buffRange > 0) ch.buffRange -= dt;
+    updateRangeScale(ch, dt); // 버프 on/off와 무관하게 매 프레임 목표 배율을 향해 부드럽게 보간
+    if (ch.hitFlashTimer > 0) ch.hitFlashTimer -= dt;
+    if (ch.lastHitRecency > 0) ch.lastHitRecency -= dt;
+    if (ch._ramCooldownTimer > 0) ch._ramCooldownTimer -= dt;
+  });
+
+  // ---- 캐릭터-캐릭터 충돌 (모든 쌍) ----
+  for (let i=0;i<characters.length;i++){
+    for (let j=i+1;j<characters.length;j++){
+      const a = characters[i], b = characters[j];
+      if (!a.dead && !b.dead){
+        resolveCharacterCollision(a, b);
+        handleRamCollision(a, b); // 램 버프 중이면 부딪히기만 해도 완충 스윙급 넉백
+      }
+    }
+  }
+
+  // ---- 벽돌 충돌 ----
+  characters.forEach(ch=>{
+    if (ch.dead) return;
+    for (let i=bricks.length-1;i>=0;i--){
+      resolveBrickCollision(ch, bricks[i]);
+    }
+  });
+  bricks = bricks.filter(b=>b.hp > 0);
+
+  // ---- 자기장이 좁아지며 바깥에 남은 벽돌/아이템/폭탄 파괴 ----
+  pruneOutOfBounds();
+
+  // ---- 경계선 벽 충돌 (더 이상 막지 않고 항상 통과시킴) ----
+  characters.forEach(ch=> resolveBoundaryCollision(ch));
+
+  // ---- 아이템 스폰 & 픽업 ----
+  itemSpawnTimer += dt;
+  if (itemSpawnTimer >= ITEM_SPAWN_INTERVAL){
+    itemSpawnTimer = 0;
+    spawnItem();
+  }
+  characters.forEach(ch=> updateItemPickup(ch));
+
+  // ---- 폭탄(퓨즈 타이머 진행 및 폭발 판정) ----
+  updateBombs(dt);
+
+  // ---- 사망 판정 ----
+  characters.forEach(ch=> checkDeath(ch, dt));
+
+  // ---- 카메라: 각 플레이어 슬롯마다 독립적으로 갱신 (죽으면 일정 시간 뒤 다른 캐릭터를 관전) ----
+  playerSlots.forEach(ch=> updateSlotCamera(ch));
+
+  // ---- 관전 / 부활 카운트다운 / 사망 횟수 HUD ----
+  updateHud();
+
+  updateFx(dt);
+  characters.forEach(ch=> updateTrail(ch, dt));
+
+  // ---- 메시지 타이머 ----
+  if (msgTimer > 0){
+    msgTimer -= dt;
+    if (msgTimer <= 0) msgEl.style.opacity = 0;
+  }
+
+  // ---- 라운드 타이머 (60초) ----
+  roundTimeLeft -= dt;
+  roundTimerEl.textContent = Math.max(0, Math.ceil(roundTimeLeft)) + 's';
+  myKoCountEl.textContent = isSplitScreen()
+    ? playerSlots.map(ch=> (ch.slotIndex+1) + 'P KO ' + (ch.koScore||0)).join('  ·  ')
+    : ('내 KO ' + (player.koScore||0));
+  if (roundTimeLeft <= 0){
+    endRound();
+  }
+}
+
+// ================= 렌더링 =================
+let shakeOffsetX = 0, shakeOffsetY = 0;
+function worldToScreen(x,y){
+  return { x: x - (activeCam.x - VIEW_W/2) + shakeOffsetX, y: y - (activeCam.y - VIEW_H/2) + shakeOffsetY };
+}
+// 렌더링 순서: 플레이어 슬롯들이 항상 맨 위에 그려지도록 마지막에 배치. 게임 시작 전에는 빈 배열.
+function renderOrder(){
+  if (!player) return [];
+  return [...aiList, ...playerSlots];
+}
+
+// 화면 흔들림 오프셋을 프레임당 한 번만 계산 (분할화면일 때 두 패널이 공유)
+function computeShake(){
+  if (screenShake.time > 0 && screenShake.duration > 0){
+    const t = screenShake.time / screenShake.duration; // 1 -> 0
+    const mag = screenShake.magnitude * t;
+    shakeOffsetX = (Math.random()*2-1) * mag;
+    shakeOffsetY = (Math.random()*2-1) * mag;
+  } else {
+    shakeOffsetX = 0; shakeOffsetY = 0;
+    screenShake.magnitude = 0;
+  }
+}
+
+// 캔버스(또는 분할화면의 한 패널) 하나 분량을 그림. 호출 전에 activeCam/viewOwner/VIEW_W/VIEW_H가
+// 이 패널에 맞게 설정되어 있어야 함.
+function renderPane(){
+  // 배경(심연)
+  ctx.fillStyle = '#070a12';
+  ctx.fillRect(0,0,VIEW_W,VIEW_H);
+
+  const centerScreen = worldToScreen(CENTER.x, CENTER.y);
+
+  // 원형 영역 클리핑 후 바닥 타일
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(centerScreen.x, centerScreen.y, currentBoundRadius(), 0, Math.PI*2);
+  ctx.clip();
+
+  const startWX = activeCam.x - VIEW_W/2;
+  const startWY = activeCam.y - VIEW_H/2;
+  const firstTileX = Math.floor(startWX / TILE) * TILE;
+  const firstTileY = Math.floor(startWY / TILE) * TILE;
+
+  for (let wx = firstTileX; wx < startWX + VIEW_W + TILE; wx += TILE){
+    for (let wy = firstTileY; wy < startWY + VIEW_H + TILE; wy += TILE){
+      const tileIndexX = Math.round(wx / TILE);
+      const tileIndexY = Math.round(wy / TILE);
+      const isDark = (tileIndexX + tileIndexY) % 2 === 0;
+      const s = worldToScreen(wx, wy);
+      // 좀 더 게임(경기장) 바닥 같은 어두운 그래파이트 톤 + 타일 이음새 라인
+      ctx.fillStyle = isDark ? '#33394a' : '#3c4356';
+      ctx.fillRect(s.x, s.y, TILE, TILE);
+      ctx.strokeStyle = 'rgba(0,0,0,0.22)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(s.x + 0.5, s.y + 0.5, TILE - 1, TILE - 1);
+      // 타일 좌표 기반의 고정 패턴(매 프레임 랜덤이 아니라 항상 같은 자리)으로 미세한 스크래치 텍스처를 얹어
+      // 밋밋한 단색 바닥이 아니라 약간 낡고 사용감 있는 경기장 바닥처럼 보이게 함
+      const seed = ((tileIndexX * 928371 + tileIndexY * 136781) % 997 + 997) % 997;
+      if (seed % 4 === 0){
+        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+        ctx.lineWidth = 1;
+        const sx = s.x + (seed * 7) % (TILE - 6) + 3;
+        const sy = s.y + (seed * 17) % (TILE - 6) + 3;
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(sx + 4 + (seed % 5), sy + 2 + (seed % 3));
+        ctx.stroke();
+      }
+    }
+  }
+  // 경기장 중심은 밝고 가장자리로 갈수록 어두워지는 비네트(음영)를 얹어서 입체감/거리감을 줌
+  const vignette = ctx.createRadialGradient(
+    centerScreen.x, centerScreen.y, currentBoundRadius() * 0.35,
+    centerScreen.x, centerScreen.y, currentBoundRadius()
+  );
+  vignette.addColorStop(0, 'rgba(0,0,0,0)');
+  vignette.addColorStop(1, 'rgba(0,0,0,0.4)');
+  ctx.fillStyle = vignette;
+  ctx.fillRect(
+    centerScreen.x - currentBoundRadius(), centerScreen.y - currentBoundRadius(),
+    currentBoundRadius() * 2, currentBoundRadius() * 2
+  );
+  ctx.restore();
+
+  // 경계선
+  ctx.beginPath();
+  ctx.arc(centerScreen.x, centerScreen.y, currentBoundRadius(), 0, Math.PI*2);
+  ctx.strokeStyle = '#ff2d7a';
+  ctx.lineWidth = BOUND_THICK;
+  ctx.shadowColor = '#ff2d7a';
+  ctx.shadowBlur = 12;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // 벽돌: 단색 사각형이 아니라 실제 벽돌쌓기 무늬(어긋난 줄눈) + 베벨 음영 + 데미지에 따라 점점
+  // 늘어나는 균열/모서리 파손으로 그려서 "부서지고 있는 벽돌"이라는 느낌을 확실히 줌
+  bricks.forEach(b=>{
+    const s = worldToScreen(b.x, b.y);
+    if (s.x < -40 || s.x > VIEW_W+40 || s.y < -40 || s.y > VIEW_H+40) return;
+
+    let baseColor, mortarColor;
+    if (b.hp >= 3){ baseColor = '#8a4a3a'; mortarColor = '#5c2f24'; }      // 멀쩡한 벽돌: 붉은 벽돌색
+    else if (b.hp === 2){ baseColor = '#7d4335'; mortarColor = '#4a2a22'; } // 금이 가기 시작
+    else { baseColor = '#6e3c30'; mortarColor = '#3a2018'; }                // 거의 다 부서짐
+
+    ctx.fillStyle = baseColor;
+    ctx.fillRect(s.x, s.y, b.w, b.h);
+
+    // 위/왼쪽 하이라이트 + 아래/오른쪽 그림자로 살짝 입체적인 벽돌 블록처럼 보이게 함
+    ctx.fillStyle = 'rgba(255,255,255,0.14)';
+    ctx.fillRect(s.x, s.y, b.w, 2);
+    ctx.fillRect(s.x, s.y, 2, b.h);
+    ctx.fillStyle = 'rgba(0,0,0,0.28)';
+    ctx.fillRect(s.x, s.y + b.h - 2, b.w, 2);
+    ctx.fillRect(s.x + b.w - 2, s.y, 2, b.h);
+
+    // 위/아래 줄이 반 칸씩 어긋나는 실제 벽돌쌓기 패턴의 줄눈(모르타르 선)
+    ctx.strokeStyle = mortarColor;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(s.x, s.y + b.h/2); ctx.lineTo(s.x + b.w, s.y + b.h/2);
+    ctx.moveTo(s.x + b.w/2, s.y); ctx.lineTo(s.x + b.w/2, s.y + b.h/2);
+    ctx.moveTo(s.x + b.w/4, s.y + b.h/2); ctx.lineTo(s.x + b.w/4, s.y + b.h);
+    ctx.moveTo(s.x + b.w*3/4, s.y + b.h/2); ctx.lineTo(s.x + b.w*3/4, s.y + b.h);
+    ctx.stroke();
+
+    // 데미지를 한 번이라도 입었으면(hp<=2) 금이 가기 시작하고, 거의 다 부서지면(hp===1) 균열이
+    // 더 늘어나면서 모서리 한쪽이 아예 떨어져나간 것처럼 표시
+    if (b.hp <= 2){
+      ctx.strokeStyle = 'rgba(10,8,6,0.8)';
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.moveTo(s.x+3, s.y+3);
+      ctx.lineTo(s.x+b.w*0.5, s.y+b.h*0.45);
+      ctx.lineTo(s.x+b.w-6, s.y+b.h-8);
+      ctx.stroke();
+    }
+    if (b.hp === 1){
+      ctx.beginPath();
+      ctx.moveTo(s.x+b.w-4, s.y+4);
+      ctx.lineTo(s.x+b.w*0.4, s.y+b.h*0.55);
+      ctx.lineTo(s.x+8, s.y+b.h-4);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.beginPath();
+      ctx.moveTo(s.x, s.y);
+      ctx.lineTo(s.x + b.w*0.28, s.y);
+      ctx.lineTo(s.x, s.y + b.h*0.28);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    ctx.strokeStyle = 'rgba(0,0,0,0.45)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(s.x+0.5, s.y+0.5, b.w-1, b.h-1);
+  });
+
+  // 아이템
+  items.forEach(it=>{
+    const s = worldToScreen(it.x, it.y);
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, it.radius, 0, Math.PI*2);
+    if (it.type === 'speed'){
+      ctx.fillStyle = '#3dff7a';
+      ctx.shadowColor = '#3dff7a';
+    } else if (it.type === 'power'){
+      ctx.fillStyle = '#ffd23d';
+      ctx.shadowColor = '#ffd23d';
+    } else if (it.type === 'ram'){
+      ctx.fillStyle = '#ffe45b';
+      ctx.shadowColor = '#ffe45b';
+    } else if (it.type === 'range'){
+      ctx.fillStyle = '#ff8cf0';
+      ctx.shadowColor = '#ff8cf0';
+    } else {
+      ctx.fillStyle = '#ff6fae';
+      ctx.shadowColor = '#ff6fae';
+    }
+    ctx.shadowBlur = 14;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#111';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    // 파워업(💥)과 램(예전 💢)이 비슷해 보여 헷갈렸어서 램은 "부딪히면 발사된다"는 느낌의
+    // 로켓 아이콘(🚀)으로 확실히 구분되게 변경. 공격범위 아이템은 조준경(🎯) 아이콘 사용
+    const itemIcon = it.type === 'speed' ? '⚡' : (it.type === 'power' ? '💥' : (it.type === 'ram' ? '🚀' : (it.type === 'range' ? '🎯' : '❤')));
+    ctx.fillText(itemIcon, s.x, s.y+1);
+  });
+
+  // 폭탄: 은은한 채움 원 + 테두리 선으로 범위를 표시하고, 그 원이 살짝 작았다 커졌다 하는
+  // 느린 펄스 애니메이션을 줌. 터지는 시간이 가까워질수록 펄스가 조금 더 빠르고 크게 뛰고,
+  // 색도 하양/주황 -> 빨강으로 뜨거워짐.
+  bombs.forEach(b=>{
+    const s = worldToScreen(b.x, b.y);
+    const tRatio = 1 - Math.max(0, b.timer) / b.maxTimer; // 0(방금 놓임) -> 1(터지기 직전)
+    const pulseSpeed = 0.5 + tRatio * 1.1;    // 초당 맥동 횟수: 0.5회 -> 최대 1.6회로 아주 천천히 빨라짐
+    const pulseAmount = 0.035 + tRatio * 0.055; // 폭발이 가까울수록 커졌다 작아지는 폭도 살짝 커짐
+    const pulse = 1 + Math.sin(performance.now()/1000 * Math.PI*2 * pulseSpeed) * pulseAmount;
+    const radius = BOMB_RADIUS * pulse;
+    const g = Math.max(0, Math.round(190 - tRatio*190));
+    const bl = Math.max(0, Math.round(60 - tRatio*60));
+
+    // 폭발 범위 표시: 반투명 채움 + 테두리 선, 둘 다 같은 반지름의 원 하나에서만 그려서 겹쳐 보이지 않게 함
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, radius, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255,${g},${bl},${0.08 + tRatio*0.1})`;
+    ctx.fill();
+    ctx.strokeStyle = `rgba(255,${g},${bl},${0.55 + tRatio*0.4})`;
+    ctx.lineWidth = 2 + tRatio*2;
+    ctx.stroke();
+
+    // 폭탄 본체
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, 13, 0, Math.PI*2);
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fill();
+    ctx.strokeStyle = `rgba(255,${g},${bl},0.9)`;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 15px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('💣', s.x, s.y+1);
+
+    // 남은 시간 숫자
+    ctx.font = 'bold 11px sans-serif';
+    ctx.fillStyle = `rgba(255,${g},${bl},0.95)`;
+    ctx.fillText(Math.max(0, b.timer).toFixed(1), s.x, s.y - 20);
+  });
+
+  // 캐릭터 잔상(모션 트레일) - 넉백으로 날아가는 중일 때는 훨씬 화려한 코멧(혜성) 트레일로 표현
+  renderOrder().forEach(ch=>{
+    if (!ch._trail) return;
+    ch._trail.forEach(t=>{
+      const s = worldToScreen(t.x, t.y);
+      if (t.launch){
+        const a = (t.life / t.maxLife);
+        // 바깥쪽 컬러 글로우
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, ch.radius*1.6, 0, Math.PI*2);
+        ctx.fillStyle = hexToRgba(ch.color, a*0.35);
+        ctx.fill();
+        // 안쪽 밝은 코어
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, ch.radius*0.95, 0, Math.PI*2);
+        ctx.fillStyle = hexToRgba('#ffffff', a*0.7);
+        ctx.fill();
+      } else {
+        const a = (t.life / t.maxLife) * 0.35;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, ch.radius*0.85, 0, Math.PI*2);
+        ctx.fillStyle = hexToRgba(ch.color, a);
+        ctx.fill();
+      }
+    });
+  });
+
+  // 캐릭터
+  renderOrder().forEach(ch=>{
+    if (ch.dead) return;
+    const s = worldToScreen(ch.x, ch.y);
+
+    // 버프 오라
+    if (ch.buffSpeed > 0){
+      ctx.beginPath(); ctx.arc(s.x, s.y, ch.radius+6, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(61,255,122,0.7)'; ctx.lineWidth=2; ctx.stroke();
+    }
+    if (ch.buffPower > 0){
+      ctx.beginPath(); ctx.arc(s.x, s.y, ch.radius+10, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(255,210,61,0.6)'; ctx.lineWidth=2; ctx.stroke();
+    }
+    // 몸싸움 넉백(램) 버프: 몸이 빛나는 강한 황금색 펄스 오라로 부딪히면 위험하다는 걸 알림
+    if (ch.buffRam > 0){
+      const ramPulse = 1 + Math.sin(performance.now()/90) * 0.28;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, (ch.radius+15)*ramPulse, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(255,223,90,0.9)'; ctx.lineWidth = 3;
+      ctx.shadowColor = '#ffe45b'; ctx.shadowBlur = 18;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, ch.radius*1.15, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(255,236,150,${0.18 + Math.sin(performance.now()/70)*0.08})`;
+      ctx.fill();
+    }
+    // 팀전에서도 팀 마커는 필요 없고(색으로 이미 구분됨), 대신 "내 캐릭터"가 어느 것인지만
+    // 명확히 알 수 있게 플레이어 머리 위에 작은 흰색 화살표 마커를 표시
+    if (ch === viewOwner){
+      const markerY = s.y - ch.radius - 22;
+      ctx.beginPath();
+      ctx.moveTo(s.x, markerY + 8);
+      ctx.lineTo(s.x - 6, markerY - 2);
+      ctx.lineTo(s.x + 6, markerY - 2);
+      ctx.closePath();
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = '#000000';
+      ctx.shadowBlur = 5;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#111';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    // 활성 버프 상태 배지: 지금 어떤 아이템 효과가 켜져 있는지, 얼마나 남았는지를
+    // 아이콘 + 원형 남은시간 게이지 + 종료 임박시 빨라지는 깜빡임으로 한눈에 알 수 있게 표시
+    {
+      const activeBuffs = [];
+      if (ch.buffSpeed > 0) activeBuffs.push({ icon:'⚡', color:'#3dff7a', remaining: ch.buffSpeed, duration: BUFF_DURATION });
+      if (ch.buffPower > 0) activeBuffs.push({ icon:'💥', color:'#ffd23d', remaining: ch.buffPower, duration: BUFF_DURATION });
+      if (ch.buffRam   > 0) activeBuffs.push({ icon:'🚀', color:'#ffe45b', remaining: ch.buffRam, duration: RAM_BUFF_DURATION });
+      if (ch.buffRange > 0) activeBuffs.push({ icon:'🎯', color:'#ff8cf0', remaining: ch.buffRange, duration: RANGE_BUFF_DURATION });
+
+      if (activeBuffs.length > 0){
+        const badgeY = s.y - ch.radius - 46;
+        const spacing = 20;
+        const startX = s.x - ((activeBuffs.length - 1) * spacing) / 2;
+        activeBuffs.forEach((buff, bi)=>{
+          const bx = startX + bi * spacing;
+          const frac = Math.max(0, Math.min(1, buff.remaining / buff.duration)); // 1(막 시작)->0(곧 종료)
+          const blinkFreq = 1.5 + (1 - frac) * 8; // 남은 시간이 적을수록 빠르게 깜빡임
+          const blink = 0.5 + Math.sin(performance.now()/1000 * Math.PI*2 * blinkFreq) * 0.5;
+          const alpha = 0.45 + blink * 0.55;
+
+          ctx.beginPath();
+          ctx.arc(bx, badgeY, 9, 0, Math.PI*2);
+          ctx.fillStyle = hexToRgba(buff.color, alpha*0.9);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          // 남은 시간 파이 게이지 (시계 방향으로 줄어듦)
+          ctx.beginPath();
+          ctx.moveTo(bx, badgeY);
+          ctx.arc(bx, badgeY, 9, -Math.PI/2, -Math.PI/2 + Math.PI*2*frac);
+          ctx.closePath();
+          ctx.fillStyle = 'rgba(255,255,255,0.4)';
+          ctx.fill();
+
+          ctx.fillStyle = '#111';
+          ctx.font = 'bold 9px sans-serif';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText(buff.icon, bx, badgeY + 0.5);
+        });
+      }
+    }
+
+    // 차징 글로우: 많이 모을수록 하얀색 -> 노란색 -> 빨간색으로 위험하게 변하고 맥동함
+    if (ch.charging){
+      const ratio = ch.chargeAmount / CHARGE_MAX; // 0~1
+      const pulse = 1 + Math.sin(performance.now()/60) * 0.15 * ratio;
+      const glowR = (ch.radius + 4 + ratio*14) * pulse;
+      let glowColor;
+      if (ratio < 0.5) glowColor = `rgba(255,255,${Math.round(255-ratio*2*160)},${0.25+ratio*0.3})`;
+      else glowColor = `rgba(255,${Math.round(200-(ratio-0.5)*2*160)},60,${0.35+ratio*0.35})`;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, glowR, 0, Math.PI*2);
+      ctx.fillStyle = glowColor;
+      ctx.shadowColor = glowColor;
+      ctx.shadowBlur = 12 + ratio*18;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // ---- 풀차지 임박(85% 이상): 훨씬 더 화려한 연출 추가 ----
+      if (ratio >= 0.85){
+        const fullness = (ratio - 0.85) / 0.15; // 0~1
+        const fastPulse = 1 + Math.sin(performance.now()/28) * 0.3;
+        // 회전하는 이중 링
+        const spin = performance.now()/220;
+        for (let k=0;k<2;k++){
+          const ringR = (ch.radius + 16 + k*9) * fastPulse;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, ringR, spin + k*Math.PI, spin + k*Math.PI + Math.PI*1.4);
+          ctx.strokeStyle = `rgba(255,${ratio>=0.98?230:120},${ratio>=0.98?120:40},${0.5+fullness*0.4})`;
+          ctx.lineWidth = 2.5;
+          ctx.stroke();
+        }
+        // 풀차지 완료(98% 이상) 순간: 강한 백색 코어 플래시
+        if (ratio >= 0.98){
+          const flashPulse = 0.6 + Math.sin(performance.now()/45) * 0.4;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, ch.radius*0.7, 0, Math.PI*2);
+          ctx.fillStyle = `rgba(255,255,255,${0.35 + flashPulse*0.3})`;
+          ctx.shadowColor = '#ffffff';
+          ctx.shadowBlur = 24;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      }
+    }
+
+    // ---- 넉백 비행 중(강하게 날아가는 중): 회전하는 스피드 링으로 스핀 연출 ----
+    if (ch.knockbackTimer > 0){
+      const spinAngle = ch._flightSpin || 0;
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.rotate(spinAngle);
+      ctx.beginPath();
+      ctx.moveTo(ch.radius*1.9, 0);
+      for (let k=1;k<=5;k++){
+        const a = k * (Math.PI*2/5);
+        ctx.lineTo(Math.cos(a)*ch.radius*1.9, Math.sin(a)*ch.radius*1.9);
+      }
+      ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // 공격 가능한 사거리/각도 프리뷰. 플레이어 전용으로만 평소에도 은은하게 보여주고,
+    // 충전 중일 때는 이 범위의 색이 흰색 -> 노란색 -> 빨간색으로 뜨겁게 변해서
+    // 기존의 막대 게이지를 대신해 충전량을 알려준다. (스윙 중엔 아래의 실제 스윙 이펙트가 대신 나타남)
+    if (ch === viewOwner && !ch.swinging){
+      const isCharging = ch.charging;
+      const ratio = isCharging ? ch.chargeAmount / CHARGE_MAX : 0;
+
+      let ringColorA, ringColorB, fillColor, strokeColorA, strokeColorB;
+      if (isCharging){
+        let r = 255, g, b;
+        if (ratio < 0.5){ g = Math.round(255 - ratio*2*130); b = Math.round(255 - ratio*2*200); }
+        else { g = Math.round(190 - (ratio-0.5)*2*150); b = Math.round(55 - (ratio-0.5)*2*55); }
+        b = Math.max(0, b); g = Math.max(0, g);
+        ringColorA = 'rgba(0,0,0,0.35)';
+        ringColorB = `rgba(${r},${g},${b},${0.6 + ratio*0.35})`;
+        fillColor = `rgba(${r},${g},${b},${0.18 + ratio*0.3})`;
+        strokeColorA = 'rgba(0,0,0,0.4)';
+        strokeColorB = `rgba(${r},${Math.min(255,g+40)},${b},${0.75 + ratio*0.25})`;
+      } else {
+        ringColorA = 'rgba(0,0,0,0.35)';
+        ringColorB = 'rgba(70,70,78,0.85)';
+        fillColor = 'rgba(60,60,68,0.22)';
+        strokeColorA = 'rgba(0,0,0,0.4)';
+        strokeColorB = 'rgba(80,80,90,0.9)';
+      }
+
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, currentSwingRange(ch), 0, Math.PI*2);
+      ctx.strokeStyle = ringColorA;
+      ctx.lineWidth = 3;
+      ctx.setLineDash([4,6]);
+      ctx.stroke();
+      ctx.strokeStyle = ringColorB;
+      ctx.lineWidth = isCharging ? 1.5 + ratio*2 : 1.5;
+      if (isCharging){ ctx.shadowColor = ringColorB; ctx.shadowBlur = 6 + ratio*16; }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.setLineDash([]);
+
+      const previewStart = ch.angle - SWING_HALF_ANGLE;
+      const previewEnd = ch.angle + SWING_HALF_ANGLE;
+      ctx.beginPath();
+      ctx.moveTo(s.x, s.y);
+      ctx.arc(s.x, s.y, currentSwingRange(ch), previewStart, previewEnd);
+      ctx.closePath();
+      ctx.fillStyle = fillColor;
+      ctx.fill();
+      ctx.strokeStyle = strokeColorA;
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.strokeStyle = strokeColorB;
+      ctx.lineWidth = isCharging ? 1.2 + ratio*1.5 : 1.2;
+      ctx.stroke();
+    }
+
+    // 스윙 이펙트: 부채꼴이 서서히 차오르는 느낌 대신, 실제 몽둥이를 휘두르는 것처럼 보이도록
+    // (1) 지나온 궤적을 갈수록 옅어지는 모션 블러 호(스웨트)로 그리고
+    // (2) 스윙 각도 끝에 손잡이는 가늘고 머리는 두꺼운 몽둥이 실루엣을 붙여서 그림
+    if (ch.swinging){
+      const t = Math.min(1, ch.swingTimer / SWING_DURATION);
+      const startA = ch.swingAngle - SWING_HALF_ANGLE;
+      const endA = ch.swingAngle + SWING_HALF_ANGLE;
+      const curA = startA + (endA-startA)*t;
+      const pw = ch.swingPower || 1;
+      const heat = Math.min(1, (pw - 1) / 2); // 파워 1~3 -> 0~1
+      const flash = Math.max(0, 1 - t*3); // 스윙 시작 순간 확 밝아졌다가 빠르게 가라앉음
+      const glowColor = heat > 0.5 ? '#ff5b3d' : '#ffe45b';
+
+      // ---- 모션 블러 궤적: 지나온 구간을 여러 짧은 호로 나눠 몽둥이 머리(curA)에 가까울수록 진하고
+      // 뒤로(오래된 위치일수록) 옅어지게 그려서 "휙" 지나간 스윙 궤적처럼 보이게 함 ----
+      const TRAIL_SEGMENTS = 7;
+      for (let i=0;i<TRAIL_SEGMENTS;i++){
+        const segA1 = startA + (curA-startA) * (i/TRAIL_SEGMENTS);
+        const segA2 = startA + (curA-startA) * ((i+1)/TRAIL_SEGMENTS);
+        const alpha = ((i+1)/TRAIL_SEGMENTS) * (0.55 + heat*0.25) * (0.5 + flash*0.5);
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, currentSwingRange(ch), segA1, segA2);
+        ctx.strokeStyle = `rgba(255,${Math.round(255-heat*140)},${Math.round(220-heat*180)},${alpha})`;
+        ctx.lineWidth = 4 + heat*4;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+      }
+
+      // ---- 몽둥이 실루엣: 손 위치에서 curA 방향 끝까지, 손잡이는 가늘고 머리는 두꺼운 방망이 모양 ----
+      const dirX = Math.cos(curA), dirY = Math.sin(curA);
+      const perpX = -dirY, perpY = dirX;
+      const handR = ch.radius*0.55, tipR = currentSwingRange(ch)*0.92;
+      const handHalfW = 2.2, tipHalfW = 6.5 + heat*2;
+      const hx = s.x + dirX*handR, hy = s.y + dirY*handR;
+      const tx = s.x + dirX*tipR, ty = s.y + dirY*tipR;
+
+      ctx.beginPath();
+      ctx.moveTo(hx + perpX*handHalfW, hy + perpY*handHalfW);
+      ctx.lineTo(tx + perpX*tipHalfW, ty + perpY*tipHalfW);
+      ctx.lineTo(tx - perpX*tipHalfW, ty - perpY*tipHalfW);
+      ctx.lineTo(hx - perpX*handHalfW, hy - perpY*handHalfW);
+      ctx.closePath();
+      ctx.fillStyle = '#c69a5c'; // 나무 몽둥이 색
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(40,25,10,0.85)';
+      ctx.lineWidth = 1.3;
+      ctx.stroke();
+
+      // 몽둥이 머리(끝부분)를 뭉툭하게 둥근 캡으로 마무리
+      ctx.beginPath();
+      ctx.arc(tx, ty, tipHalfW, 0, Math.PI*2);
+      ctx.fillStyle = '#c69a5c';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(40,25,10,0.85)';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // 파워가 셀수록 몽둥이 끝(임팩트 지점)이 뜨겁게 빛남
+      ctx.beginPath();
+      ctx.arc(tx, ty, tipHalfW*1.6, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(255,${Math.round(220-heat*140)},${Math.round(140-heat*100)},${0.25+heat*0.35+flash*0.2})`;
+      ctx.shadowColor = glowColor;
+      ctx.shadowBlur = 12 + heat*16 + flash*10;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    // 캐릭터 본체: 단순한 원이 아니라 위에서 내려다본 사람 모양(머리+몸통+팔+다리)으로 그리고,
+    // 이동 속도에 따라 팔다리가 걷는(달리는) 것처럼 움직이도록 함 (완충에 가까울수록 살짝 커지는 스쿼시 느낌 유지)
+    const chargeScale = ch.charging ? 1 + (ch.chargeAmount/CHARGE_MAX)*0.18 : 1;
+    let bodyFillColor;
+    if (ch.hitFlashTimer > 0){
+      bodyFillColor = '#ffffff';
+    } else if (ch.invincible){
+      bodyFillColor = 'rgba(255,255,255,0.5)';
+    } else if (ch.buffRam > 0){
+      // 램(부딪히기) 버프가 활성 중임을 명확히 알 수 있게 몸 색이 골드색과 원래색 사이를 깜빡임.
+      // 남은 시간이 줄어들수록 깜빡이는 속도가 점점 빨라지고, 효과가 끝나면 원래 색으로 자연스럽게 복귀.
+      const frac = Math.max(0, ch.buffRam) / RAM_BUFF_DURATION; // 1(막 먹음) -> 0(곧 종료)
+      const blinkFreq = 2 + (1 - frac) * 9; // 초당 2회 -> 최대 11회로 점점 빨라짐
+      const blink = Math.sin(performance.now()/1000 * Math.PI*2 * blinkFreq);
+      bodyFillColor = blink > 0 ? '#ffe45b' : ch.color;
+    } else {
+      bodyFillColor = ch.color;
+    }
+    const limbColor = shadeColor(bodyFillColor, -22);
+    const headColor = shadeColor(bodyFillColor, 18);
+
+    // 걷기/달리기 팔다리 스윙: 이동 속도가 빠를수록 더 빠르고 크게 움직이고, 멈춰있으면 거의 정지
+    const moveSpeed = Math.hypot(ch.vx, ch.vy);
+    const speedRatio = Math.min(1, moveSpeed / (BASE_VMAX*0.85));
+    const gaitPhase = performance.now()/1000 * (5 + speedRatio*9);
+    const legSwing = Math.sin(gaitPhase) * (ch.radius*0.34) * (0.35 + speedRatio*0.65);
+    const armSwing = Math.sin(gaitPhase + Math.PI) * (ch.radius*0.3) * (0.3 + speedRatio*0.7);
+    // 스윙(공격) 중에는 팔(무기 쪽)이 스윙 진행률에 맞춰 앞으로 쭉 뻗어나가는 느낌을 추가로 줌
+    const swingReach = ch.swinging ? Math.sin(Math.min(1, ch.swingTimer / SWING_DURATION) * Math.PI) * ch.radius*0.9 : 0;
+
+    // 바닥에 떨어지는 은은한 그림자: 캐릭터가 바닥에 딛고 서 있는 느낌(입체감)을 줌
+    ctx.beginPath();
+    ctx.ellipse(s.x + ch.radius*0.12, s.y + ch.radius*0.28, ch.radius*0.85*chargeScale, ch.radius*0.5*chargeScale, 0, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(0,0,0,0.28)';
+    ctx.fill();
+
+    ctx.save();
+    ctx.translate(s.x, s.y);
+    ctx.rotate(ch.angle); // 이후로는 +x축이 "정면" 방향이 됨
+
+    const skinShade = shadeColor(bodyFillColor, -35); // 손/발(맨살 느낌) 음영
+
+    // 다리 (몸통 뒤쪽, 좌우 번갈아 앞뒤로 스윙) + 발끝에 작은 신발 포인트
+    [legSwing, -legSwing].forEach(off=>{
+      const lx = -ch.radius*0.42*chargeScale + off*0.25;
+      ctx.beginPath();
+      ctx.ellipse(lx, off, ch.radius*0.3*chargeScale, ch.radius*0.55*chargeScale, 0, 0, Math.PI*2);
+      ctx.fillStyle = limbColor;
+      ctx.strokeStyle = '#111'; ctx.lineWidth = 1;
+      ctx.fill(); ctx.stroke();
+      // 신발(다리 끝, 뒤쪽)
+      ctx.beginPath();
+      ctx.ellipse(lx - ch.radius*0.22*chargeScale, off, ch.radius*0.18*chargeScale, ch.radius*0.22*chargeScale, 0, 0, Math.PI*2);
+      ctx.fillStyle = '#2a2a30';
+      ctx.fill();
+    });
+
+    // 팔 (몸통 옆, 다리와 반대 위상으로 스윙 + 공격 중인 팔은 앞으로 뻗음) + 손 끝에 작은 주먹 포인트
+    [ { off: armSwing, reach: swingReach }, { off: -armSwing, reach: 0 } ].forEach(arm=>{
+      const ax = ch.radius*0.1*chargeScale + arm.reach*0.6;
+      ctx.beginPath();
+      ctx.ellipse(ax, arm.off, ch.radius*0.28*chargeScale, ch.radius*0.6*chargeScale, 0, 0, Math.PI*2);
+      ctx.fillStyle = bodyFillColor;
+      ctx.strokeStyle = '#111'; ctx.lineWidth = 1;
+      ctx.fill(); ctx.stroke();
+      // 주먹(팔 끝, 앞쪽)
+      ctx.beginPath();
+      ctx.arc(ax + ch.radius*0.32*chargeScale, arm.off, ch.radius*0.19*chargeScale, 0, Math.PI*2);
+      ctx.fillStyle = skinShade;
+      ctx.fill();
+      ctx.strokeStyle = '#111'; ctx.lineWidth = 0.8; ctx.stroke();
+    });
+
+    // 몸통 (타원, 정면 방향으로 살짝 길쭉하게)
+    ctx.beginPath();
+    ctx.ellipse(0, 0, ch.radius*0.66*chargeScale, ch.radius*0.86*chargeScale, 0, 0, Math.PI*2);
+    ctx.fillStyle = bodyFillColor;
+    ctx.fill();
+    ctx.strokeStyle = '#111'; ctx.lineWidth = 1.5; ctx.stroke();
+    // 허리띠 라인으로 몸통에 실루엣을 하나 더 줘서 밋밋한 타원이 아니라 사람 몸통처럼 보이게 함
+    ctx.beginPath();
+    ctx.ellipse(-ch.radius*0.08*chargeScale, 0, ch.radius*0.5*chargeScale, ch.radius*0.08*chargeScale, 0, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // 머리 (정면 쪽에 배치해서 바라보는 방향을 표시)
+    ctx.beginPath();
+    ctx.arc(ch.radius*0.58*chargeScale, 0, ch.radius*0.48*chargeScale, 0, Math.PI*2);
+    ctx.fillStyle = headColor;
+    ctx.fill();
+    ctx.strokeStyle = '#111'; ctx.lineWidth = 1.2; ctx.stroke();
+    // 눈 + 눈 위 미간의 옅은 그림자로 얼굴이 좀 더 또렷해 보이게 함
+    ctx.beginPath();
+    ctx.ellipse(ch.radius*0.5*chargeScale, 0, ch.radius*0.16*chargeScale, ch.radius*0.28*chargeScale, 0, -Math.PI/2, Math.PI/2);
+    ctx.fillStyle = 'rgba(0,0,0,0.08)';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(ch.radius*0.78*chargeScale, -ch.radius*0.14, ch.radius*0.07, 0, Math.PI*2);
+    ctx.arc(ch.radius*0.78*chargeScale, ch.radius*0.14, ch.radius*0.07, 0, Math.PI*2);
+    ctx.fillStyle = '#111';
+    ctx.fill();
+
+    ctx.restore();
+  });
+
+  // 타격 이펙트 (파워에 비례해 더 크고 밝은 링 + 코어 플래시)
+  fx.forEach(f=>{
+    const s = worldToScreen(f.x, f.y);
+    const t = 1 - f.life/f.maxLife;
+    const pw = f.power || 1;
+    const fxColor = f.color || '#ffffff';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, (8 + t*(24 + pw*10)), 0, Math.PI*2);
+    ctx.strokeStyle = hexToRgba(fxColor, (1-t));
+    ctx.lineWidth = 3 + pw;
+    ctx.stroke();
+    if (t < 0.3){
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, 10 + pw*4, 0, Math.PI*2);
+      ctx.fillStyle = hexToRgba(fxColor, (1-t/0.3)*0.8);
+      ctx.fill();
+    }
+  });
+
+  // 벽돌 파괴 잔해
+  debris.forEach(d=>{
+    const s = worldToScreen(d.x, d.y);
+    const a = d.life / d.maxLife;
+    ctx.fillStyle = hexToRgba(d.color, a);
+    ctx.fillRect(s.x - d.size/2, s.y - d.size/2, d.size, d.size);
+  });
+
+  // 풀차지 에너지 스파크 (캐릭터로 빨려들어가는 반짝임)
+  chargeSparks.forEach(sp=>{
+    const s = worldToScreen(sp.x, sp.y);
+    const a = sp.life / sp.maxLife;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, 2.5 + a*2, 0, Math.PI*2);
+    ctx.fillStyle = hexToRgba(sp.color, a);
+    ctx.shadowColor = sp.color;
+    ctx.shadowBlur = 8;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  });
+
+  // 풀스윙 강타 스타(별) 파편 (스매시류 KO 연출)
+  stars.forEach(st=>{
+    const s = worldToScreen(st.x, st.y);
+    const a = st.life / st.maxLife;
+    ctx.save();
+    ctx.translate(s.x, s.y);
+    ctx.rotate(st.rot);
+    ctx.beginPath();
+    for (let i=0;i<5;i++){
+      const a1 = (i*2*Math.PI)/5 - Math.PI/2;
+      const a2 = a1 + Math.PI/5;
+      ctx.lineTo(Math.cos(a1)*st.size, Math.sin(a1)*st.size);
+      ctx.lineTo(Math.cos(a2)*st.size*0.45, Math.sin(a2)*st.size*0.45);
+    }
+    ctx.closePath();
+    ctx.fillStyle = `rgba(255,${Math.round(210+a*45)},80,${a})`;
+    ctx.shadowColor = '#ffd23d';
+    ctx.shadowBlur = 10;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  });
+
+  // 데미지 % 팝업 텍스트
+  floatingTexts.forEach(ft=>{
+    const s = worldToScreen(ft.x, ft.y);
+    const a = Math.min(1, ft.life / ft.maxLife * 1.4);
+    ctx.font = 'bold 16px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = hexToRgba(ft.color, a);
+    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+    ctx.shadowBlur = 3;
+    ctx.fillText(ft.text, s.x, s.y);
+    ctx.shadowBlur = 0;
+  });
+
+  // 관전 모드일 때는 화면(패널) 전체를 살짝 어둡게 덮어서 "지금 내가 아니라 다른 캐릭터를 보고 있다"는
+  // 걸 한눈에 인지할 수 있게 함
+  const ownerSpectating = viewOwner ? !!viewOwner._spectating : isSpectatingNow;
+  if (ownerSpectating){
+    ctx.fillStyle = 'rgba(0,0,0,0.38)';
+    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+  }
+
+  // 분할화면 모드에서는 (공용 DOM 오버레이 대신) 이 패널 안에 직접 사망/부활 카운트다운을 그림
+  if (isSplitScreen() && viewOwner && viewOwner.dead){
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    if (ownerSpectating){
+      const label = viewOwner._spectateLabel;
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillStyle = '#ffd23d';
+      ctx.shadowColor = '#000'; ctx.shadowBlur = 4;
+      ctx.fillText('관전 모드' + (label ? (': ' + label) : ''), VIEW_W/2, VIEW_H*0.34);
+      ctx.shadowBlur = 0;
+    }
+    if (viewOwner.deadTimer <= COUNTDOWN_START){
+      const remain = Math.max(1, Math.ceil(viewOwner.deadTimer));
+      ctx.font = 'bold 56px sans-serif';
+      ctx.fillStyle = '#fff';
+      ctx.shadowColor = '#f0a'; ctx.shadowBlur = 14;
+      ctx.fillText(String(remain), VIEW_W/2, VIEW_H*0.4);
+      ctx.shadowBlur = 0;
+    }
+  }
+}
+
+// 플레이어 슬롯 수(n)에 맞춰 화면을 나눌 패널 사각형들을 계산.
+// 1명: 전체화면 / 2명: 화면 비율에 맞춰 좌우 또는 상하 분할 / 3~4명: 2x2 그리드(3명이면 마지막 칸은 비움)
+function computePaneLayout(n, fullW, fullH){
+  if (n <= 1) return [{ ox:0, oy:0, w:fullW, h:fullH }];
+  if (n === 2){
+    const horizontal = fullW >= fullH;
+    if (horizontal){
+      const w = Math.floor(fullW/2);
+      return [{ ox:0, oy:0, w, h:fullH }, { ox:w, oy:0, w:fullW-w, h:fullH }];
+    }
+    const h = Math.floor(fullH/2);
+    return [{ ox:0, oy:0, w:fullW, h }, { ox:0, oy:h, w:fullW, h:fullH-h }];
+  }
+  const w = Math.floor(fullW/2), h = Math.floor(fullH/2);
+  const cells = [
+    { ox:0, oy:0, w, h }, { ox:w, oy:0, w:fullW-w, h },
+    { ox:0, oy:h, w, h:fullH-h }, { ox:w, oy:h, w:fullW-w, h:fullH-h }
+  ];
+  return cells.slice(0, n);
+}
+
+// 매 프레임 실제로 호출되는 렌더 진입점. 분할화면이면 캔버스를 플레이어 수만큼 나눠 각자의
+// 카메라로 그리고, 아니면 기존처럼 캔버스 전체를 한 번에 그림.
+function render(){
+  computeShake();
+
+  if (!player){
+    // 아직 게임을 시작하기 전(시작화면 표시 중): 기본 카메라로 빈 맵만 그려둠
+    activeCam = fallbackCam;
+    viewOwner = null;
+    VIEW_W = canvas.width; VIEW_H = canvas.height;
+    renderPane();
+    return;
+  }
+
+  if (isSplitScreen()){
+    const fullW = canvas.width, fullH = canvas.height;
+
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, fullW, fullH);
+
+    const layout = computePaneLayout(playerSlots.length, fullW, fullH);
+    const panes = playerSlots.map((ch,i)=> ({ ...layout[i], owner: ch, label: (ch.slotIndex+1) + 'P' }));
+
+    const savedVIEW_W = VIEW_W, savedVIEW_H = VIEW_H;
+    panes.forEach(p=>{
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(p.ox, p.oy, p.w, p.h);
+      ctx.clip();
+      ctx.translate(p.ox, p.oy);
+      VIEW_W = p.w; VIEW_H = p.h;
+      activeCam = p.owner.cam;
+      viewOwner = p.owner;
+      renderPane();
+      ctx.restore();
+    });
+    VIEW_W = savedVIEW_W; VIEW_H = savedVIEW_H;
+    activeCam = player.cam;
+    viewOwner = player;
+    ctx.setTransform(1,0,0,1,0,0);
+
+    // 패널 구분선 + 각 패널의 N P 라벨
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.lineWidth = 3;
+    panes.forEach(p=> ctx.strokeRect(p.ox+1.5, p.oy+1.5, p.w-3, p.h-3));
+    ctx.font = 'bold 13px sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.shadowColor = '#000'; ctx.shadowBlur = 3;
+    panes.forEach(p=> ctx.fillText(p.label, p.ox + 10, p.oy + 10));
+    ctx.shadowBlur = 0;
+  } else {
+    activeCam = player.cam;
+    viewOwner = player;
+    VIEW_W = canvas.width; VIEW_H = canvas.height;
+    renderPane();
+  }
+
+  drawScreenFlash();
+}
+
+// 라운드 시작/종료 등 큰 이벤트에서 화면 전체(분할화면이면 두 패널 모두)를 잠깐 색으로 확 밝혔다가
+// 가라앉히는 플래시 연출. 패널 나누기와 무관하게 캔버스 전체에 한 번만 그리면 되므로 render()
+// 맨 마지막(모든 패널을 다 그린 뒤)에 전체 캔버스 좌표계로 그림
+function drawScreenFlash(){
+  if (screenFlash.time <= 0 || screenFlash.duration <= 0) return;
+  const t = Math.max(0, screenFlash.time / screenFlash.duration); // 1 -> 0
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.fillStyle = hexToRgba(screenFlash.color, t*0.5);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+// hex(#rrggbb) 또는 rgb() 색상 문자열을 알파값 포함 rgba()로 변환
+function hexToRgba(color, alpha){
+  if (color.startsWith('#')){
+    const r = parseInt(color.slice(1,3),16);
+    const g = parseInt(color.slice(3,5),16);
+    const b = parseInt(color.slice(5,7),16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+  if (color.startsWith('rgb')){
+    const nums = color.match(/[\d.]+/g);
+    return `rgba(${nums[0]},${nums[1]},${nums[2]},${alpha})`;
+  }
+  return color;
+}
+
+// hex 색상을 percent(-100~100)만큼 밝게(+)/어둡게(-) 보정. hex가 아니면(rgba 등) 원래 색을 그대로 반환
+// (캐릭터 몸통/팔다리/머리 색상에 미세한 명암차를 줘서 입체감을 내는 데 사용)
+function shadeColor(color, percent){
+  if (!color || !color.startsWith('#') || color.length < 7) return color;
+  const num = parseInt(color.slice(1), 16);
+  const amt = Math.round(2.55 * percent);
+  let r = (num >> 16) + amt, g = (num >> 8 & 0x00FF) + amt, b = (num & 0x0000FF) + amt;
+  r = Math.max(0, Math.min(255, r)); g = Math.max(0, Math.min(255, g)); b = Math.max(0, Math.min(255, b));
+  return '#' + (0x1000000 + r*0x10000 + g*0x100 + b).toString(16).slice(1);
+}
+
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
