@@ -43,6 +43,15 @@
   .hudRow.hudRowSelf { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.35); }
   .hudName { font-weight: bold; font-size: 12px; margin-bottom: 3px; text-shadow: 0 0 4px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px; color: #fff; }
   .colorDot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; box-shadow: 0 0 4px rgba(0,0,0,0.8); flex-shrink: 0; }
+  /* 등급 엠블럼: 이름 옆에 붙는 작은 배지. 배경색은 등급의 "밴드"(루키/브레이커/스매셔/임팩터/레전드)를,
+     숫자는 밴드 안에서의 세부 단계(IV~I, I가 가장 높음)를 나타냄 */
+  .rankEmblem {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 30px; height: 15px; padding: 0 4px; border-radius: 4px;
+    font-size: 9px; font-weight: bold; color: #111; flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.45); text-shadow: none;
+    box-shadow: 0 0 4px rgba(0,0,0,0.5);
+  }
   .hudMeta { font-size: 10px; color: #ccc; margin-top: 2px; text-shadow: 0 0 4px #000; display: flex; justify-content: space-between; }
   /* 타이틀 화면: 게임 진입 시 가장 먼저 보이는 분위기용 화면. 터치/클릭하면 메뉴(startScreen)로 넘어감 */
   #titleScreen {
@@ -197,29 +206,40 @@
   #shopPanel {
     text-align: center; color: #eee; padding: 26px 34px; border-radius: 12px; max-width: 90vw;
     background: rgba(20,22,30,0.94); border: 1px solid #444; box-shadow: 0 0 40px rgba(0,0,0,0.6);
+    display: flex; flex-direction: column; max-height: 88vh;
   }
-  #shopPanel h2 { margin: 0 0 10px; font-size: 22px; letter-spacing: 2px; text-shadow: 0 0 12px #ffd23d; }
-  #shopWalletDisplay { color: #ffd23d; font-weight: bold; margin: 0 0 4px; }
+  #shopPanel h2 { margin: 0 0 10px; font-size: 22px; letter-spacing: 2px; text-shadow: 0 0 12px #ffd23d; flex-shrink: 0; }
+  #shopWalletDisplay { color: #ffd23d; font-weight: bold; margin: 0 0 4px; flex-shrink: 0; }
+  /* 캐릭터가 20종 가까이 되면서 한 화면에 다 안 들어오므로, 이 목록만 세로 스크롤되게 함.
+     -webkit-overflow-scrolling:touch로 iOS에서도 부드럽게 스크롤되고, touch-action:pan-y로
+     세로 스크롤 제스처가 다른 데로 가로채이지 않게 함(모바일 터치 스크롤 지원). */
   #shopGrid {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px;
-    max-width: 560px;
+    max-width: 560px; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y;
+    padding-right: 4px;
   }
+  #shopGrid::-webkit-scrollbar { width: 8px; }
+  #shopGrid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 4px; }
   .skinCard {
     background: rgba(255,255,255,0.06); border: 1px solid #444; border-radius: 10px; padding: 12px 8px;
     display: flex; flex-direction: column; align-items: center; gap: 6px;
   }
   .skinCard.equipped { border-color: #ffd23d; box-shadow: 0 0 14px rgba(255,210,61,0.5); background: rgba(255,210,61,0.1); }
+  .skinCard.locked { opacity: 0.6; }
   .skinSwatch {
-    width: 44px; height: 44px; background: linear-gradient(160deg,#ff6a6a,#c23b3b);
+    width: 44px; height: 44px;
     border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 0 10px rgba(0,0,0,0.5);
   }
-  /* 상점 미리보기는 색이 아니라 캐릭터 실루엣(모양)을 구분해서 보여줌 */
-  .skinSwatch.shape-round { border-radius: 50%; }
-  .skinSwatch.shape-blocky { border-radius: 10px; }
-  .skinSwatch.shape-spiky { border-radius: 0; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
-  .skinSwatch.shape-giant { border-radius: 50%; width: 52px; height: 52px; }
+  /* 상점 미리보기는 색이 아니라 캐릭터 실루엣(도형 kind)을 구분해서 보여줌 */
+  .skinSwatch.shape-kind-ellipse { border-radius: 50%; }
+  .skinSwatch.shape-kind-rect { border-radius: 10px; }
+  .skinSwatch.shape-kind-diamond { border-radius: 0; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+  .skinSwatch.shape-kind-hex { border-radius: 0; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+  .skinSwatch.shape-kind-tri { border-radius: 0; clip-path: polygon(50% 0%, 95% 90%, 5% 90%); }
+  .skinSwatch.shape-kind-star { border-radius: 0; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
   .skinName { font-size: 12px; font-weight: bold; }
   .skinCost { font-size: 11px; color: #ffd23d; }
+  .skinCostLocked { color: #ff8a8a; font-size: 10px; }
   .skinBtn {
     padding: 6px 14px; font-size: 12px; font-weight: bold; border-radius: 6px; border: 1px solid #555;
     background: #23262f; color: #eee; cursor: pointer; width: 100%;
@@ -227,7 +247,9 @@
   .skinBtn.buy { border-color: #ffd23d; background: rgba(255,210,61,0.15); color: #ffd23d; }
   .skinBtn.equip { border-color: #3dff7a; background: rgba(61,255,122,0.15); color: #3dff7a; }
   .skinBtn.equipped { border-color: #ffd23d; background: #ffd23d; color: #221800; cursor: default; }
+  .skinBtn.locked { border-color: #ff5b5b; background: rgba(255,91,91,0.1); color: #ff8a8a; }
   .skinBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+  #shopBackBtn { flex-shrink: 0; }
   #shopBackBtn {
     padding: 10px 30px; font-size: 14px; font-weight: bold; border-radius: 8px; border: 1px solid #555;
     background: #23262f; color: #eee; cursor: pointer;
@@ -257,7 +279,107 @@
     background: linear-gradient(90deg, rgba(255,210,61,0.28), rgba(255,140,0,0.14));
     border: 1px solid rgba(255,210,61,0.7); box-shadow: 0 0 18px rgba(255,210,61,0.45);
   }
+  @keyframes bannerPop {
+    0%   { opacity: 0; transform: scale(0.4) rotate(-6deg); }
+    60%  { opacity: 1; transform: scale(1.12) rotate(2deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+  @keyframes bannerGlowPulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.35); }
+  }
+  @keyframes bannerShine {
+    0% { left: -60%; }
+    100% { left: 130%; }
+  }
   .resultRow.rank1 .resultRank { color: #fff; text-shadow: 0 0 8px #ffd23d; }
+
+  /* ===== 라운드 종료 후 시퀀스: 경험치 게이지 팝업 / 등급 변경 팝업 (결과 화면보다 먼저, 그 위에 뜸) ===== */
+  .postRoundPopup {
+    position: absolute; inset: 0; z-index: 31;
+    display: none; align-items: center; justify-content: center;
+    background: rgba(5,7,12,0.55); opacity: 0; transition: opacity 0.3s ease;
+  }
+  .postRoundPopup.show { opacity: 1; }
+  .postRoundPopupInner {
+    position: relative; text-align: center; color: #eee; padding: 26px 36px; border-radius: 14px;
+    background: rgba(20,22,30,0.96); border: 1px solid #555; box-shadow: 0 0 50px rgba(0,0,0,0.7);
+    min-width: 240px; max-width: 86vw;
+    transform: scale(0.6); opacity: 0;
+  }
+  .postRoundPopup.show .postRoundPopupInner {
+    animation: bannerPop 0.5s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  .popupRankEmblemSmall, .popupRankEmblemBig {
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 50%; font-weight: bold; color: #111; margin: 0 auto 8px;
+    border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 0 12px rgba(0,0,0,0.5);
+  }
+  .popupRankEmblemSmall { width: 40px; height: 40px; font-size: 12px; }
+  .popupRankEmblemBig { width: 64px; height: 64px; font-size: 15px; }
+  .xpGaugeLevelText { font-size: 20px; font-weight: 900; color: #ffd23d; margin-bottom: 10px; text-shadow: 0 0 10px rgba(255,210,61,0.6); }
+  .xpGaugeBarOuter {
+    position: relative; width: 240px; max-width: 60vw; height: 18px; border-radius: 9px;
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.3); overflow: hidden;
+  }
+  .xpGaugeBarFill {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 0%;
+    background: linear-gradient(90deg, #3bd0ff, #5bffe4); box-shadow: 0 0 10px rgba(91,255,228,0.7);
+  }
+  .xpGaugeBarText {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: bold; color: #fff; text-shadow: 0 0 3px #000;
+  }
+  .xpGaugeGainText { margin-top: 10px; font-size: 13px; color: #9fd8ff; }
+  .levelUpBurstText {
+    margin-top: 12px; font-size: 20px; font-weight: 900; color: #fff05b;
+    text-shadow: 0 0 14px #fff05b, 0 0 28px rgba(255,240,91,0.6);
+    opacity: 0; transform: scale(0.4);
+  }
+  .levelUpBurstText.burstShow {
+    animation: bannerPop 0.45s cubic-bezier(.34,1.56,.64,1) both, bannerGlowPulse 0.9s ease-in-out infinite;
+  }
+  /* 레벨업 순간 팝업 전체가 한 번 확 빛나는 플래시 */
+  .postRoundPopup.levelUpFlash .postRoundPopupInner {
+    animation: levelUpFlashPulse 0.5s ease-out;
+  }
+  @keyframes levelUpFlashPulse {
+    0% { box-shadow: 0 0 50px rgba(0,0,0,0.7); }
+    30% { box-shadow: 0 0 70px 20px rgba(255,240,91,0.85); }
+    100% { box-shadow: 0 0 50px rgba(0,0,0,0.7); }
+  }
+  .rankChangeTitle { font-size: 20px; font-weight: 900; margin-bottom: 14px; }
+  .rankChangeTitle.up { color: #ffe9a8; text-shadow: 0 0 14px rgba(255,210,61,0.7); }
+  .rankChangeTitle.down { color: #ffb0b0; text-shadow: 0 0 10px rgba(255,91,91,0.5); }
+  .rankChangeRow { display: flex; align-items: center; justify-content: center; gap: 16px; }
+  .rankChangeArrow { font-size: 22px; color: #ffd23d; }
+  .postRoundPopup.rankPopUp .postRoundPopupInner {
+    border-color: rgba(255,210,61,0.8);
+    animation: bannerPop 0.5s cubic-bezier(.34,1.56,.64,1) both, bannerGlowPulse 1.2s ease-in-out 0.5s infinite;
+  }
+  .postRoundPopup.rankPopUp .postRoundPopupInner::after {
+    content: ''; position: absolute; top: 0; left: -60%; width: 40%; height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,0.55), transparent);
+    animation: bannerShine 1.4s ease-in-out 0.5s 2;
+  }
+  #rankNewEmblem { animation: bannerGlowPulse 1s ease-in-out 0.6s infinite; }
+
+  /* ===== 게임 시작 전 메뉴 화면 최상단 우측 상태 헤더(레벨/등급/코인) =====
+     화면 해상도가 달라져도 clamp()로 글자 크기가 완만하게 스케일되고, 폭이 좁으면 줄바꿈되도록 해서
+     어떤 해상도에서도 화면 밖으로 잘리거나 겹치지 않게 함. */
+  #topStatusHeader {
+    position: absolute; top: 10px; right: 10px; z-index: 21;
+    display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px;
+    max-width: 46vw; pointer-events: none;
+  }
+  .topStatusItem {
+    display: flex; align-items: center; gap: 4px;
+    padding: 4px 9px; border-radius: 20px; white-space: nowrap;
+    background: rgba(10,12,18,0.62); border: 1px solid rgba(255,255,255,0.22);
+    font-size: clamp(10px, 2.4vw, 13px); font-weight: bold; color: #eee;
+    box-shadow: 0 0 8px rgba(0,0,0,0.4);
+  }
+  #topStatusCoins { color: #ffd23d; }
   #resultsPanel h2 { transition: transform 0.4s cubic-bezier(.34,1.56,.64,1), opacity 0.4s; }
   #confettiLayer { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 24; }
   .confettiPiece { position: absolute; top: -20px; opacity: 0.95; animation: confettiFall linear forwards; }
@@ -351,6 +473,36 @@
 <div id="wrap">
   <canvas id="game" width="1000" height="700"></canvas>
   <div id="pauseBtn">⏸</div>
+  <!-- 게임 시작 전 메뉴 화면 최상단 우측에 항상 떠 있는 상태 요약(레벨/등급/보유 코인) -->
+  <div id="topStatusHeader" style="display:none;">
+    <div id="topStatusRank" class="topStatusItem"></div>
+    <div id="topStatusLevel" class="topStatusItem"></div>
+    <div id="topStatusCoins" class="topStatusItem"></div>
+  </div>
+  <!-- 라운드 종료 후: 경험치 게이지가 차오르는 연출(레벨업 시 화려한 축하 연출 포함) -->
+  <div id="xpGaugePopup" class="postRoundPopup">
+    <div class="postRoundPopupInner">
+      <div id="xpGaugeRankEmblem" class="popupRankEmblemSmall"></div>
+      <div class="xpGaugeLevelText">Lv.<span id="xpGaugeLevelNum">1</span></div>
+      <div class="xpGaugeBarOuter">
+        <div id="xpGaugeBarFill" class="xpGaugeBarFill"></div>
+        <div id="xpGaugeBarText" class="xpGaugeBarText"></div>
+      </div>
+      <div id="xpGaugeGainText" class="xpGaugeGainText"></div>
+      <div id="levelUpBurstText" class="levelUpBurstText">⬆ LEVEL UP!</div>
+    </div>
+  </div>
+  <!-- 라운드 종료 후(등급이 바뀐 경우에만): 이전 등급 -> 새 등급으로 바뀌는 연출 -->
+  <div id="rankChangePopup" class="postRoundPopup">
+    <div class="postRoundPopupInner rankChangeInner">
+      <div id="rankChangeTitle" class="rankChangeTitle"></div>
+      <div class="rankChangeRow">
+        <div id="rankOldEmblem" class="popupRankEmblemBig"></div>
+        <div class="rankChangeArrow">➜</div>
+        <div id="rankNewEmblem" class="popupRankEmblemBig"></div>
+      </div>
+    </div>
+  </div>
   <div id="pauseScreen">
     <div id="pausePanel">
       <h2>일시정지</h2>
@@ -611,6 +763,12 @@ const KO_CREDIT_WINDOW = 2.0; // 맞은 뒤 이 시간 안에 링아웃되어야
 // ================= 캔버스 세팅 (모니터 해상도에 맞춘 풀스크린) =================
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
+// 메뉴 화면(게임 시작 전) 최상단 우측 상태 헤더 - updateWalletDisplays()가 스크립트 로드 시점에
+// 곧바로 한 번 호출되므로(아래쪽), 그 시점에 이미 참조 가능하도록 다른 DOM 참조들보다 앞쪽에 둠
+const topStatusHeaderEl = document.getElementById('topStatusHeader');
+const topStatusRankEl = document.getElementById('topStatusRank');
+const topStatusLevelEl = document.getElementById('topStatusLevel');
+const topStatusCoinsEl = document.getElementById('topStatusCoins');
 
 // 터치가 가능한 기기(폰/태블릿)인지 판별. 데스크톱 브라우저 창을 세로로 좁게 줄인 경우까지
 // 억지로 회전시키지 않기 위해, 세로 방향인 것뿐 아니라 터치 기기인지도 함께 확인함.
@@ -748,12 +906,31 @@ const OWNED_SKINS_STORAGE_KEY = 'impactDash2_ownedSkins';
 const EQUIPPED_SKIN_STORAGE_KEY = 'impactDash2_equippedSkin';
 
 // 상점에서 파는 건 색상이 아니라 캐릭터의 몸/머리 형태(실루엣) 자체. shape 값이 실제 캐릭터
-// 렌더링(SHAPE_PARAMS)에서 어떤 도형(원/사각/마름모)으로 그릴지를 결정함.
+// 렌더링(SHAPE_PARAMS)에서 어떤 도형(원/사각/마름모/육각형/삼각형/별)으로 그릴지를 결정함.
+// levelReq: 이 레벨(경험치 시스템의 레벨) 이상이어야 구매할 수 있음. 없으면(undefined) 레벨 제한 없음.
+// accent: 상점 미리보기(스와치)에 쓰이는 그라디언트 색상 - 실제 게임에서의 캐릭터 색은 플레이어가
+// 고른 색(팀/슬롯 색)을 그대로 쓰므로 게임플레이에는 영향 없음, 순수하게 상점에서 구분하기 쉽게 하기 위함.
 const SKINS = [
-  { id:'default', name:'라운드 (기본)', shape:'round',  cost:0   },
-  { id:'blocky',  name:'블록 로봇',     shape:'blocky', cost:60  },
-  { id:'spiky',   name:'스파이크 닌자', shape:'spiky',  cost:80  },
-  { id:'giant',   name:'자이언트',      shape:'giant',  cost:120 }
+  { id:'default',     name:'라운드 (기본)',   shape:'round',      cost:0,   accent:'#ff6a6a' },
+  { id:'mini',        name:'미니',            shape:'mini',       cost:50,  accent:'#8cff5b' },
+  { id:'blocky',      name:'블록 로봇',       shape:'blocky',     cost:60,  accent:'#3bd0ff' },
+  { id:'spiky',       name:'스파이크 닌자',   shape:'spiky',      cost:80,  accent:'#c060ff' },
+  { id:'giant',       name:'자이언트',        shape:'giant',      cost:120, accent:'#ffb84d' },
+  { id:'hexbot',      name:'헥사봇',          shape:'hexbot',     cost:140, levelReq:3,  accent:'#3dff7a' },
+  { id:'tripod',      name:'트라이팟',        shape:'tripod',     cost:150, levelReq:3,  accent:'#ffe45b' },
+  { id:'shadow',      name:'섀도우',          shape:'shadow',     cost:160, levelReq:4,  accent:'#6b6b7a' },
+  { id:'needle',      name:'니들',            shape:'needle',     cost:200, levelReq:5,  accent:'#ff5fc0' },
+  { id:'tank',        name:'탱크',            shape:'tank',       cost:220, levelReq:5,  accent:'#8a8a92' },
+  { id:'crystal',     name:'크리스탈',        shape:'crystal',    cost:240, levelReq:6,  accent:'#5bffe4' },
+  { id:'cube',        name:'큐브',            shape:'cube',       cost:260, levelReq:8,  accent:'#4d9eff' },
+  { id:'phantom',     name:'팬텀',            shape:'phantom',    cost:280, levelReq:7,  accent:'#9b5bff' },
+  { id:'juggernaut',  name:'저거너트',        shape:'juggernaut', cost:300, levelReq:7,  accent:'#ff8a3d' },
+  { id:'starling',    name:'스타링',          shape:'starling',   cost:340, levelReq:9,  accent:'#fff05b' },
+  { id:'viper',       name:'바이퍼',          shape:'viper',      cost:360, levelReq:10, accent:'#3dffb0' },
+  { id:'titan',       name:'타이탄',          shape:'titan',      cost:380, levelReq:10, accent:'#ff5b5b' },
+  { id:'nova',        name:'노바',            shape:'nova',       cost:420, levelReq:12, accent:'#5bc8ff' },
+  { id:'eclipse',     name:'이클립스',        shape:'eclipse',    cost:460, levelReq:14, accent:'#2d2d3d' },
+  { id:'legend',      name:'레전드',          shape:'legend',     cost:600, levelReq:16, accent:'#ffd23d' }
 ];
 
 function loadWallet(){
@@ -776,6 +953,121 @@ function updateWalletDisplays(){
   if (a) a.textContent = walletCoins;
   if (b) b.textContent = walletCoins;
   if (c) c.textContent = '🪙 ' + walletCoins;
+  updateTopStatusHeader(); // 코인이 바뀔 때마다 메뉴 화면 우측 상단 헤더의 코인 표시도 같이 갱신
+}
+
+// 게임 시작 전 메뉴 화면 최상단 우측에 떠 있는 상태 헤더(등급/레벨/코인)를 최신 값으로 갱신.
+// 표시 여부(게임 중엔 숨김) 자체는 showStartScreen()/startGame()에서 따로 제어함.
+function updateTopStatusHeader(){
+  if (!topStatusHeaderEl) return;
+  const tier = computeRankTierIndex(rankStats);
+  const info = getRankTierInfo(tier);
+  const level = levelFromXp(rankStats.xp).level;
+  topStatusRankEl.textContent = info.name;
+  topStatusRankEl.style.borderColor = info.color;
+  topStatusRankEl.style.color = info.color;
+  topStatusLevelEl.textContent = 'Lv.' + level;
+  topStatusCoinsEl.textContent = '🪙 ' + walletCoins;
+}
+
+// ================= 등급(랭크)/경험치·레벨 시스템 =================
+// 지갑(walletCoins)과 마찬가지로 이 브라우저(기기) 하나에 귀속되는 "내 전적"을 localStorage에
+// 누적 저장함. 분할화면으로 여러 명이 함께 해도(2P, 3P 등) 등급/경험치는 이 계정 하나로만 쌓임.
+const RANK_STATS_STORAGE_KEY = 'impactDash2_rankStats';
+function loadRankStats(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(RANK_STATS_STORAGE_KEY) || '{}');
+    return {
+      totalKO: Math.max(0, raw.totalKO|0),
+      totalDeaths: Math.max(0, raw.totalDeaths|0),
+      roundsPlayed: Math.max(0, raw.roundsPlayed|0),
+      wins: Math.max(0, raw.wins|0),
+      xp: Math.max(0, raw.xp|0)
+    };
+  } catch(e){ return { totalKO:0, totalDeaths:0, roundsPlayed:0, wins:0, xp:0 }; }
+}
+let rankStats = loadRankStats();
+function saveRankStats(){
+  try{ localStorage.setItem(RANK_STATS_STORAGE_KEY, JSON.stringify(rankStats)); } catch(e){}
+}
+
+// ---- 20단계 등급: 5개 "밴드"(루키/브레이커/스매셔/임팩터/레전드) x 밴드당 4단계(IV~I, I가 최고) ----
+const RANK_BANDS = [
+  { name:'루키',    color:'#9aa0ab' },
+  { name:'브레이커', color:'#3dff7a' },
+  { name:'스매셔',   color:'#3bd0ff' },
+  { name:'임팩터',   color:'#c060ff' },
+  { name:'레전드',   color:'#ffd23d' }
+];
+const RANK_SUB_LABELS = ['IV', 'III', 'II', 'I']; // 밴드 안에서 낮은 순 -> 높은 순
+const RANK_TIER_COUNT = RANK_BANDS.length * RANK_SUB_LABELS.length; // 5 x 4 = 20
+
+// tierIndex: 0(루키 IV, 가장 낮음) ~ 19(레전드 I, 가장 높음)
+function getRankTierInfo(tierIndex){
+  const idx = Math.max(0, Math.min(RANK_TIER_COUNT-1, tierIndex|0));
+  const band = RANK_BANDS[Math.floor(idx / RANK_SUB_LABELS.length)];
+  const sub = RANK_SUB_LABELS[idx % RANK_SUB_LABELS.length];
+  return { index: idx, band, sub, name: band.name + ' ' + sub, color: band.color };
+}
+
+// ---- 누적 전적(KO/사망/플레이수/승률)을 하나의 점수로 조합 ----
+// - KO/사망 비율: 전투력(잘 죽이고 안 죽었는지)
+// - 승률: 실력 지표. 단, 판수가 적으면(한두 판 운으로 이긴 경우) 가중치를 낮춰서 "승률과 플레이수를
+//   맞춰"(요청사항) 최소한의 판수를 채워야 승률이 온전히 반영되게 함
+// - 플레이 판수: 로그 스케일로 완만하게 반영해 "많이 할수록 조금씩 오르는" 경험치성 성장을 줌
+function computeRankScore(stats){
+  const played = stats.roundsPlayed;
+  // KO/사망 비율이 그대로 커지면(특히 거의 안 죽는 고수는 분모가 1에 가까워 비율이 끝없이 치솟음)
+  // 점수가 너무 쉽게 폭주하므로, 제곱근으로 완만하게 눌러서 반영함
+  const kd = stats.totalKO / Math.max(1, stats.totalDeaths);
+  const winRate = played > 0 ? stats.wins / played : 0;
+  const experience = Math.log(1 + played) * 30; // 플레이할수록 완만하게, 그러나 꾸준히 오름
+  const skill = winRate * 90 + Math.sqrt(kd) * 40;
+  const skillWeight = Math.min(1, played / 10); // 최소 10판을 채워야 승률/전투력이 온전히 반영됨
+  return experience + skill * skillWeight;
+}
+// 20단계 임계값(뒤로 갈수록 점점 더 벌어짐 - 위 등급일수록 올라가기 어려워짐)
+const RANK_THRESHOLDS = [0,12,25,40,58,78,100,124,150,178,208,240,275,312,352,395,441,490,542,598];
+function computeRankTierIndex(stats){
+  const score = computeRankScore(stats);
+  let idx = 0;
+  for (let i=0;i<RANK_THRESHOLDS.length;i++){ if (score >= RANK_THRESHOLDS[i]) idx = i; }
+  return idx;
+}
+
+// ---- 경험치/레벨 ----
+// 라운드 하나를 마치면 참가만 해도 기본 경험치 + KO당 추가 + 승리 보너스 + 적게 죽었을 때 보너스
+function xpForRound(koCount, deathCount, won){
+  return 20 + koCount*8 + (won ? 30 : 0) + Math.max(0, 3 - deathCount) * 3;
+}
+// 총 누적 경험치(xp)로부터 현재 레벨/그 레벨 안에서의 진행도를 계산. 레벨이 오를수록 다음 레벨까지
+// 필요한 경험치가 조금씩 더 늘어남(완만한 성장 곡선)
+function levelFromXp(xp){
+  let level = 1, need = 100, total = 0;
+  while (xp >= total + need){
+    total += need;
+    level++;
+    need = Math.floor(need * 1.18);
+  }
+  return { level, xpIntoLevel: xp - total, xpForThisLevel: need };
+}
+
+// HUD(좌상단 참가자 명단) 이름 옆에 붙는 등급 엠블럼 HTML 조각. tierIndex가 숫자가 아니면(=AI 등
+// 등급이 없는 캐릭터) 빈 문자열을 반환해 아무것도 표시하지 않음
+function rankEmblemHtml(tierIndex){
+  if (typeof tierIndex !== 'number') return '';
+  const info = getRankTierInfo(tierIndex);
+  return '<span class="rankEmblem" style="background:' + info.color + ';" title="' + info.name + '">' +
+    info.sub + '</span>';
+}
+// 라운드 종료 팝업(경험치 게이지/등급 변경)에 쓰이는 더 큰 원형 등급 엠블럼. HUD용 rankEmblemHtml()과
+// 달리 배지 자체가 원형 컨테이너(.popupRankEmblemSmall/.popupRankEmblemBig)라서, innerHTML로 작은
+// 알약형 배지를 끼워넣는 대신 그 원형 요소에 색/글자를 직접 입혀 꽉 채워 보이게 함.
+function applyRankEmblemToEl(el, tierIndex){
+  const info = getRankTierInfo(tierIndex);
+  el.style.background = info.color;
+  el.textContent = info.sub;
+  el.title = info.name;
 }
 
 function loadOwnedSkins(){
@@ -811,26 +1103,46 @@ const shopGridEl = document.getElementById('shopGrid');
 const shopBtn = document.getElementById('shopBtn');
 const shopBackBtn = document.getElementById('shopBackBtn');
 
+// 캐릭터(스킨) 구매에 필요한 레벨을 만족하는지 확인. levelReq가 없으면 항상 통과.
+function meetsLevelReq(skin){
+  if (!skin.levelReq) return true;
+  return levelFromXp(rankStats.xp).level >= skin.levelReq;
+}
+
 function buildShopGrid(){
   shopGridEl.innerHTML = '';
+  const myLevel = levelFromXp(rankStats.xp).level;
   SKINS.forEach(skin=>{
     const owned = ownedSkins.has(skin.id);
     const equipped = equippedSkinId === skin.id;
+    const levelOk = meetsLevelReq(skin);
     const card = document.createElement('div');
-    card.className = 'skinCard' + (equipped ? ' equipped' : '');
+    card.className = 'skinCard' + (equipped ? ' equipped' : '') + (!owned && !levelOk ? ' locked' : '');
+    const kind = (SHAPE_PARAMS[skin.shape] || SHAPE_PARAMS.round).kind;
     let btnHtml;
     if (equipped){
       btnHtml = '<button class="skinBtn equipped" disabled>장착중</button>';
     } else if (owned){
       btnHtml = '<button class="skinBtn equip" data-equip="' + skin.id + '">장착하기</button>';
+    } else if (!levelOk){
+      // 레벨이 부족하면 코인이 충분해도 구매 자체를 막고, "Lv.X 필요"를 표시함
+      btnHtml = '<button class="skinBtn locked" disabled>🔒 Lv.' + skin.levelReq + ' 필요</button>';
     } else {
       const canAfford = walletCoins >= skin.cost;
       btnHtml = '<button class="skinBtn buy" data-buy="' + skin.id + '"' + (canAfford ? '' : ' disabled') + '>구매 (' + skin.cost + '🪙)</button>';
     }
+    let costLine;
+    if (owned){
+      costLine = '<div class="skinCost">보유중</div>';
+    } else if (!levelOk){
+      costLine = '<div class="skinCost skinCostLocked">' + skin.cost + ' 🪙 · 레벨 ' + skin.levelReq + ' 필요 (현재 Lv.' + myLevel + ')</div>';
+    } else {
+      costLine = '<div class="skinCost">' + skin.cost + ' 🪙</div>';
+    }
     card.innerHTML =
-      '<div class="skinSwatch shape-' + skin.shape + '"></div>' +
-      '<div class="skinName">' + skin.name + '</div>' +
-      (owned ? '<div class="skinCost">보유중</div>' : '<div class="skinCost">' + skin.cost + ' 🪙</div>') +
+      '<div class="skinSwatch shape-kind-' + kind + '" style="background:linear-gradient(160deg,' + (skin.accent||'#ff6a6a') + ',#1a1c24);"></div>' +
+      '<div class="skinName">' + skin.name + (!owned && !levelOk ? ' 🔒' : '') + '</div>' +
+      costLine +
       btnHtml;
     shopGridEl.appendChild(card);
   });
@@ -839,7 +1151,8 @@ function buildShopGrid(){
     btn.addEventListener('click', ()=>{
       const id = btn.getAttribute('data-buy');
       const skin = SKINS.find(s=> s.id === id);
-      if (!skin || ownedSkins.has(id) || walletCoins < skin.cost) return;
+      // 레벨 조건도 다시 한번 확인(방어적) - 코인만 있다고 살 수 없게 함
+      if (!skin || ownedSkins.has(id) || walletCoins < skin.cost || !meetsLevelReq(skin)) return;
       walletCoins -= skin.cost;
       saveWallet();
       ownedSkins.add(id);
@@ -913,6 +1226,8 @@ function dismissTitleScreen(){
   sfxMenuConfirm();
   titleScreenEl.style.display = 'none';
   startScreenEl.style.display = 'flex';
+  updateTopStatusHeader();
+  topStatusHeaderEl.style.display = 'flex';
   if (typeof showModeSelectPanel === 'function') showModeSelectPanel();
   refreshStartScreenNav();
 }
@@ -1207,6 +1522,18 @@ const resultsScreenEl = document.getElementById('resultsScreen');
 const resultsListEl = document.getElementById('resultsList');
 const resultsCoinGainEl = document.getElementById('resultsCoinGain');
 const restartBtn = document.getElementById('restartBtn');
+// 라운드 종료 후 시퀀스(경험치 게이지 -> 등급 변경 -> 결과 화면) 팝업 요소들
+const xpGaugePopupEl = document.getElementById('xpGaugePopup');
+const xpGaugeRankEmblemEl = document.getElementById('xpGaugeRankEmblem');
+const xpGaugeLevelNumEl = document.getElementById('xpGaugeLevelNum');
+const xpGaugeBarFillEl = document.getElementById('xpGaugeBarFill');
+const xpGaugeBarTextEl = document.getElementById('xpGaugeBarText');
+const xpGaugeGainTextEl = document.getElementById('xpGaugeGainText');
+const levelUpBurstTextEl = document.getElementById('levelUpBurstText');
+const rankChangePopupEl = document.getElementById('rankChangePopup');
+const rankChangeTitleEl = document.getElementById('rankChangeTitle');
+const rankOldEmblemEl = document.getElementById('rankOldEmblem');
+const rankNewEmblemEl = document.getElementById('rankNewEmblem');
 restartBtn.addEventListener('click', ()=>{ showStartScreen(); });
 const roundAnnounceEl = document.getElementById('roundAnnounce');
 const confettiLayerEl = document.getElementById('confettiLayer');
@@ -1239,6 +1566,25 @@ function spawnConfetti(count){
     piece.style.background = colors[i % colors.length];
     piece.style.animationDuration = (1.6 + Math.random()*1.4) + 's';
     piece.style.animationDelay = (Math.random()*0.6) + 's';
+    confettiLayerEl.appendChild(piece);
+  }
+}
+
+// 등급 상승/레벨 업 같은 "추가 경사"를 축하하는 용도. spawnConfetti()와 달리 기존에 떨어지고 있는
+// 조각들을 지우지 않고 그 위에 더 얹어서, 이미 진행 중인 라운드 결과 컨페티와 자연스럽게 섞이게 함.
+function spawnBonusConfetti(count, colors){
+  const palette = colors || ['#ffd23d', '#ff8a3d', '#fff05b'];
+  const n = count || 30;
+  for (let i=0;i<n;i++){
+    const piece = document.createElement('div');
+    piece.className = 'confettiPiece';
+    const size = 6 + Math.random()*8;
+    piece.style.left = (Math.random()*100) + '%';
+    piece.style.width = size + 'px';
+    piece.style.height = (size*0.4) + 'px';
+    piece.style.background = palette[i % palette.length];
+    piece.style.animationDuration = (1.4 + Math.random()*1.2) + 's';
+    piece.style.animationDelay = (Math.random()*0.4) + 's';
     confettiLayerEl.appendChild(piece);
   }
 }
@@ -1316,6 +1662,8 @@ function showStartScreen(){
   joystickStickEl.style.opacity = 0;
   aimStickEl.style.opacity = 0;
   startScreenEl.style.display = 'flex';
+  updateTopStatusHeader();
+  topStatusHeaderEl.style.display = 'flex'; // 게임 중이 아닐 때(메뉴 화면)만 등급/레벨/코인 헤더를 보여줌
   refreshStartScreenNav();
 }
 
@@ -1689,6 +2037,20 @@ function sfxVictoryFanfare(){
   const notes = [523, 659, 784, 1046];
   notes.forEach((f, i)=> setTimeout(()=> playTone(f, 0.24, 'triangle', 0.24, f*1.15), i*110));
 }
+// 레벨 업: 짧고 경쾌한 2음 상승 차임
+function sfxLevelUp(){
+  playTone(660, 0.14, 'sine', 0.22, 990);
+  setTimeout(()=> playTone(880, 0.18, 'sine', 0.24, 1320), 90);
+}
+// 등급 상승: 승리 팡파레보다 한 옥타브 더 올라가는 화려한 5음 아르페지오
+function sfxRankUp(){
+  const notes = [523, 659, 784, 988, 1318];
+  notes.forEach((f, i)=> setTimeout(()=> playTone(f, 0.22, 'triangle', 0.26, f*1.2), i*90));
+}
+// 등급 하락: 힘 빠지는 느낌의 짧은 하강음
+function sfxRankDown(){
+  playTone(392, 0.22, 'sawtooth', 0.18, 220);
+}
 
 // ================= 히트스탑 & 화면 흔들림 (타격감 연출) =================
 let hitStopTime = 0;      // 남은 정지 시간(초, 실시간 기준)
@@ -1732,11 +2094,29 @@ function makeCharacter(x, y, color, isAI){
 
 // ================= 캐릭터 모양(형태) 변형 - 상점에서 색이 아니라 이 실루엣 자체를 판매함 =================
 // kind: 몸통/머리/팔다리를 그릴 도형 종류. 나머지 값들은 기본(round) 대비 각 부위 크기 배율.
+// 상점에 캐릭터를 20종 가까이 채우기 위해, 기존 4가지 도형(ellipse/rect/diamond)에 hex(육각형)/
+// tri(삼각형)/star(별) 세 가지를 더 추가해서 조합 가짓수를 늘림.
 const SHAPE_PARAMS = {
-  round:  { kind:'ellipse', torso:1,    head:1,    limb:1    }, // 기본: 둥근 사람 모양
-  blocky: { kind:'rect',    torso:0.94, head:0.88, limb:0.92 }, // 로봇: 각진 사각형 몸통/머리/팔다리
-  spiky:  { kind:'diamond', torso:1.05, head:0.9,  limb:0.75 }, // 닌자: 마름모꼴, 팔다리는 더 가늘게
-  giant:  { kind:'ellipse', torso:1.35, head:0.78, limb:1.35 }  // 자이언트: 몸통/팔다리는 크게, 머리는 작게(밸런스용)
+  round:      { kind:'ellipse', torso:1,    head:1,    limb:1    }, // 기본: 둥근 사람 모양
+  blocky:     { kind:'rect',    torso:0.94, head:0.88, limb:0.92 }, // 로봇: 각진 사각형 몸통/머리/팔다리
+  spiky:      { kind:'diamond', torso:1.05, head:0.9,  limb:0.75 }, // 닌자: 마름모꼴, 팔다리는 더 가늘게
+  giant:      { kind:'ellipse', torso:1.35, head:0.78, limb:1.35 }, // 자이언트: 몸통/팔다리는 크게, 머리는 작게(밸런스용)
+  mini:       { kind:'ellipse', torso:0.78, head:1.1,  limb:0.8  }, // 미니: 몸은 작고 머리는 통통하게
+  hexbot:     { kind:'hex',     torso:1,    head:0.9,  limb:0.9  }, // 헥사봇: 육각형 몸통의 기계형
+  tripod:     { kind:'tri',     torso:1.05, head:0.85, limb:0.85 }, // 트라이팟: 삼각형 몸통
+  shadow:     { kind:'diamond', torso:0.85, head:0.8,  limb:0.7  }, // 섀도우: 작고 날렵한 마름모
+  tank:       { kind:'rect',    torso:1.3,  head:0.9,  limb:1.1  }, // 탱크: 크고 각진 사각형
+  needle:     { kind:'tri',     torso:0.8,  head:0.75, limb:0.65 }, // 니들: 작고 뾰족한 삼각형
+  crystal:    { kind:'hex',     torso:0.85, head:0.95, limb:0.8  }, // 크리스탈: 작은 육각형
+  juggernaut: { kind:'ellipse', torso:1.5,  head:0.85, limb:1.4  }, // 저거너트: 거대한 원형
+  phantom:    { kind:'diamond', torso:1.2,  head:0.95, limb:0.9  }, // 팬텀: 큰 마름모
+  cube:       { kind:'rect',    torso:1.05, head:1,    limb:0.95 }, // 큐브: 정사각형에 가까운 로봇
+  starling:   { kind:'star',    torso:0.95, head:0.85, limb:0.8  }, // 스타링: 작은 별 모양
+  titan:      { kind:'hex',     torso:1.4,  head:0.85, limb:1.2  }, // 타이탄: 거대한 육각형
+  viper:      { kind:'tri',     torso:0.95, head:0.8,  limb:0.65 }, // 바이퍼: 가늘고 날렵한 삼각형
+  nova:       { kind:'star',    torso:1.15, head:0.95, limb:1    }, // 노바: 중간 크기 별 모양
+  eclipse:    { kind:'ellipse', torso:1.25, head:0.82, limb:1.05 }, // 이클립스: 크고 어두운 느낌의 원형
+  legend:     { kind:'star',    torso:1.35, head:1,    limb:1.15 }  // 레전드: 가장 크고 화려한 별 모양(최상위 스킨)
 };
 function getShapeParams(ch){ return SHAPE_PARAMS[ch.shape] || SHAPE_PARAMS.round; }
 
@@ -1761,6 +2141,28 @@ function traceShapePath(ctx, cx, cy, rx, ry, kind){
     ctx.lineTo(cx+rx, cy);
     ctx.lineTo(cx, cy+ry);
     ctx.lineTo(cx-rx, cy);
+    ctx.closePath();
+  } else if (kind === 'hex'){
+    for (let i=0;i<6;i++){
+      const a = -Math.PI/2 + i * Math.PI/3;
+      const px = cx + Math.cos(a)*rx, py = cy + Math.sin(a)*ry;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+  } else if (kind === 'tri'){
+    ctx.moveTo(cx, cy-ry);
+    ctx.lineTo(cx+rx*0.95, cy+ry*0.8);
+    ctx.lineTo(cx-rx*0.95, cy+ry*0.8);
+    ctx.closePath();
+  } else if (kind === 'star'){
+    const spikes = 5;
+    const outerRx = rx, outerRy = ry, innerRx = rx*0.45, innerRy = ry*0.45;
+    for (let i=0;i<spikes*2;i++){
+      const a = -Math.PI/2 + i * Math.PI/spikes;
+      const px = cx + Math.cos(a) * (i%2===0 ? outerRx : innerRx);
+      const py = cy + Math.sin(a) * (i%2===0 ? outerRy : innerRy);
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
     ctx.closePath();
   } else {
     ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2);
@@ -1835,6 +2237,9 @@ function netMakeCharacterForPeer(meta, x, y, color){
   ch.netSessionId = meta.sessionId;
   ch.label = meta.name || ('플레이어' + (meta.index + 1));
   ch.slotIndex = -1; // playerSlots(=분할화면 패널)에는 포함되지 않음
+  // 접속 시 서버에 함께 보낸 등급 정보(meta.rankTier)를 그대로 반영해, 다른 참가자들의 등급
+  // 엠블럼도 내 화면 좌상단 명단에 표시되게 함
+  if (typeof meta.rankTier === 'number') ch.rankTierIndex = meta.rankTier;
   return ch;
 }
 
@@ -1941,7 +2346,8 @@ async function netConnectAsHost(){
   netSetConnectStatus('방 만드는 중...', '#ffd23d');
   try{
     netClient = new Colyseus.Client(serverUrl);
-    netRoom = await netClient.create('game', { roomCode, name }); // 항상 새 방을 만듦 = 내가 호스트
+    // rankTier: 접속하는 시점의 내 등급을 함께 보내서, 다른 참가자들 화면에도 내 등급 엠블럼이 보이게 함
+    netRoom = await netClient.create('game', { roomCode, name, rankTier: computeRankTierIndex(rankStats) }); // 항상 새 방을 만듦 = 내가 호스트
     netMySessionId = netRoom.sessionId;
     netConnected = true;
     netIsHost = true;
@@ -1962,7 +2368,7 @@ async function netConnectAsGuest(){
   netSetConnectStatus('방 찾는 중...', '#ffd23d');
   try{
     netClient = new Colyseus.Client(serverUrl);
-    netRoom = await netClient.join('game', { roomCode, name }); // 이미 존재하는(호스트가 만든) 방에만 참가
+    netRoom = await netClient.join('game', { roomCode, name, rankTier: computeRankTierIndex(rankStats) }); // 이미 존재하는(호스트가 만든) 방에만 참가
     netMySessionId = netRoom.sessionId;
     netConnected = true;
     netIsHost = false;
@@ -2139,6 +2545,7 @@ function netStartAsClient(){
   me.label = netLocalName || 'PLAYER'; // 로비 접속 때 입력한 내 닉네임을 실제 캐릭터 이름에 반영
   me.slotIndex = 0;
   me.shape = getEquippedShape();
+  me.rankTierIndex = computeRankTierIndex(rankStats); // 이 기기(계정)의 현재 등급
   me.cam = { x: CENTER.x, y: CENTER.y };
   playerSlots = [me];
   player = me;
@@ -2153,6 +2560,7 @@ function netStartAsClient(){
   isPaused = false;
   startScreenEl.style.display = 'none';
   resultsScreenEl.style.display = 'none';
+  topStatusHeaderEl.style.display = 'none';
   hudEl.style.display = 'flex';
   infoEl.style.display = 'none';
   roundHudEl.style.display = 'flex';
@@ -2212,7 +2620,8 @@ function netSerializeState(){
       hitFlashTimer: ch.hitFlashTimer, damagePercent: ch.damagePercent,
       koScore: ch.koScore, deathCount: ch.deathCount,
       buffSpeed: ch.buffSpeed, buffPower: ch.buffPower, buffRam: ch.buffRam, buffRange: ch.buffRange,
-      rangeScale: ch.rangeScale
+      rangeScale: ch.rangeScale,
+      rank: (typeof ch.rankTierIndex === 'number') ? ch.rankTierIndex : null // 등급 엠블럼 표시용
     })),
     bricks: bricks.map(b => ({ x: b.x, y: b.y, w: b.w, h: b.h, hp: b.hp })),
     // 아이템/폭탄/코인은 렌더링 코드가 참조하는 필드가 이후에도 추가/변경될 수 있으므로, 일부 필드만
@@ -2266,7 +2675,8 @@ function netApplySnapshot(snap){
       swinging: sc.swinging, swingTimer: sc.swingTimer, swingAngle: sc.swingAngle,
       hitFlashTimer: sc.hitFlashTimer, damagePercent: sc.damagePercent, koScore: sc.koScore,
       deathCount: sc.deathCount, buffSpeed: sc.buffSpeed, buffPower: sc.buffPower, buffRam: sc.buffRam,
-      buffRange: sc.buffRange, rangeScale: sc.rangeScale
+      buffRange: sc.buffRange, rangeScale: sc.rangeScale,
+      rankTierIndex: (typeof sc.rank === 'number') ? sc.rank : ch.rankTierIndex
     });
 
     ch._netTargetX = sc.x; ch._netTargetY = sc.y; ch._netTargetAngle = sc.angle;
@@ -2417,6 +2827,9 @@ function startGame(aiCount){
     ch._spectateIndex = 0; ch._spectatePrevLeft = false; ch._spectatePrevRight = false;
     ch.skill = 0.8; // AI 대체 조작일 때 쓰일 실력치(꽤 잘하는 편으로)
     if (isTeamMode) ch.team = slotTeams[i];
+    // 등급 엠블럼: 이 브라우저(계정)의 현재 누적 전적 기준 등급을 로컬 플레이어 슬롯 전원(2P 등
+    // 분할화면 참가자 포함)에 동일하게 표시함 - 등급/경험치는 계정(기기) 하나에 귀속되기 때문
+    ch.rankTierIndex = computeRankTierIndex(rankStats);
     playerSlots.push(ch);
   }
   player = playerSlots[0];
@@ -2466,6 +2879,7 @@ function startGame(aiCount){
 
   startScreenEl.style.display = 'none';
   resultsScreenEl.style.display = 'none';
+  topStatusHeaderEl.style.display = 'none'; // 게임 플레이 중에는 메뉴용 상태 헤더를 가림(HUD가 이미 있음)
   hudEl.style.display = 'flex';
   infoEl.style.display = isSplitScreen() ? 'none' : 'block'; // 분할화면에서는 화면이 좁아지므로 조작 안내 문구는 생략
   roundHudEl.style.display = 'flex';
@@ -2549,7 +2963,7 @@ function showResultsScreen(){
       row.innerHTML =
         '<div class="resultRank">' + RANK_MEDALS[i] + '</div>' +
         '<span class="colorDot" style="background:' + ch.color + ';"></span>' +
-        '<div class="resultName" style="color:' + ch.color + ';">' + ch.label + (isHuman(ch) ? ' (나)' : '') + '</div>' +
+        '<div class="resultName" style="color:' + ch.color + ';">' + rankEmblemHtml(ch.rankTierIndex) + ch.label + (isHuman(ch) ? ' (나)' : '') + '</div>' +
         '<div class="resultStats">KO ' + (ch.koScore||0) + ' · 사망 ' + (ch.deathCount||0) + '</div>';
       resultsListEl.appendChild(row);
     });
@@ -2557,6 +2971,7 @@ function showResultsScreen(){
 
   // 등수 보상 코인: 사람 플레이어(플레이어 슬롯) 각자가 마친 등수에 맞춰 코인을 지급하고 즉시 저장함
   let totalEarned = 0;
+  let localWonRound = false; // 내(로컬 플레이어) 쪽이 1등을 했는지 - 경험치 승리 보너스/등급 승률에 반영
   playerSlots.forEach(ch=>{
     let rankIdx = -1;
     if (gameMode === 'team' && teamStats){
@@ -2565,6 +2980,7 @@ function showResultsScreen(){
       rankIdx = ranked.indexOf(ch);
     }
     if (rankIdx !== -1) totalEarned += coinRewardForRank(rankIdx);
+    if (rankIdx === 0) localWonRound = true;
   });
   if (totalEarned > 0){
     addCoins(totalEarned);
@@ -2574,6 +2990,31 @@ function showResultsScreen(){
     resultsCoinGainEl.style.display = 'none';
   }
 
+  // ---- 등급/경험치 갱신: 이번 라운드에 로컬 플레이어 슬롯들(2P 등 분할화면 포함)이 합산으로
+  // 올린 KO/사망을 이 기기의 누적 전적에 더함. 결과 화면 자체는 아직 띄우지 않고, 먼저 경험치
+  // 게이지 팝업 -> (등급이 바뀐 경우만) 등급 변경 팝업 순서로 연출을 보여준 뒤에 표시함 ----
+  const localKO = playerSlots.reduce((s,ch)=> s + (ch.koScore||0), 0);
+  const localDeaths = playerSlots.reduce((s,ch)=> s + (ch.deathCount||0), 0);
+  const prevRankTier = computeRankTierIndex(rankStats);
+  const prevLevelInfo = levelFromXp(rankStats.xp);
+
+  rankStats.totalKO += localKO;
+  rankStats.totalDeaths += localDeaths;
+  rankStats.roundsPlayed += 1;
+  if (localWonRound) rankStats.wins += 1;
+  const xpGained = xpForRound(localKO, localDeaths, localWonRound);
+  rankStats.xp += xpGained;
+  saveRankStats();
+
+  const newRankTier = computeRankTierIndex(rankStats);
+  const newLevelInfo = levelFromXp(rankStats.xp);
+
+  runPostRoundSequence({ prevRankTier, newRankTier, prevLevelInfo, newLevelInfo, xpGained }, revealResultsScreen);
+}
+
+// 실제로 순위 목록/코인 보상이 담긴 결과 화면을 화면에 띄움. 경험치 게이지/등급 변경 팝업이 모두
+// 끝난 뒤(또는 둘 다 해당 사항이 없어 곧바로) runPostRoundSequence()가 이 함수를 호출함.
+function revealResultsScreen(){
   resultsScreenEl.style.display = 'flex';
   pauseBtnEl.style.display = 'none'; // 결과 화면에서는 일시정지 버튼이 필요 없음
   setMenuNavElements([restartBtn], 0);
@@ -2586,6 +3027,138 @@ function showResultsScreen(){
   rows.forEach((r, i)=>{
     setTimeout(()=> r.classList.add('show'), 90 + i*90);
   });
+}
+
+// ================= 라운드 종료 후 시퀀스: 경험치 게이지 -> (등급 변경 시만) 등급 변경 -> onDone =================
+function runPostRoundSequence(data, onDone){
+  showXpGaugePopup(data, ()=>{
+    if (data.newRankTier !== data.prevRankTier){
+      showRankChangePopup(data, onDone);
+    } else {
+      onDone();
+    }
+  });
+}
+
+const XP_POPUP_FILL_MS = 900;       // 게이지가 채워지는 데 걸리는 시간
+const XP_POPUP_BURST_HOLD_MS = 800; // 레벨업 축하 연출이 유지되는 시간
+const XP_POPUP_RESET_FILL_MS = 650; // 레벨업 후 게이지가 0에서 다시 채워지는 시간
+const XP_POPUP_FINAL_HOLD_MS = 550; // 다 채운 뒤 팝업이 닫히기 전 잠깐 멈춰서 보여주는 시간
+
+// 경험치 게이지가 차오르는 팝업. 이번 라운드로 레벨이 올랐으면(1개 이상) 게이지가 꽉 찬 순간
+// 화려한 레벨업 연출(플래시/컨페티/사운드)이 재생된 뒤, 게이지가 0으로 리셋되고 남은 경험치만큼
+// 다시 채워짐. 다 끝나면 onDone()을 호출해 다음 단계(등급 팝업 또는 결과 화면)로 넘어감.
+function showXpGaugePopup(data, onDone){
+  const { prevLevelInfo, newLevelInfo, xpGained, newRankTier } = data;
+  const leveledUp = newLevelInfo.level > prevLevelInfo.level;
+  const levelsGained = newLevelInfo.level - prevLevelInfo.level;
+
+  applyRankEmblemToEl(xpGaugeRankEmblemEl, newRankTier);
+  xpGaugeLevelNumEl.textContent = prevLevelInfo.level;
+  xpGaugeGainTextEl.textContent = '✨ 경험치 +' + xpGained;
+  levelUpBurstTextEl.classList.remove('burstShow');
+
+  xpGaugePopupEl.style.display = 'flex';
+  xpGaugePopupEl.classList.remove('show', 'levelUpFlash');
+  void xpGaugePopupEl.offsetWidth; // 리플로우 강제(연속 재생 시 애니메이션이 다시 걸리게 함)
+  xpGaugePopupEl.classList.add('show');
+
+  // 시작 상태: 트랜지션 없이 이번 라운드가 시작되기 전 진행도로 즉시 맞춰둠
+  xpGaugeBarFillEl.style.transition = 'none';
+  const startFrac = Math.min(1, prevLevelInfo.xpIntoLevel / prevLevelInfo.xpForThisLevel);
+  xpGaugeBarFillEl.style.width = (startFrac*100) + '%';
+  xpGaugeBarTextEl.textContent = prevLevelInfo.xpIntoLevel + ' / ' + prevLevelInfo.xpForThisLevel;
+  void xpGaugeBarFillEl.offsetWidth;
+
+  const FILL_START_DELAY = 300; // 팝업이 통통 튀며 나타나는 애니메이션이 어느 정도 진행된 뒤 채우기 시작
+  setTimeout(()=>{
+    xpGaugeBarFillEl.style.transition = 'width ' + (XP_POPUP_FILL_MS/1000) + 's cubic-bezier(.22,.8,.32,1)';
+    if (leveledUp){
+      xpGaugeBarFillEl.style.width = '100%';
+      xpGaugeBarTextEl.textContent = prevLevelInfo.xpForThisLevel + ' / ' + prevLevelInfo.xpForThisLevel;
+    } else {
+      const frac = Math.min(1, newLevelInfo.xpIntoLevel / newLevelInfo.xpForThisLevel);
+      xpGaugeBarFillEl.style.width = (frac*100) + '%';
+      xpGaugeBarTextEl.textContent = newLevelInfo.xpIntoLevel + ' / ' + newLevelInfo.xpForThisLevel;
+    }
+  }, FILL_START_DELAY);
+
+  const afterFill = FILL_START_DELAY + XP_POPUP_FILL_MS;
+
+  if (leveledUp){
+    // 게이지가 꽉 찬 순간: 레벨 숫자를 올리고 화려한 축하 연출 재생
+    setTimeout(()=>{
+      xpGaugeLevelNumEl.textContent = newLevelInfo.level;
+      levelUpBurstTextEl.textContent = '⬆ LEVEL UP!' + (levelsGained > 1 ? ' x' + levelsGained : '');
+      levelUpBurstTextEl.classList.remove('burstShow');
+      void levelUpBurstTextEl.offsetWidth;
+      levelUpBurstTextEl.classList.add('burstShow');
+      xpGaugePopupEl.classList.add('levelUpFlash');
+      sfxLevelUp();
+      spawnBonusConfetti(36, ['#3bd0ff', '#5bffe4', '#8cff5b', '#fff05b']);
+    }, afterFill);
+
+    // 축하 연출을 잠깐 보여준 뒤, 게이지를 0으로 순간 리셋했다가 남은 경험치만큼 다시 채움
+    const afterBurst = afterFill + XP_POPUP_BURST_HOLD_MS;
+    setTimeout(()=>{
+      xpGaugePopupEl.classList.remove('levelUpFlash');
+      xpGaugeBarFillEl.style.transition = 'none';
+      xpGaugeBarFillEl.style.width = '0%';
+      void xpGaugeBarFillEl.offsetWidth;
+      xpGaugeBarFillEl.style.transition = 'width ' + (XP_POPUP_RESET_FILL_MS/1000) + 's cubic-bezier(.22,.8,.32,1)';
+      const frac = Math.min(1, newLevelInfo.xpIntoLevel / newLevelInfo.xpForThisLevel);
+      xpGaugeBarFillEl.style.width = (frac*100) + '%';
+      xpGaugeBarTextEl.textContent = newLevelInfo.xpIntoLevel + ' / ' + newLevelInfo.xpForThisLevel;
+    }, afterBurst);
+
+    const closeAt = afterBurst + XP_POPUP_RESET_FILL_MS + XP_POPUP_FINAL_HOLD_MS;
+    setTimeout(()=> closeXpGaugePopup(onDone), closeAt);
+  } else {
+    setTimeout(()=> closeXpGaugePopup(onDone), afterFill + XP_POPUP_FINAL_HOLD_MS);
+  }
+}
+
+function closeXpGaugePopup(onDone){
+  xpGaugePopupEl.classList.remove('show');
+  setTimeout(()=>{
+    xpGaugePopupEl.style.display = 'none';
+    onDone();
+  }, 300); // opacity 트랜지션(0.3s)이 끝날 시간을 준 뒤 다음 단계로
+}
+
+const RANK_POPUP_HOLD_MS = 2000; // 등급 변경 팝업이 화면에 떠 있는 시간
+
+// 등급이 바뀐 경우에만 호출됨: 이전 등급 -> 새 등급으로 넘어가는 화려한 전환 연출
+function showRankChangePopup(data, onDone){
+  const { prevRankTier, newRankTier } = data;
+  const isUp = newRankTier > prevRankTier;
+  const newInfo = getRankTierInfo(newRankTier);
+
+  applyRankEmblemToEl(rankOldEmblemEl, prevRankTier);
+  applyRankEmblemToEl(rankNewEmblemEl, newRankTier);
+  rankChangeTitleEl.textContent = isUp ? ('🎖 등급 상승! ' + newInfo.name) : ('등급 하락 · ' + newInfo.name);
+  rankChangeTitleEl.className = 'rankChangeTitle ' + (isUp ? 'up' : 'down');
+
+  rankChangePopupEl.style.display = 'flex';
+  rankChangePopupEl.classList.remove('show', 'rankPopUp');
+  void rankChangePopupEl.offsetWidth;
+  rankChangePopupEl.classList.add('show');
+  if (isUp) rankChangePopupEl.classList.add('rankPopUp');
+
+  if (isUp){
+    sfxRankUp();
+    setTimeout(()=> spawnBonusConfetti(50, ['#ffd23d', '#ff8a3d', '#fff05b', '#ff2d7a']), 250);
+  } else {
+    sfxRankDown();
+  }
+
+  setTimeout(()=>{
+    rankChangePopupEl.classList.remove('show');
+    setTimeout(()=>{
+      rankChangePopupEl.style.display = 'none';
+      onDone();
+    }, 300);
+  }, RANK_POPUP_HOLD_MS);
 }
 // 순위별 메달 표시(1~3등은 메달 이모지, 4등 이후는 숫자)
 const RANK_MEDALS = ['🥇', '🥈', '🥉', '4', '5', '6'];
@@ -3486,6 +4059,7 @@ function buildHud(){
     // 이 목록에는 이름과 KO/사망 숫자만 보여줌
     row.innerHTML =
       '<div class="hudName"><span class="colorDot" style="background:' + ch.color + ';"></span>' +
+        rankEmblemHtml(ch.rankTierIndex) +
         ch.label + (isHuman(ch) ? ' (나)' : '') +
         (isHuman(ch) ? ' <span id="hudctl_' + idx + '" style="font-weight:normal;color:#ffb84d;"></span>' : '') +
       '</div>' +
@@ -3812,9 +4386,27 @@ function updateItemPickup(ch){
 // ================= 메인 루프 =================
 let lastTime = performance.now();
 
+// requestAnimationFrame은 브라우저가 알아서 모니터의 실제 주사율(60/120/144Hz 등)에 맞춰 호출해주므로,
+// 이 게임에는 "30fps로 제한" 같은 인위적인 프레임 상한이 따로 없음 - 이미 화면이 낼 수 있는 최대
+// 프레임레이트로 그리려고 시도하는 중임. 다만 한 프레임을 그리는 데 걸리는 실제 계산/렌더링 시간이
+// 모니터 주사율이 요구하는 시간(예: 144Hz면 6.9ms)보다 오래 걸리면, 뒤에서 병목이 걸려 결과적으로
+// 그보다 낮은 프레임레이트로만 보이게 됨. F3을 누르면 화면 우측 상단에 실제로 몇 fps가 나오고 있는지
+// 표시해서, "화면 배율(모니터 Hz) 문제"인지 "렌더링이 느려서 병목"인지 직접 확인할 수 있게 함.
+let showFpsCounter = false;
+let fpsSmoothed = 60;
+window.addEventListener('keydown', e=>{
+  if (e.key === 'F3'){ showFpsCounter = !showFpsCounter; e.preventDefault(); }
+});
+
 function loop(now){
   let dt = (now - lastTime) / 1000;
   lastTime = now;
+  // 실제 순간 fps를 지수이동평균(EMA)으로 부드럽게 만들어서(매 프레임 들쭉날쭉한 숫자 대신) 표시함.
+  // dt가 0에 가까우면(=fps가 매우 높으면) 나누기 오류가 나지 않도록 방어.
+  if (dt > 0.0001){
+    const instFps = 1 / dt;
+    fpsSmoothed += (instFps - fpsSmoothed) * 0.1;
+  }
   dt = Math.min(dt, 0.05); // 급격한 프레임드랍 방지
 
   // 이 프레임에서 어딘가 예외가 터지더라도(특히 온라인 모드에서 아직 다듬어지지 않은 부분) 애니메이션
@@ -5050,6 +5642,7 @@ function render(){
   }
 
   drawScreenFlash();
+  drawFpsCounter();
 }
 
 // 라운드 시작/종료 등 큰 이벤트에서 화면 전체(분할화면이면 두 패널 모두)를 잠깐 색으로 확 밝혔다가
@@ -5061,6 +5654,25 @@ function drawScreenFlash(){
   ctx.setTransform(1,0,0,1,0,0);
   ctx.fillStyle = hexToRgba(screenFlash.color, t*0.5);
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+// F3으로 켜고 끌 수 있는 간단한 fps 표시. 항상 캔버스 전체 좌표계(줌/분할화면과 무관) 우측 상단에 그림.
+// 지금 실제로 몇 fps가 나오는지 눈으로 바로 확인할 수 있어서, "모니터 주사율만큼 안 나온다"는 느낌이
+// 들 때 이게 화면(브라우저) 쪽 제한 때문인지 아니면 이 프레임을 그리는 데 시간이 오래 걸려서(렌더링
+// 병목) 그런지 구분하는 데 도움이 됨.
+function drawFpsCounter(){
+  if (!showFpsCounter) return;
+  ctx.setTransform(1,0,0,1,0,0);
+  const text = Math.round(fpsSmoothed) + ' FPS';
+  ctx.font = 'bold 14px monospace';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  const px = canvas.width - 10, py = 10;
+  const metrics = ctx.measureText(text);
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.fillRect(px - metrics.width - 8, py - 4, metrics.width + 12, 22);
+  ctx.fillStyle = fpsSmoothed >= 55 ? '#3dff7a' : (fpsSmoothed >= 30 ? '#ffd23d' : '#ff5b5b');
+  ctx.fillText(text, px, py);
 }
 
 // hex(#rrggbb) 또는 rgb() 색상 문자열을 알파값 포함 rgba()로 변환
