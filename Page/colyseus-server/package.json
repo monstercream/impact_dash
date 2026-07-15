@@ -1,0 +1,21 @@
+{
+  "name": "impact-dash-colyseus-server",
+  "version": "1.0.0",
+  "description": "Impact Dash 2.0 실시간 멀티플레이용 Colyseus 릴레이 서버 (호스트-릴레이 방식)",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "@colyseus/schema": "^2.0.35",
+    "@colyseus/ws-transport": "^0.15.3",
+    "colyseus": "^0.15.39",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "colyseus.js": "0.15.28"
+  }
+}
