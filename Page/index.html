@@ -743,8 +743,17 @@
       <h2>🏆 라운드 종료 🏆</h2>
       <div id="resultsList"></div>
       <p id="resultsCoinGain" style="display:none;"></p>
+      <button id="watchAdDoubleBtn" style="display:none;">🎬 광고 보고 코인 2배 받기</button>
       <button id="restartBtn">다시 플레이</button>
     </div>
+  </div>
+  <!-- 가짜(데모) 리워드 광고 오버레이: 실제 광고 SDK 연동 전까지 이 화면으로 흐름/UX를 미리 확인함.
+       나중에 진짜 광고 SDK(Google Ad Manager 등)로 교체할 때는 showFakeRewardAd() 함수 안의
+       setTimeout/카운트다운 부분을 실제 광고 재생 완료 콜백으로 바꾸면 됨. -->
+  <div id="fakeAdOverlay" style="display:none; position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.88); color:#fff; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-size:16px;">
+    <div>📺 (데모) 광고 재생 중...</div>
+    <div id="fakeAdCountdown" style="font-size:36px; font-weight:bold; margin:14px 0;">5</div>
+    <div style="font-size:12px; color:#999;">실제 서비스에서는 이 화면 대신 진짜 동영상 광고가 재생됩니다</div>
   </div>
   <div id="shopScreen">
     <div id="shopPanel">
@@ -1013,29 +1022,30 @@ const EQUIPPED_SKIN_STORAGE_KEY = 'impactDash2_equippedSkin';
 // 고른 색(팀/슬롯 색)을 그대로 쓰므로 게임플레이에는 영향 없음, 순수하게 상점에서 구분하기 쉽게 하기 위함.
 const SKINS = [
   { id:'default',        name:'버디봇 (기본)',         shape:'buddybot',      cost:0,   accent:'#ff6a6a' },
-  { id:'sproutpot',      name:'새싹 화분',             shape:'sproutpot',     cost:200, levelReq:6,  accent:'#ED8936' },
+  { id:'sproutpot',      name:'새싹 화분',             shape:'sproutpot',     cost:250, levelReq:6,  accent:'#ED8936' },
   // 레트로 감성 꼬마 픽셀 로봇 친구들 20종 - 기존 상점 캐릭터(라운드/미니/블록로봇 등 도형 스킨과
   // 버블티/식빵)를 전부 대체함
-  { id:'crttubby',       name:'브라운관 TV',           shape:'crttubby',      cost:60,  levelReq:1,  accent:'#718096' },
-  { id:'beepypager',     name:'삐삐 로봇',             shape:'beepypager',    cost:80,  levelReq:1,  accent:'#2D3748' },
-  { id:'diskettebuddy',  name:'플로피 디스크',         shape:'diskettebuddy', cost:100, levelReq:2,  accent:'#3182CE' },
-  { id:'joypadmini',     name:'미니 게임기',           shape:'joypadmini',    cost:120, levelReq:2,  accent:'#ECC94B' },
-  { id:'radiotune',      name:'아날로그 라디오',       shape:'radiotune',     cost:140, levelReq:3,  accent:'#ED8936' },
-  { id:'djbeat',         name:'헤드폰 DJ',             shape:'djbeat',        cost:160, levelReq:3,  accent:'#E2E8F0' },
-  { id:'ticktock',       name:'탁상시계',              shape:'ticktock',      cost:180, levelReq:4,  accent:'#FC8181' },
-  { id:'polaroidpippo',  name:'즉석 카메라',           shape:'polaroidpippo', cost:200, levelReq:4,  accent:'#4FD1C5' },
-  { id:'sparkybattery',  name:'보조배터리',            shape:'sparkybattery', cost:220, levelReq:5,  accent:'#4299E1' },
-  { id:'pluggy',         name:'전원 플러그',           shape:'pluggy',        cost:240, levelReq:5,  accent:'#EDF2F7' },
-  { id:'brightwatt',     name:'픽셀 전구',             shape:'brightwatt',    cost:260, levelReq:6,  accent:'#FEFCBF' },
-  { id:'tapycassette',   name:'카세트테이프',          shape:'tapycassette',  cost:280, levelReq:6,  accent:'#9F7AEA' },
-  { id:'captainenter',   name:'엔터 키',               shape:'captainenter',  cost:300, levelReq:7,  accent:'#EDF2F7' },
-  { id:'clickymouse',    name:'클래식 마우스',         shape:'clickymouse',   cost:320, levelReq:7,  accent:'#E2E8F0' },
-  { id:'sodapop',        name:'탄산캔',                shape:'sodapop',       cost:340, levelReq:8,  accent:'#ED64A6' },
-  { id:'sweetcube',      name:'큐브 얼음',             shape:'sweetcube',     cost:360, levelReq:8,  accent:'#EBF8FF' },
-  { id:'retrotoasty',    name:'미니 토스터기',         shape:'retrotoasty',   cost:380, levelReq:9,  accent:'#FC8181' },
-  { id:'gumballbot',     name:'캔디 머신',             shape:'gumballbot',    cost:400, levelReq:9,  accent:'#E2E8F0' },
-  { id:'signalsam',      name:'신호등',                shape:'signalsam',     cost:420, levelReq:10, accent:'#2D3748' },
-  { id:'retrostick',     name:'아케이드 조이스틱',     shape:'retrostick',    cost:440, levelReq:10, accent:'#4A5568' }
+  // (2026-07 가격 전체 인상: 기존 대비 약 25% 인상)
+  { id:'crttubby',       name:'브라운관 TV',           shape:'crttubby',      cost:80,  levelReq:1,  accent:'#718096' },
+  { id:'beepypager',     name:'삐삐 로봇',             shape:'beepypager',    cost:100, levelReq:1,  accent:'#2D3748' },
+  { id:'diskettebuddy',  name:'플로피 디스크',         shape:'diskettebuddy', cost:130, levelReq:2,  accent:'#3182CE' },
+  { id:'joypadmini',     name:'미니 게임기',           shape:'joypadmini',    cost:150, levelReq:2,  accent:'#ECC94B' },
+  { id:'radiotune',      name:'아날로그 라디오',       shape:'radiotune',     cost:180, levelReq:3,  accent:'#ED8936' },
+  { id:'djbeat',         name:'헤드폰 DJ',             shape:'djbeat',        cost:200, levelReq:3,  accent:'#E2E8F0' },
+  { id:'ticktock',       name:'탁상시계',              shape:'ticktock',      cost:230, levelReq:4,  accent:'#FC8181' },
+  { id:'polaroidpippo',  name:'즉석 카메라',           shape:'polaroidpippo', cost:250, levelReq:4,  accent:'#4FD1C5' },
+  { id:'sparkybattery',  name:'보조배터리',            shape:'sparkybattery', cost:280, levelReq:5,  accent:'#4299E1' },
+  { id:'pluggy',         name:'전원 플러그',           shape:'pluggy',        cost:300, levelReq:5,  accent:'#EDF2F7' },
+  { id:'brightwatt',     name:'픽셀 전구',             shape:'brightwatt',    cost:330, levelReq:6,  accent:'#FEFCBF' },
+  { id:'tapycassette',   name:'카세트테이프',          shape:'tapycassette',  cost:350, levelReq:6,  accent:'#9F7AEA' },
+  { id:'captainenter',   name:'엔터 키',               shape:'captainenter',  cost:380, levelReq:7,  accent:'#EDF2F7' },
+  { id:'clickymouse',    name:'클래식 마우스',         shape:'clickymouse',   cost:400, levelReq:7,  accent:'#E2E8F0' },
+  { id:'sodapop',        name:'탄산캔',                shape:'sodapop',       cost:430, levelReq:8,  accent:'#ED64A6' },
+  { id:'sweetcube',      name:'큐브 얼음',             shape:'sweetcube',     cost:450, levelReq:8,  accent:'#EBF8FF' },
+  { id:'retrotoasty',    name:'미니 토스터기',         shape:'retrotoasty',   cost:480, levelReq:9,  accent:'#FC8181' },
+  { id:'gumballbot',     name:'캔디 머신',             shape:'gumballbot',    cost:500, levelReq:9,  accent:'#E2E8F0' },
+  { id:'signalsam',      name:'신호등',                shape:'signalsam',     cost:530, levelReq:10, accent:'#2D3748' },
+  { id:'retrostick',     name:'아케이드 조이스틱',     shape:'retrostick',    cost:550, levelReq:10, accent:'#4A5568' }
 ];
 
 // ---- 경기장 배경(맵) 테마: 기존엔 그래파이트 바닥 하나뿐이었는데, 여러 테마 중 하나를 골라서
@@ -1939,7 +1949,46 @@ const myKoCountEl = document.getElementById('myKoCount');
 const resultsScreenEl = document.getElementById('resultsScreen');
 const resultsListEl = document.getElementById('resultsList');
 const resultsCoinGainEl = document.getElementById('resultsCoinGain');
+const watchAdDoubleBtnEl = document.getElementById('watchAdDoubleBtn');
+const fakeAdOverlayEl = document.getElementById('fakeAdOverlay');
+const fakeAdCountdownEl = document.getElementById('fakeAdCountdown');
 const restartBtn = document.getElementById('restartBtn');
+// 이번 라운드에 지급된 "기본" 코인 보상(광고 2배 지급의 기준값) + 이미 2배를 받았는지 여부
+let lastRoundCoinEarned = 0;
+let adDoubleUsedThisRound = false;
+
+// (데모용) 가짜 리워드 광고 재생. 실제 광고 SDK를 붙일 때는 이 함수 내부만 실제 광고 재생 API
+// 호출로 바꾸면 되고, 성공 콜백에서 onComplete()를 그대로 호출해주면 나머지(코인 2배 지급) 로직은
+// 그대로 재사용 가능함.
+function showFakeRewardAd(onComplete){
+  if (!fakeAdOverlayEl || !fakeAdCountdownEl) { onComplete(); return; }
+  fakeAdOverlayEl.style.display = 'flex';
+  let remain = 5;
+  fakeAdCountdownEl.textContent = String(remain);
+  const timer = setInterval(()=>{
+    remain -= 1;
+    if (remain <= 0){
+      clearInterval(timer);
+      fakeAdOverlayEl.style.display = 'none';
+      onComplete();
+    } else {
+      fakeAdCountdownEl.textContent = String(remain);
+    }
+  }, 1000);
+}
+
+if (watchAdDoubleBtnEl){
+  watchAdDoubleBtnEl.addEventListener('click', ()=>{
+    if (adDoubleUsedThisRound || lastRoundCoinEarned <= 0) return;
+    watchAdDoubleBtnEl.disabled = true;
+    showFakeRewardAd(()=>{
+      addCoins(lastRoundCoinEarned); // 같은 금액을 한 번 더 지급 -> 결과적으로 2배
+      adDoubleUsedThisRound = true;
+      resultsCoinGainEl.textContent = '🪙 라운드 보상 +' + (lastRoundCoinEarned*2) + ' 코인 (광고 2배 적용, 보유 ' + walletCoins + ')';
+      watchAdDoubleBtnEl.style.display = 'none';
+    });
+  });
+}
 // 라운드 종료 후 시퀀스(경험치 게이지 -> 등급 변경 -> 결과 화면) 팝업 요소들
 const xpGaugePopupEl = document.getElementById('xpGaugePopup');
 const xpGaugeRankEmblemEl = document.getElementById('xpGaugeRankEmblem');
@@ -4721,12 +4770,16 @@ function showResultsScreen(){
     });
   }
 
+  lastRoundCoinEarned = totalEarned;
+  adDoubleUsedThisRound = false;
   if (totalEarned > 0){
     addCoins(totalEarned);
     resultsCoinGainEl.textContent = '🪙 라운드 보상 +' + totalEarned + ' 코인 (보유 ' + walletCoins + ')';
     resultsCoinGainEl.style.display = 'block';
+    if (watchAdDoubleBtnEl){ watchAdDoubleBtnEl.style.display = 'block'; watchAdDoubleBtnEl.disabled = false; }
   } else {
     resultsCoinGainEl.style.display = 'none';
+    if (watchAdDoubleBtnEl) watchAdDoubleBtnEl.style.display = 'none';
   }
 
   runPostRoundSequence({ prevRankTier, newRankTier, prevLevelInfo, newLevelInfo, xpGained }, revealResultsScreen);
