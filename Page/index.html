@@ -4307,7 +4307,10 @@ function updateOnlineClient(dt){
   let angle = ch.angle;
   if (!ch.dead){
     if (gpInput.hasAim) angle = Math.atan2(gpInput.aimY, gpInput.aimX);
-    else if (touchAim.active && touchAim.hasVector) angle = Math.atan2(touchAim.curY - touchAim.anchorY, touchAim.curX - touchAim.anchorX);
+    // touchAim.active는 손을 뗀 순간 이미 false로 바뀌어 있지만(endTouch), 그 손 뗀 프레임엔
+    // justReleased가 true라서 스윙이 발동됨 - 이때도 마지막으로 겨눴던 터치 방향을 그대로 써야
+    // "딴 곳을 보고 스윙"하지 않음(터치를 뗀 순간 마우스 좌표로 각도가 튀던 버그 수정).
+    else if ((touchAim.active || touchAim.justReleased) && touchAim.hasVector) angle = Math.atan2(touchAim.curY - touchAim.anchorY, touchAim.curX - touchAim.anchorX);
     else angle = Math.atan2(worldMouseY - ch.y, worldMouseX - ch.x);
   }
 
@@ -6429,7 +6432,9 @@ function update(dt){
           ch._lastAimWasGamepad = true;
         } else if (gpInput.connected && ch._lastAimWasGamepad){
           // 오른쪽 스틱이 데드존 안(중앙 근처)으로 돌아온 상태: 스틱을 놓기 직전의 조준 방향을 유지
-        } else if (touchAim.active && touchAim.hasVector){
+        } else if ((touchAim.active || touchAim.justReleased) && touchAim.hasVector){
+          // touchAim.active는 손을 뗀 순간 이미 false지만, 그 프레임엔 justReleased가 true라서
+          // 스윙이 발동됨 - 이때 마지막 터치 방향을 유지해야 손 뗄 때 엉뚱한 곳을 보고 스윙하지 않음.
           const tdx = touchAim.curX - touchAim.anchorX, tdy = touchAim.curY - touchAim.anchorY;
           ch.angle = Math.atan2(tdy, tdx);
           ch._lastAimWasGamepad = false;
