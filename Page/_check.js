@@ -2888,7 +2888,7 @@ function netSaveRememberedConnectInfo(serverUrl, name){
 //   암호화된 터널 주소로 보고 wss://를 붙이고 포트는 안 붙임(ngrok이 443으로 알아서 받아주므로)
 function netNormalizeServerAddress(raw){
   const v = (raw || '').trim();
-  if (!v) return 'ws://localhost:2567';
+  if (!v) return 'wss://defuse-finch-hacker.ngrok-free.dev';
   if (/^wss?:\/\//i.test(v)) return v;
   const m = v.match(/^((?:\d{1,3}\.){3}\d{1,3}|localhost)(?::(\d+))?$/i);
   if (m) return 'ws://' + m[1] + ':' + (m[2] || '2567');
@@ -2899,7 +2899,7 @@ function netReadConnectForm(){
   const urlEl = document.getElementById('onlineServerUrl');
   const codeEl = document.getElementById('onlineRoomCode');
   const nameEl = document.getElementById('onlineName');
-  const rawUrl = (urlEl && urlEl.value.trim()) || 'localhost';
+  const rawUrl = (urlEl && urlEl.value.trim()) || 'defuse-finch-hacker.ngrok-free.dev';
   const name = (nameEl && nameEl.value.trim()) || '플레이어';
   netSaveRememberedConnectInfo(rawUrl, name); // 입력한 그대로(IP만) 기억해둠 - 다음에 열어도 IP만 보이게
   return {
@@ -3047,7 +3047,7 @@ async function netRefreshRoomList(){
     return;
   }
   const urlEl = document.getElementById('onlineServerUrl');
-  const rawUrl = (urlEl && urlEl.value.trim()) || 'localhost';
+  const rawUrl = (urlEl && urlEl.value.trim()) || 'defuse-finch-hacker.ngrok-free.dev';
   const serverUrl = netNormalizeServerAddress(rawUrl);
   listEl.innerHTML = '<div class="onlineRoomListEmpty">불러오는 중...</div>';
   try {
@@ -3088,7 +3088,7 @@ async function netJoinRoomById(serverUrl, roomId){
   // 기억해두는 값은 입력한 그대로(IP만)여야 다음에 열어도 IP만 보이므로, 이미 ws://로 완성된
   // serverUrl 대신 입력칸의 원본 값을 다시 읽어서 저장함
   const urlElForSave = document.getElementById('onlineServerUrl');
-  netSaveRememberedConnectInfo((urlElForSave && urlElForSave.value.trim()) || 'localhost', name);
+  netSaveRememberedConnectInfo((urlElForSave && urlElForSave.value.trim()) || 'defuse-finch-hacker.ngrok-free.dev', name);
   try{
     netClient = new Colyseus.Client(serverUrl);
     netRoom = await netClient.joinById(roomId, { name, rankTier: computeRankTierIndex(rankStats) });
