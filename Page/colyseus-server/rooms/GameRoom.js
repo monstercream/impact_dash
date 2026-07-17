@@ -17,6 +17,11 @@ class GameRoom extends Room {
     this.hostSessionId = null;
     this.playerMeta = new Map(); // sessionId -> { index, name, ready }
 
+    // 방 목록 화면(게스트가 서버 주소만 입력하고 방 코드는 직접 안 치고 목록에서 골라 들어올 수
+    // 있게 하기 위한 기능)에서 각 방을 구분해 보여줄 수 있도록 메타데이터를 심어둠. 호스트 이름은
+    // 아직 아무도 안 들어온 시점이라 여기선 모르고, onJoin에서 호스트가 들어오는 순간 채워짐.
+    this.setMetadata({ roomCode: (options && options.roomCode) || 'default', hostName: null });
+
     this.onMessage('input', (client, data) => {
       if (!this.hostSessionId) return;
       const host = this.clients.find(c => c.sessionId === this.hostSessionId);
@@ -77,6 +82,8 @@ class GameRoom extends Room {
 
     if (!this.hostSessionId) {
       this.hostSessionId = client.sessionId;
+      // 방 목록에 "누구 방인지" 이름이 보이도록, 방을 만든(첫 입장한) 사람의 이름을 메타데이터에 채움
+      this.setMetadata({ roomCode: (options && options.roomCode) || 'default', hostName: name });
     }
 
     console.log(`[join] room=${this.roomId} session=${client.sessionId} index=${index} host=${this.hostSessionId} (${this.playerMeta.size}/${ROOM_MAX_CLIENTS})`);
