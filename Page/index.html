@@ -43,14 +43,12 @@
   .hudRow.hudRowSelf { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.35); }
   .hudName { font-weight: bold; font-size: 12px; margin-bottom: 3px; text-shadow: 0 0 4px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px; color: #fff; }
   .colorDot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; box-shadow: 0 0 4px rgba(0,0,0,0.8); flex-shrink: 0; }
-  /* 등급 엠블럼: 이름 옆에 붙는 작은 배지. 배경색은 등급의 "밴드"(루키/브레이커/스매셔/임팩터/레전드)를,
-     숫자는 밴드 안에서의 세부 단계(IV~I, I가 가장 높음)를 나타냄 */
+  /* 등급 엠블럼: 이름 옆에 붙는 작은 원형 배지 이미지(20단계 전용 그라디언트 오르비탈 디자인).
+     정확한 등급명(밴드+세부단계)은 title 툴팁과 상단 상태표시줄 텍스트로 확인 가능함 */
   .rankEmblem {
-    display: inline-flex; align-items: center; justify-content: center;
-    min-width: 30px; height: 15px; padding: 0 4px; border-radius: 4px;
-    font-size: 9px; font-weight: bold; color: #111; flex-shrink: 0;
-    border: 1px solid rgba(255,255,255,0.45); text-shadow: none;
-    box-shadow: 0 0 4px rgba(0,0,0,0.5);
+    display: inline-block; width: 16px; height: 16px; border-radius: 50%;
+    flex-shrink: 0; border: 1px solid rgba(255,255,255,0.45);
+    box-shadow: 0 0 4px rgba(0,0,0,0.5); vertical-align: middle;
   }
   .hudMeta { font-size: 10px; color: #ccc; margin-top: 2px; text-shadow: 0 0 4px #000; display: flex; justify-content: space-between; }
   /* 타이틀 화면: 게임 진입 시 가장 먼저 보이는 분위기용 화면. 터치/클릭하면 메뉴(startScreen)로 넘어감 */
@@ -107,6 +105,18 @@
     color: #eee; font-size: 14px; font-weight: bold; cursor: pointer;
   }
   #modeButtons button.selected { background: #ff2d7a; border-color: #ff2d7a; box-shadow: 0 0 12px #ff2d7a; }
+  /* 배경(맵) 테마 선택: 작은 정사각 스와치 버튼 - 각 버튼의 배경 그라디언트가 실제 경기장 바닥
+     타일 색을 그대로 미리 보여줘서 고르기 쉽게 함 */
+  #bgThemeButtons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 18px; }
+  #bgThemeButtons button {
+    width: 52px; height: 52px; border-radius: 8px; border: 2px solid #555; cursor: pointer;
+    padding: 0; position: relative;
+  }
+  #bgThemeButtons button.selected { border-color: #ffd23d; box-shadow: 0 0 12px #ffd23d; }
+  #bgThemeButtons button span {
+    position: absolute; left: 0; right: 0; bottom: -18px; font-size: 10px; color: #ccc;
+    white-space: nowrap; text-align: center;
+  }
   #teamButtons button[data-team="0"].selected { background: #ff3b3b; border-color: #ff3b3b; box-shadow: 0 0 12px #ff3b3b; }
   #teamButtons button[data-team="1"].selected { background: #3b7bff; border-color: #3b7bff; box-shadow: 0 0 12px #3b7bff; }
   #roundDurationButtons button.selected { background: #ffe45b; border-color: #ffe45b; color:#221800; box-shadow: 0 0 12px #ffe45b; }
@@ -237,6 +247,12 @@
   .skinSwatch.shape-kind-hex { border-radius: 0; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
   .skinSwatch.shape-kind-tri { border-radius: 0; clip-path: polygon(50% 0%, 95% 90%, 5% 90%); }
   .skinSwatch.shape-kind-star { border-radius: 0; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+  .skinSwatch.shape-kind-robot { border-radius: 22%; }
+  .skinSwatch.shape-kind-sprout { border-radius: 6% 6% 32% 32%; }
+  /* 전용 그리기 함수가 있는 캐릭터(로봇/화분/버블티/식빵)는 CSS 도형 대신 실제 캐릭터를
+     캔버스에 그려서 보여줌 - 이 클래스는 그 캔버스를 담는 래퍼 스와치용 */
+  .skinSwatch.skinSwatchCanvasWrap { border-radius: 30%; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .skinPreviewCanvas { width:100%; height:100%; display:block; }
   .skinName { font-size: 12px; font-weight: bold; }
   .skinCost { font-size: 11px; color: #ffd23d; }
   .skinCostLocked { color: #ff8a8a; font-size: 10px; }
@@ -565,6 +581,8 @@
           <button id="gotoMultiBtn" class="bigChoiceBtn bigChoiceBtnBlue">🌐<br>멀티 플레이<br><span class="bigChoiceSub">다른 기기와 실시간 대전</span></button>
         </div>
         <button id="shopBtn">🛒 상점</button>
+        <p style="margin-top:18px;">배경(경기장) 테마</p>
+        <div id="bgThemeButtons"></div>
       </div>
 
       <!-- ===== 싱글 플레이(기존 로컬 메뉴 그대로) ===== -->
@@ -942,27 +960,76 @@ const EQUIPPED_SKIN_STORAGE_KEY = 'impactDash2_equippedSkin';
 // accent: 상점 미리보기(스와치)에 쓰이는 그라디언트 색상 - 실제 게임에서의 캐릭터 색은 플레이어가
 // 고른 색(팀/슬롯 색)을 그대로 쓰므로 게임플레이에는 영향 없음, 순수하게 상점에서 구분하기 쉽게 하기 위함.
 const SKINS = [
-  { id:'default',     name:'라운드 (기본)',   shape:'round',      cost:0,   accent:'#ff6a6a' },
-  { id:'mini',        name:'미니',            shape:'mini',       cost:50,  accent:'#8cff5b' },
-  { id:'blocky',      name:'블록 로봇',       shape:'blocky',     cost:60,  accent:'#3bd0ff' },
-  { id:'spiky',       name:'스파이크 닌자',   shape:'spiky',      cost:80,  accent:'#c060ff' },
-  { id:'giant',       name:'자이언트',        shape:'giant',      cost:120, accent:'#ffb84d' },
-  { id:'hexbot',      name:'헥사봇',          shape:'hexbot',     cost:140, levelReq:3,  accent:'#3dff7a' },
-  { id:'tripod',      name:'트라이팟',        shape:'tripod',     cost:150, levelReq:3,  accent:'#ffe45b' },
-  { id:'shadow',      name:'섀도우',          shape:'shadow',     cost:160, levelReq:4,  accent:'#6b6b7a' },
-  { id:'needle',      name:'니들',            shape:'needle',     cost:200, levelReq:5,  accent:'#ff5fc0' },
-  { id:'tank',        name:'탱크',            shape:'tank',       cost:220, levelReq:5,  accent:'#8a8a92' },
-  { id:'crystal',     name:'크리스탈',        shape:'crystal',    cost:240, levelReq:6,  accent:'#5bffe4' },
-  { id:'cube',        name:'큐브',            shape:'cube',       cost:260, levelReq:8,  accent:'#4d9eff' },
-  { id:'phantom',     name:'팬텀',            shape:'phantom',    cost:280, levelReq:7,  accent:'#9b5bff' },
-  { id:'juggernaut',  name:'저거너트',        shape:'juggernaut', cost:300, levelReq:7,  accent:'#ff8a3d' },
-  { id:'starling',    name:'스타링',          shape:'starling',   cost:340, levelReq:9,  accent:'#fff05b' },
-  { id:'viper',       name:'바이퍼',          shape:'viper',      cost:360, levelReq:10, accent:'#3dffb0' },
-  { id:'titan',       name:'타이탄',          shape:'titan',      cost:380, levelReq:10, accent:'#ff5b5b' },
-  { id:'nova',        name:'노바',            shape:'nova',       cost:420, levelReq:12, accent:'#5bc8ff' },
-  { id:'eclipse',     name:'이클립스',        shape:'eclipse',    cost:460, levelReq:14, accent:'#2d2d3d' },
-  { id:'legend',      name:'레전드',          shape:'legend',     cost:600, levelReq:16, accent:'#ffd23d' }
+  { id:'default',        name:'버디봇 (기본)',         shape:'buddybot',      cost:0,   accent:'#ff6a6a' },
+  { id:'sproutpot',      name:'새싹 화분',             shape:'sproutpot',     cost:200, levelReq:6,  accent:'#ED8936' },
+  // 레트로 감성 꼬마 픽셀 로봇 친구들 20종 - 기존 상점 캐릭터(라운드/미니/블록로봇 등 도형 스킨과
+  // 버블티/식빵)를 전부 대체함
+  { id:'crttubby',       name:'브라운관 TV',           shape:'crttubby',      cost:60,  levelReq:1,  accent:'#718096' },
+  { id:'beepypager',     name:'삐삐 로봇',             shape:'beepypager',    cost:80,  levelReq:1,  accent:'#2D3748' },
+  { id:'diskettebuddy',  name:'플로피 디스크',         shape:'diskettebuddy', cost:100, levelReq:2,  accent:'#3182CE' },
+  { id:'joypadmini',     name:'미니 게임기',           shape:'joypadmini',    cost:120, levelReq:2,  accent:'#ECC94B' },
+  { id:'radiotune',      name:'아날로그 라디오',       shape:'radiotune',     cost:140, levelReq:3,  accent:'#ED8936' },
+  { id:'djbeat',         name:'헤드폰 DJ',             shape:'djbeat',        cost:160, levelReq:3,  accent:'#E2E8F0' },
+  { id:'ticktock',       name:'탁상시계',              shape:'ticktock',      cost:180, levelReq:4,  accent:'#FC8181' },
+  { id:'polaroidpippo',  name:'즉석 카메라',           shape:'polaroidpippo', cost:200, levelReq:4,  accent:'#4FD1C5' },
+  { id:'sparkybattery',  name:'보조배터리',            shape:'sparkybattery', cost:220, levelReq:5,  accent:'#4299E1' },
+  { id:'pluggy',         name:'전원 플러그',           shape:'pluggy',        cost:240, levelReq:5,  accent:'#EDF2F7' },
+  { id:'brightwatt',     name:'픽셀 전구',             shape:'brightwatt',    cost:260, levelReq:6,  accent:'#FEFCBF' },
+  { id:'tapycassette',   name:'카세트테이프',          shape:'tapycassette',  cost:280, levelReq:6,  accent:'#9F7AEA' },
+  { id:'captainenter',   name:'엔터 키',               shape:'captainenter',  cost:300, levelReq:7,  accent:'#EDF2F7' },
+  { id:'clickymouse',    name:'클래식 마우스',         shape:'clickymouse',   cost:320, levelReq:7,  accent:'#E2E8F0' },
+  { id:'sodapop',        name:'탄산캔',                shape:'sodapop',       cost:340, levelReq:8,  accent:'#ED64A6' },
+  { id:'sweetcube',      name:'큐브 얼음',             shape:'sweetcube',     cost:360, levelReq:8,  accent:'#EBF8FF' },
+  { id:'retrotoasty',    name:'미니 토스터기',         shape:'retrotoasty',   cost:380, levelReq:9,  accent:'#FC8181' },
+  { id:'gumballbot',     name:'캔디 머신',             shape:'gumballbot',    cost:400, levelReq:9,  accent:'#E2E8F0' },
+  { id:'signalsam',      name:'신호등',                shape:'signalsam',     cost:420, levelReq:10, accent:'#2D3748' },
+  { id:'retrostick',     name:'아케이드 조이스틱',     shape:'retrostick',    cost:440, levelReq:10, accent:'#4A5568' }
 ];
+
+// ---- 경기장 배경(맵) 테마: 기존엔 그래파이트 바닥 하나뿐이었는데, 여러 테마 중 하나를 골라서
+// 쓸 수 있게 함. 순전히 로컬 취향(코스튬)이라 코인/레벨 조건 없이 전부 처음부터 다 골라 쓸 수 있고,
+// 멀티플레이에서도 동기화가 필요 없는(각자 화면에서만 보이는) 순수 렌더링 설정이라 로컬에만 저장함.
+const BG_THEME_STORAGE_KEY = 'impactDash2_bgTheme';
+const BACKGROUND_THEMES = [
+  { id:'jungle',  name:'정글',   space:'#050f08', tileDark:'#204a2c', tileLight:'#245030', vignette:'rgba(0,12,4,0.45)' },
+  { id:'ocean',   name:'바다',   space:'#020a12', tileDark:'#0e3a52', tileLight:'#123f58', vignette:'rgba(0,10,22,0.45)' },
+  { id:'office',  name:'사무실', space:'#111318', tileDark:'#565b66', tileLight:'#5e636e', vignette:'rgba(8,8,12,0.4)' },
+  { id:'village', name:'마을',   space:'#140f08', tileDark:'#6b5236', tileLight:'#75593c', vignette:'rgba(20,12,4,0.4)' },
+  { id:'field',   name:'들판',   space:'#0a1408', tileDark:'#3a6b3f', tileLight:'#417346', vignette:'rgba(4,14,4,0.4)' }
+];
+function loadBgThemeId(){
+  try {
+    const id = localStorage.getItem(BG_THEME_STORAGE_KEY);
+    return (id && BACKGROUND_THEMES.some(t=> t.id === id)) ? id : BACKGROUND_THEMES[0].id;
+  } catch(e){ return BACKGROUND_THEMES[0].id; }
+}
+let equippedBgThemeId = loadBgThemeId();
+function saveBgThemeId(){
+  try { localStorage.setItem(BG_THEME_STORAGE_KEY, equippedBgThemeId); } catch(e){}
+}
+function getEquippedBgTheme(){
+  return BACKGROUND_THEMES.find(t=> t.id === equippedBgThemeId) || BACKGROUND_THEMES[0];
+}
+function buildBgThemeButtons(){
+  const wrap = document.getElementById('bgThemeButtons');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  BACKGROUND_THEMES.forEach(theme=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.title = theme.name;
+    btn.className = (theme.id === equippedBgThemeId) ? 'selected' : '';
+    btn.style.background = 'linear-gradient(135deg,' + theme.tileLight + ',' + theme.tileDark + ' 55%,' + theme.space + ')';
+    btn.innerHTML = '<span>' + theme.name + '</span>';
+    btn.addEventListener('click', ()=>{
+      equippedBgThemeId = theme.id;
+      saveBgThemeId();
+      wrap.querySelectorAll('button').forEach(b=> b.classList.remove('selected'));
+      btn.classList.add('selected');
+    });
+    wrap.appendChild(btn);
+  });
+}
 
 function loadWallet(){
   try { return Math.max(0, parseInt(localStorage.getItem(WALLET_STORAGE_KEY), 10) || 0); }
@@ -1098,21 +1165,110 @@ function levelFromXp(xp){
   return { level, xpIntoLevel: xp - total, xpForThisLevel: need };
 }
 
+// ---- 등급 엠블럼 배지 이미지(20단계 전용 디자인) ----
+// 사용자가 제공한 "Premium Hi-End 하이라이트 & 라운드 오르비탈 엠블렘" 20종을 그대로 재현함.
+// 10개 색상 계열(스톤/브론즈/실버/골드/에메랄드/플래티넘/다이아몬드/벨벳/크림슨/제니스)이 낮은
+// 단계부터 순서대로 배정되고, 각 계열은 2단계(I/II)씩 있어 총 20단계와 정확히 맞음. 문양도
+// 점 하나(1~2단계) → 고리+점(3~6단계) → 세로 2점+고리(7~12단계) → 십자 4점+고리(13~20단계)로
+// 갈수록 화려해지고, 짝수 단계(각 계열의 II)에는 중앙에 흰 코어가 하나 더 추가됨.
+const RANK_BADGE_FAMILY_DEFS = {
+  stone:   { stops:[[0,'#F7FAFC'],[50,'#CBD5E0'],[100,'#718096']], outline:'#4A5568', ringOpacity:0.4, ringWidth:1.5 },
+  bronze:  { stops:[[0,'#FFFAF0'],[40,'#ED8936'],[100,'#7B341E']], outline:'#652B19', ringOpacity:0.4, ringWidth:1.5 },
+  silver:  { stops:[[0,'#FFFFFF'],[35,'#E2E8F0'],[100,'#4A5568']], outline:'#2D3748', ringOpacity:0.6, ringWidth:1.5 },
+  gold:    { stops:[[0,'#FFFDF5'],[30,'#ECC94B'],[70,'#D69E2E'],[100,'#744210']], outline:'#5F370E', ringOpacity:0.6, ringWidth:1.5 },
+  emerald: { stops:[[0,'#E6FFFA'],[30,'#38B2AC'],[70,'#234E52'],[100,'#0D2628']], outline:'#0D2628', ringOpacity:0.6, ringWidth:1.5 },
+  plat:    { stops:[[0,'#EBF8FF'],[30,'#63B3ED'],[70,'#2B6CB0'],[100,'#1A365D']], outline:'#1A365D', ringOpacity:0.6, ringWidth:1.5 },
+  dia:     { stops:[[0,'#FFFFFF'],[30,'#90CDF4'],[70,'#2B6CB0'],[100,'#0F172A']], outline:'#0F172A', ringOpacity:0.7, ringWidth:1.5 },
+  purple:  { stops:[[0,'#FAF5FF'],[30,'#D6BCFA'],[70,'#6B46C1'],[100,'#2D3748']], outline:'#322659', ringOpacity:0.7, ringWidth:1.5 },
+  red:     { stops:[[0,'#FFF5F5'],[30,'#FEB2B2'],[70,'#9B2C2C'],[100,'#4A1D1D']], outline:'#4A1D1D', ringOpacity:0.7, ringWidth:1.5 },
+  zenith:  { stops:[[0,'#EDF2F7'],[40,'#4A5568'],[100,'#1A202C']], outline:'#1A202C', ringOpacity:0.4, ringWidth:1.2 }
+};
+const RANK_BADGE_FAMILY_BY_TIER = ['stone','stone','bronze','bronze','silver','silver','gold','gold','emerald','emerald','plat','plat','dia','dia','purple','purple','red','red','zenith','zenith'];
+const RANK_BADGE_PATTERN_BY_TIER = [
+  { kind:'dot', dotR:7, opacity:0.85 },
+  { kind:'ringdot', ringR:13, dotR:5, opacity:0.85 },
+  { kind:'dot', dotR:7, opacity:0.85 },
+  { kind:'ringdot', ringR:13, dotR:5, opacity:0.85 },
+  { kind:'dot', dotR:8, opacity:0.85 },
+  { kind:'ringdot', ringR:14, dotR:5.5, opacity:0.85 },
+  { kind:'twin', ringR:14, ringW:2.5, dotR:5, opacity:0.85, core:false },
+  { kind:'twin', ringR:14, ringW:2.5, dotR:5, opacity:0.85, core:true, coreR:3.5 },
+  { kind:'twin', ringR:14, ringW:2.5, dotR:5, opacity:0.85, core:false },
+  { kind:'twin', ringR:14, ringW:2.5, dotR:5, opacity:0.85, core:true, coreR:3.5 },
+  { kind:'twin', ringR:14, ringW:2.5, dotR:5, opacity:0.85, core:false },
+  { kind:'twin', ringR:14, ringW:2.5, dotR:5, opacity:0.85, core:true, coreR:3.5 },
+  { kind:'quad', ringR:15, ringW:3, dotR:4.5, opacity:0.85, core:false },
+  { kind:'quad', ringR:15, ringW:3, dotR:4.5, opacity:0.85, core:true, coreR:4 },
+  { kind:'quad', ringR:15, ringW:3, dotR:4.5, opacity:0.85, core:false },
+  { kind:'quad', ringR:15, ringW:3, dotR:4.5, opacity:0.85, core:true, coreR:4 },
+  { kind:'quad', ringR:15, ringW:3, dotR:4.5, opacity:0.85, core:false },
+  { kind:'quad', ringR:15, ringW:3, dotR:4.5, opacity:0.85, core:true, coreR:4 },
+  { kind:'quad', ringR:15, ringW:3, dotR:4.5, opacity:0.95, core:false, patternColor:'#D69E2E', aureola:true },
+  { kind:'quad', ringR:15, ringW:3, dotR:4.5, opacity:0.95, core:true, coreR:4.5, patternColor:'#D69E2E', aureola:true }
+];
+function rankBadgeCircleSvg(cx, cy, r, fill, opacity){
+  return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+fill+'" opacity="'+opacity+'"/>';
+}
+function rankBadgeRingSvg(cx, cy, r, stroke, sw, opacity){
+  return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+stroke+'" stroke-width="'+sw+'" opacity="'+opacity+'"/>';
+}
+function buildRankBadgeSvg(tier){
+  const fam = RANK_BADGE_FAMILY_DEFS[RANK_BADGE_FAMILY_BY_TIER[tier]];
+  const pat = RANK_BADGE_PATTERN_BY_TIER[tier];
+  const gradId = 'rankGrad' + tier;
+  const color = pat.patternColor || fam.outline;
+  const stopsHtml = fam.stops.map(function(s){ return '<stop offset="'+s[0]+'%" stop-color="'+s[1]+'" />'; }).join('');
+  let patternSvg = '';
+  if (pat.kind === 'dot'){
+    patternSvg = rankBadgeCircleSvg(50,50,pat.dotR, color, pat.opacity);
+  } else if (pat.kind === 'ringdot'){
+    patternSvg = rankBadgeRingSvg(50,50,pat.ringR, color, 3, pat.opacity) + rankBadgeCircleSvg(50,50,pat.dotR, color, pat.opacity);
+  } else if (pat.kind === 'twin'){
+    patternSvg = rankBadgeRingSvg(50,50,pat.ringR, color, pat.ringW, pat.opacity) +
+      rankBadgeCircleSvg(50,42,pat.dotR, color, pat.opacity) + rankBadgeCircleSvg(50,58,pat.dotR, color, pat.opacity);
+  } else if (pat.kind === 'quad'){
+    patternSvg = rankBadgeRingSvg(50,50,pat.ringR, color, pat.ringW, pat.opacity) +
+      rankBadgeCircleSvg(50,38,pat.dotR, color, pat.opacity) + rankBadgeCircleSvg(50,62,pat.dotR, color, pat.opacity) +
+      rankBadgeCircleSvg(38,50,pat.dotR, color, pat.opacity) + rankBadgeCircleSvg(62,50,pat.dotR, color, pat.opacity);
+  }
+  if (pat.core) patternSvg += rankBadgeCircleSvg(50,50,pat.coreR, '#FFF', 1);
+  const aureolaSvg = pat.aureola ? rankBadgeRingSvg(50,50,35,'#D69E2E',1.5,0.7) : '';
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">' +
+    '<defs><linearGradient id="'+gradId+'" x1="0%" y1="0%" x2="0%" y2="100%">'+stopsHtml+'</linearGradient></defs>' +
+    '<circle cx="50" cy="50" r="40" fill="url(#'+gradId+')" stroke="'+fam.outline+'" stroke-width="4"/>' +
+    aureolaSvg +
+    '<circle cx="50" cy="50" r="36" fill="none" stroke="#FFF" stroke-width="'+fam.ringWidth+'" opacity="'+fam.ringOpacity+'"/>' +
+    patternSvg +
+    '</svg>';
+}
+const rankBadgeDataUriCache = {};
+function getRankBadgeDataUri(tierIndex){
+  const idx = Math.max(0, Math.min(RANK_TIER_COUNT-1, tierIndex|0));
+  if (!rankBadgeDataUriCache[idx]) rankBadgeDataUriCache[idx] = 'data:image/svg+xml;utf8,' + encodeURIComponent(buildRankBadgeSvg(idx));
+  return rankBadgeDataUriCache[idx];
+}
+
 // HUD(좌상단 참가자 명단) 이름 옆에 붙는 등급 엠블럼 HTML 조각. tierIndex가 숫자가 아니면(=AI 등
 // 등급이 없는 캐릭터) 빈 문자열을 반환해 아무것도 표시하지 않음
 function rankEmblemHtml(tierIndex){
   if (typeof tierIndex !== 'number') return '';
   const info = getRankTierInfo(tierIndex);
-  return '<span class="rankEmblem" style="background:' + info.color + ';" title="' + info.name + '">' +
-    info.sub + '</span>';
+  return '<img class="rankEmblem" src="' + getRankBadgeDataUri(tierIndex) + '" title="' + info.name + '" alt="' + info.name + '">';
 }
 // 라운드 종료 팝업(경험치 게이지/등급 변경)에 쓰이는 더 큰 원형 등급 엠블럼. HUD용 rankEmblemHtml()과
 // 달리 배지 자체가 원형 컨테이너(.popupRankEmblemSmall/.popupRankEmblemBig)라서, innerHTML로 작은
-// 알약형 배지를 끼워넣는 대신 그 원형 요소에 색/글자를 직접 입혀 꽉 채워 보이게 함.
+// 알약형 배지를 끼워넣는 대신 그 원형 요소의 배경 이미지로 새 엠블럼 배지를 채워넣음.
 function applyRankEmblemToEl(el, tierIndex){
   const info = getRankTierInfo(tierIndex);
-  el.style.background = info.color;
-  el.textContent = info.sub;
+  // 배지 SVG 안에 fill="url(#gradId)" 같은 괄호가 그대로 들어있는데, background-image의
+  // url(...) 안에 따옴표 없이 넣으면 그 안쪽 괄호에서 CSS가 URL을 조기에 잘라버려 이미지가
+  // 안 보이는 문제가 있었음(등급 변경 팝업에서 엠블럼이 안 보이던 원인). url("...")처럼
+  // 따옴표로 감싸서 내부 괄호가 있어도 안전하게 파싱되도록 고침.
+  el.style.background = 'transparent';
+  el.style.backgroundImage = 'url("' + getRankBadgeDataUri(tierIndex) + '")';
+  el.style.backgroundSize = 'cover';
+  el.style.backgroundPosition = 'center';
+  el.textContent = '';
   el.title = info.name;
 }
 
@@ -1155,6 +1311,13 @@ function meetsLevelReq(skin){
   return levelFromXp(rankStats.xp).level >= skin.levelReq;
 }
 
+// AI가 무작위로 등장할 캐릭터 모양(상점의 모든 캐릭터 중 하나)을 골라줌. 소유/레벨 조건과
+// 무관하게(AI는 코인/레벨이 없으므로) 상점에 존재하는 전체 목록에서 매 라운드 새로 뽑음
+function randomSkinShape(){
+  const pick = SKINS[Math.floor(Math.random() * SKINS.length)];
+  return pick ? pick.shape : 'buddybot';
+}
+
 function buildShopGrid(){
   shopGridEl.innerHTML = '';
   const myLevel = levelFromXp(rankStats.xp).level;
@@ -1185,12 +1348,23 @@ function buildShopGrid(){
     } else {
       costLine = '<div class="skinCost">' + skin.cost + ' 🪙</div>';
     }
+    // 전용 그리기 함수가 있는 캐릭터(로봇/화분/버블티/식빵 등)는 CSS 도형 대신 실제 캐릭터
+    // 그림을 캔버스에 그려서 미리보기로 보여줌 - 나머지는 기존처럼 CSS clip-path 스와치를 씀
+    const swatchHtml = CUSTOM_SKIN_DRAW[kind]
+      ? '<div class="skinSwatch skinSwatchCanvasWrap" style="background:linear-gradient(160deg,' + (skin.accent||'#ff6a6a') + ',#1a1c24);"><canvas class="skinPreviewCanvas" data-skin-canvas="' + skin.id + '"></canvas></div>'
+      : '<div class="skinSwatch shape-kind-' + kind + '" style="background:linear-gradient(160deg,' + (skin.accent||'#ff6a6a') + ',#1a1c24);"></div>';
     card.innerHTML =
-      '<div class="skinSwatch shape-kind-' + kind + '" style="background:linear-gradient(160deg,' + (skin.accent||'#ff6a6a') + ',#1a1c24);"></div>' +
+      swatchHtml +
       '<div class="skinName">' + skin.name + (!owned && !levelOk ? ' 🔒' : '') + '</div>' +
       costLine +
       btnHtml;
     shopGridEl.appendChild(card);
+  });
+
+  // 방금 추가한 카드들 중 캔버스 미리보기가 필요한 것들을 실제로 그림(DOM에 붙은 뒤에 그려야 함)
+  shopGridEl.querySelectorAll('canvas[data-skin-canvas]').forEach(canvas=>{
+    const skin = SKINS.find(s=> s.id === canvas.getAttribute('data-skin-canvas'));
+    if (skin) renderSkinPreviewCanvas(canvas, skin);
   });
 
   shopGridEl.querySelectorAll('[data-buy]').forEach(btn=>{
@@ -1235,6 +1409,7 @@ function hideShopScreen(){
 shopBtn.addEventListener('click', showShopScreen);
 shopBackBtn.addEventListener('click', hideShopScreen);
 updateWalletDisplays();
+buildBgThemeButtons();
 
 // ================= 시작 화면 (AI 인원수 선택) =================
 // ================= 메뉴 포커스 내비게이션 (게임패드/키보드로 UI 버튼 탐색) =================
@@ -2125,7 +2300,7 @@ function triggerShake(magnitude, duration){
 function makeCharacter(x, y, color, isAI){
   return {
     x, y, vx:0, vy:0, angle:0,
-    radius: CHAR_R, color, isAI, shape: 'round',
+    radius: CHAR_R, color, isAI, shape: 'buddybot',
     charging:false, chargeAmount:0,
     swingCooldownTimer:0, swinging:false, swingTimer:0, swingAngle:0,
     dead:false, deadTimer:0, invincible:false,
@@ -2163,7 +2338,39 @@ const SHAPE_PARAMS = {
   viper:      { kind:'tri',     torso:0.95, head:0.8,  limb:0.65 }, // 바이퍼: 가늘고 날렵한 삼각형
   nova:       { kind:'star',    torso:1.15, head:0.95, limb:1    }, // 노바: 중간 크기 별 모양
   eclipse:    { kind:'ellipse', torso:1.25, head:0.82, limb:1.05 }, // 이클립스: 크고 어두운 느낌의 원형
-  legend:     { kind:'star',    torso:1.35, head:1,    limb:1.15 }  // 레전드: 가장 크고 화려한 별 모양(최상위 스킨)
+  legend:     { kind:'star',    torso:1.35, head:1,    limb:1.15 }, // 레전드: 가장 크고 화려한 별 모양(최상위 스킨)
+  // 버디봇: 사용자가 제공한 귀여운 로봇 SVG(안테나/화면 얼굴/귀 나사/다리)를 그대로 재현한 전용 스킨.
+  // kind가 'robot'이면 아래 그리기 코드에서 traceShapePath 대신 전용 함수(drawBuddyBot)로 그림
+  buddybot:   { kind:'robot',   torso:1,    head:1,    limb:1    },
+  // 새싹 화분: 사용자가 제공한 화분+새싹 SVG를 그대로 재현한 전용 스킨.
+  // kind가 'sprout'이면 아래 그리기 코드에서 전용 함수(drawSproutPot)로 그림
+  sproutpot:  { kind:'sprout',  torso:1,    head:1,    limb:1    },
+  // 버블티(보바): 사용자가 제공한 컵+빨대+타피오카 펄 SVG를 그대로 재현한 전용 스킨
+  bobatea:    { kind:'boba',    torso:1,    head:1,    limb:1    },
+  // 식빵(토스트): 사용자가 제공한 식빵 SVG를 그대로 재현한 전용 스킨
+  toastbread: { kind:'bread',   torso:1,    head:1,    limb:1    },
+  // 레트로 픽셀 로봇 20종: kind를 각자의 고유 키와 동일하게 둬서, 아래 그리기 코드에서
+  // RETRO_BOT_SPECS[kind]를 그대로 찾아 drawRetroBot으로 그릴 수 있게 함
+  crttubby:      { kind:'crttubby',      torso:1, head:1, limb:1 },
+  beepypager:    { kind:'beepypager',    torso:1, head:1, limb:1 },
+  diskettebuddy: { kind:'diskettebuddy', torso:1, head:1, limb:1 },
+  joypadmini:    { kind:'joypadmini',    torso:1, head:1, limb:1 },
+  radiotune:     { kind:'radiotune',     torso:1, head:1, limb:1 },
+  djbeat:        { kind:'djbeat',        torso:1, head:1, limb:1 },
+  ticktock:      { kind:'ticktock',      torso:1, head:1, limb:1 },
+  polaroidpippo: { kind:'polaroidpippo', torso:1, head:1, limb:1 },
+  sparkybattery: { kind:'sparkybattery', torso:1, head:1, limb:1 },
+  pluggy:        { kind:'pluggy',        torso:1, head:1, limb:1 },
+  brightwatt:    { kind:'brightwatt',    torso:1, head:1, limb:1 },
+  tapycassette:  { kind:'tapycassette',  torso:1, head:1, limb:1 },
+  captainenter:  { kind:'captainenter',  torso:1, head:1, limb:1 },
+  clickymouse:   { kind:'clickymouse',   torso:1, head:1, limb:1 },
+  sodapop:       { kind:'sodapop',       torso:1, head:1, limb:1 },
+  sweetcube:     { kind:'sweetcube',     torso:1, head:1, limb:1 },
+  retrotoasty:   { kind:'retrotoasty',   torso:1, head:1, limb:1 },
+  gumballbot:    { kind:'gumballbot',    torso:1, head:1, limb:1 },
+  signalsam:     { kind:'signalsam',     torso:1, head:1, limb:1 },
+  retrostick:    { kind:'retrostick',    torso:1, head:1, limb:1 }
 };
 function getShapeParams(ch){ return SHAPE_PARAMS[ch.shape] || SHAPE_PARAMS.round; }
 
@@ -2215,6 +2422,1064 @@ function traceShapePath(ctx, cx, cy, rx, ry, kind){
     ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2);
   }
 }
+
+// (x,y,w,h) 사각형의 둥근 모서리 경로 - 버디봇 스킨(몸통/화면/귀/다리)에서 사용
+function roundRectPath(ctx, x, y, w, h, r){
+  const rr = Math.min(r, w/2, h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+rr, y);
+  ctx.lineTo(x+w-rr, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+rr);
+  ctx.lineTo(x+w, y+h-rr);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-rr, y+h);
+  ctx.lineTo(x+rr, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-rr);
+  ctx.lineTo(x, y+rr);
+  ctx.quadraticCurveTo(x, y, x+rr, y);
+  ctx.closePath();
+}
+
+// ---- 버디봇 전용 스킨: 사용자가 제공한 SVG(안테나 + 화면 얼굴/태엽 등판 + 귀 나사 + 다리)를 그대로 재현함.
+// "시선 각도"(ch.angle)를 45도씩 8구간(동/서/남/북 + 대각선 4방향)으로 스냅해서 실제 캐릭터 게임처럼
+// 오른쪽/왼쪽 옆모습, 아래=앞모습(화면 얼굴), 위=뒷모습(태엽 등판), 그리고 대각선 4방향은 그 중간 형태로
+// 그림. 스프라이트 자체는 회전시키지 않고(ctx.rotate 안 씀), 방향에 따라 다른 그림을 그리거나 좌우
+// 반전(ctx.scale(-1,1))만 사용함. 몸체 색은 플레이어가 고른 캐릭터 색(bodyFillColor)을 그대로 따름.
+function drawBuddyBot(ctx, ch, chargeScale, legSwing, bodyFillColor){
+  const k = ch.radius * chargeScale / 23;
+  if (ch._botSeed === undefined) ch._botSeed = Math.random() * 10;
+  const t = performance.now() / 1000;
+  // 안테나가 살랑살랑 흔들리는 아이들 애니메이션(캐릭터마다 위상이 달라 다 같이 흔들리지 않음)
+  const antennaWobble = Math.sin(t * 2.2 + ch._botSeed) * 0.24;
+  // 이따금 눈을 깜빡임
+  const blinkPhase = (t * 0.55 + ch._botSeed * 2.7) % 3.4;
+  const blinking = blinkPhase > 3.25;
+  // 이동 중이면 다리가 걷듯이 번갈아 살짝 들림(legSwing은 이미 이동속도에 비례해 계산되어 있음)
+  const legLiftL = Math.max(0, legSwing) * 0.55;
+  const legLiftR = Math.max(0, -legSwing) * 0.55;
+
+  // 몸체/화면/귀 색은 플레이어 지정 색(bodyFillColor)에서 밝기만 살짝 조정해서 파생시키고,
+  // 윤곽선은 원본 SVG 느낌을 살리기 위해 고정된 짙은 남색을 유지, 포인트(입/안테나 끝)는
+  // 어떤 캐릭터 색이 와도 잘 보이도록 흰색 하이라이트로 고정함.
+  const bodyColor = bodyFillColor, screenColor = shadeColor(bodyFillColor, -20),
+        darkLine = '#4A5568', earColor = shadeColor(bodyFillColor, -12), accent = '#FFFFFF';
+
+  // 시선 각도(ch.angle, atan2 기준: 0=오른쪽, +PI/2=아래, -PI/2=위, ±PI=왼쪽)를
+  // 45도씩 8구간으로 스냅
+  const a = ch.angle;
+  const seg = Math.round(a / (Math.PI/4));
+  const dirIndex = ((seg % 8) + 8) % 8;
+  const DIRS = ['right','front-right','front','front-left','left','back-left','back','back-right'];
+  const facing = DIRS[dirIndex];
+
+  ctx.save();
+  if (facing === 'front' || facing === 'back'){
+    drawBuddyBotFrontBack(ctx, k, legLiftL, legLiftR, bodyColor, screenColor, darkLine, earColor, accent, antennaWobble, blinking, facing === 'front');
+  } else if (facing === 'right' || facing === 'left'){
+    // 옆모습은 오른쪽 기준으로만 그려두고, 왼쪽을 볼 땐 좌우로 뒤집어서 재사용함
+    if (facing === 'left') ctx.scale(-1, 1);
+    drawBuddyBotSide(ctx, k, legLiftL, legLiftR, bodyColor, screenColor, darkLine, earColor, accent, antennaWobble, blinking);
+  } else {
+    // 대각선 4방향: front-right/back-right 기준으로만 그려두고, 왼쪽 계열(front-left/back-left)은 좌우 반전
+    const isFront = facing.startsWith('front');
+    if (facing.endsWith('left')) ctx.scale(-1, 1);
+    drawBuddyBotDiag(ctx, k, legLiftL, legLiftR, bodyColor, screenColor, darkLine, earColor, accent, antennaWobble, blinking, isFront);
+  }
+  ctx.restore();
+}
+
+// 앞모습(아래를 볼 때): 화면 얼굴(눈+입)이 정면으로 보임
+// 뒷모습(위를 볼 때): 사용자가 제공한 "뒷면" SVG(태엽 + 열 방출구 슬롯)를 그대로 재현
+function drawBuddyBotFrontBack(ctx, k, legLiftL, legLiftR, bodyColor, screenColor, darkLine, earColor, accent, antennaWobble, blinking, isFront){
+  // 다리(걸을 때 번갈아 살짝 들림)
+  [ { x:-12, lift: legLiftL }, { x:6, lift: legLiftR } ].forEach(leg=>{
+    roundRectPath(ctx, leg.x*k, (23*k) - leg.lift, 6*k, 12*k, 2*k);
+    ctx.fillStyle = darkLine;
+    ctx.fill();
+  });
+
+  // 귀(양옆 나사)
+  [ -30, 24 ].forEach(ex=>{
+    roundRectPath(ctx, ex*k, -6*k, 6*k, 12*k, 2*k);
+    ctx.fillStyle = earColor;
+    ctx.strokeStyle = darkLine; ctx.lineWidth = 2.5*k;
+    ctx.fill(); ctx.stroke();
+  });
+
+  // 몸통
+  roundRectPath(ctx, -25*k, -23*k, 50*k, 46*k, 10*k);
+  ctx.fillStyle = bodyColor;
+  ctx.fill();
+  ctx.strokeStyle = darkLine; ctx.lineWidth = 3.5*k;
+  ctx.stroke();
+
+  if (isFront){
+    // 화면(스크린) + 눈 + 입 - 앞모습일 때만 보임
+    roundRectPath(ctx, -18*k, -16*k, 36*k, 26*k, 6*k);
+    ctx.fillStyle = screenColor;
+    ctx.fill();
+
+    [ -8, 8 ].forEach(ex=>{
+      if (blinking){
+        ctx.fillStyle = '#2D3748';
+        ctx.fillRect(ex*k - 2*k, -6*k - 0.5*k, 4*k, 1*k);
+      } else {
+        ctx.fillStyle = '#2D3748';
+        ctx.fillRect(ex*k - 2*k, -8*k, 4*k, 4*k);
+      }
+    });
+
+    ctx.fillStyle = accent;
+    ctx.fillRect(-4*k, 1*k, 8*k, 3*k);
+  } else {
+    // 뒷모습(사용자 제공 SVG 그대로): 태엽(wind-up key) + 열 방출구 슬롯 두 줄
+    // 태엽 손잡이(세로 막대)
+    ctx.strokeStyle = darkLine; ctx.lineWidth = 4*k; ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(0, -8*k);
+    ctx.lineTo(0, 0);
+    ctx.stroke();
+    ctx.lineCap = 'butt';
+    // 태엽 나사 두 개(속이 빈 원)
+    [ -6, 6 ].forEach(ex=>{
+      ctx.beginPath();
+      ctx.arc(ex*k, -10*k, 5*k, 0, Math.PI*2);
+      ctx.strokeStyle = darkLine; ctx.lineWidth = 3*k;
+      ctx.stroke();
+    });
+    // 열 방출구 슬롯 두 줄
+    [ 6, 12 ].forEach(ey=>{
+      roundRectPath(ctx, -12*k, ey*k, 24*k, 4*k, 1*k);
+      ctx.fillStyle = screenColor;
+      ctx.fill();
+    });
+  }
+
+  // 안테나(대에 살짝 흔들리는 회전을 줘서 살아있는 느낌)
+  ctx.save();
+  ctx.translate(0, -23*k);
+  ctx.rotate(antennaWobble);
+  ctx.strokeStyle = darkLine;
+  ctx.lineWidth = 3*k;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(0, -13*k);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(0, -15*k, 4*k, 0, Math.PI*2);
+  ctx.fillStyle = accent;
+  ctx.fill();
+  ctx.restore();
+}
+
+// 옆모습(오른쪽 기준, +x가 정면): 몸통을 좀 더 좁고 길쭉하게, 귀/눈은 하나만, 다리는 앞뒤로 겹쳐서 배치
+function drawBuddyBotSide(ctx, k, legLiftL, legLiftR, bodyColor, screenColor, darkLine, earColor, accent, antennaWobble, blinking){
+  // 다리(앞/뒤로 겹쳐서, 걸을 때 번갈아 살짝 들림)
+  [ { x:-6, lift: legLiftL }, { x:8, lift: legLiftR } ].forEach(leg=>{
+    roundRectPath(ctx, leg.x*k, (23*k) - leg.lift, 7*k, 12*k, 2*k);
+    ctx.fillStyle = darkLine;
+    ctx.fill();
+  });
+
+  // 뒤통수 쪽 귀 하나만 보임
+  roundRectPath(ctx, -22*k, -6*k, 6*k, 12*k, 2*k);
+  ctx.fillStyle = earColor;
+  ctx.strokeStyle = darkLine; ctx.lineWidth = 2.5*k;
+  ctx.fill(); ctx.stroke();
+
+  // 몸통(옆에서 본 실루엣)
+  roundRectPath(ctx, -20*k, -23*k, 40*k, 46*k, 10*k);
+  ctx.fillStyle = bodyColor;
+  ctx.fill();
+  ctx.strokeStyle = darkLine; ctx.lineWidth = 3.5*k;
+  ctx.stroke();
+
+  // 옆에서 본 화면(앞쪽에 좁게 보임)
+  roundRectPath(ctx, 2*k, -16*k, 14*k, 26*k, 5*k);
+  ctx.fillStyle = screenColor;
+  ctx.fill();
+
+  // 눈(옆모습이라 하나만, 앞쪽에 배치) - 깜빡일 땐 납작한 선으로
+  if (blinking){
+    ctx.fillStyle = '#2D3748';
+    ctx.fillRect(6*k, -6.5*k, 6*k, 1*k);
+  } else {
+    ctx.fillStyle = '#2D3748';
+    ctx.fillRect(6*k, -8*k, 6*k, 4*k);
+  }
+
+  // 미소(입 포인트, 앞쪽 아래)
+  ctx.fillStyle = accent;
+  ctx.fillRect(5*k, 1*k, 7*k, 3*k);
+
+  // 안테나(뒤통수 쪽에서 살짝 흔들리며 위로)
+  ctx.save();
+  ctx.translate(-10*k, -23*k);
+  ctx.rotate(antennaWobble);
+  ctx.strokeStyle = darkLine;
+  ctx.lineWidth = 3*k;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(0, -13*k);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(0, -15*k, 4*k, 0, Math.PI*2);
+  ctx.fillStyle = accent;
+  ctx.fill();
+  ctx.restore();
+}
+
+// 대각선 모습(오른쪽-앞/오른쪽-뒤 기준, 왼쪽 계열은 호출부에서 좌우 반전해서 재사용): 옆모습보다
+// 몸통을 조금 더 넓게, 귀/화면(또는 등판)을 앞쪽으로 살짝 치우쳐 그려서 "돌아보는" 느낌을 줌
+function drawBuddyBotDiag(ctx, k, legLiftL, legLiftR, bodyColor, screenColor, darkLine, earColor, accent, antennaWobble, blinking, isFront){
+  // 다리
+  [ { x:-9, lift: legLiftL }, { x:7, lift: legLiftR } ].forEach(leg=>{
+    roundRectPath(ctx, leg.x*k, (23*k) - leg.lift, 7*k, 12*k, 2*k);
+    ctx.fillStyle = darkLine;
+    ctx.fill();
+  });
+
+  // 뒤쪽 귀(작고 몸통 뒤 가장자리에 살짝 걸침) + 앞쪽 귀(크게, 몸통 앞쪽)
+  roundRectPath(ctx, -25*k, -6*k, 5*k, 11*k, 2*k);
+  ctx.fillStyle = earColor;
+  ctx.strokeStyle = darkLine; ctx.lineWidth = 2.2*k;
+  ctx.fill(); ctx.stroke();
+  roundRectPath(ctx, 17*k, -6*k, 6*k, 12*k, 2*k);
+  ctx.fillStyle = earColor;
+  ctx.lineWidth = 2.5*k;
+  ctx.fill(); ctx.stroke();
+
+  // 몸통(정면보다 좁고 옆모습보다는 넓은 절충 폭)
+  roundRectPath(ctx, -22*k, -23*k, 44*k, 46*k, 10*k);
+  ctx.fillStyle = bodyColor;
+  ctx.fill();
+  ctx.strokeStyle = darkLine; ctx.lineWidth = 3.5*k;
+  ctx.stroke();
+
+  if (isFront){
+    // 화면 얼굴을 앞쪽(오른쪽)으로 치우치게, 폭은 좁힘 - 뒤쪽 눈은 원근감 있게 더 작게
+    roundRectPath(ctx, -8*k, -16*k, 28*k, 26*k, 6*k);
+    ctx.fillStyle = screenColor;
+    ctx.fill();
+    [ { ex:-2, s:1 }, { ex:13, s:0.75 } ].forEach(eye=>{
+      if (blinking){
+        ctx.fillStyle = '#2D3748';
+        ctx.fillRect(eye.ex*k - 2*k*eye.s, -6*k - 0.5*k, 4*k*eye.s, 1*k);
+      } else {
+        ctx.fillStyle = '#2D3748';
+        ctx.fillRect(eye.ex*k - 2*k*eye.s, -8*k, 4*k*eye.s, 4*k*eye.s);
+      }
+    });
+    ctx.fillStyle = accent;
+    ctx.fillRect(-1*k, 1*k, 8*k, 3*k);
+  } else {
+    // 등판(태엽+슬롯)을 앞쪽으로 살짝 치우쳐서
+    ctx.strokeStyle = darkLine; ctx.lineWidth = 4*k; ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(3*k, -8*k);
+    ctx.lineTo(3*k, 0);
+    ctx.stroke();
+    ctx.lineCap = 'butt';
+    [ -3, 9 ].forEach(ex=>{
+      ctx.beginPath();
+      ctx.arc(ex*k, -10*k, 4.5*k, 0, Math.PI*2);
+      ctx.strokeStyle = darkLine; ctx.lineWidth = 2.6*k;
+      ctx.stroke();
+    });
+    [ 6, 12 ].forEach(ey=>{
+      roundRectPath(ctx, -6*k, ey*k, 22*k, 4*k, 1*k);
+      ctx.fillStyle = screenColor;
+      ctx.fill();
+    });
+  }
+
+  // 안테나(몸 중앙보다 살짝 뒤쪽에, 흔들림 애니메이션)
+  ctx.save();
+  ctx.translate(-3*k, -23*k);
+  ctx.rotate(antennaWobble);
+  ctx.strokeStyle = darkLine;
+  ctx.lineWidth = 3*k;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(0, -13*k);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(0, -15*k, 4*k, 0, Math.PI*2);
+  ctx.fillStyle = accent;
+  ctx.fill();
+  ctx.restore();
+}
+
+// ---- 새싹 화분 전용 스킨: 사용자가 제공한 SVG(화분 + 새싹 줄기/이파리 + 얼굴 + 볼터치)를 그대로 재현함.
+// 버디봇과 같은 방식으로 시선 각도를 8구간으로 스냅해서 오른쪽/왼쪽 옆모습, 아래=앞모습(얼굴),
+// 위=뒷모습(흙 결만 보임), 대각선 4방향을 그림. 새싹(줄기+이파리)은 방향과 무관하게 항상 화분
+// 위에 표시되고 살짝 흔들리는 애니메이션만 있음(버디봇의 안테나와 같은 역할). 화분 몸체 색은
+// 플레이어가 지정한 캐릭터 색을 따르고, 이파리/얼굴/볼터치는 원본 SVG 색을 그대로 고정해서 씀.
+function drawSproutPot(ctx, ch, chargeScale, legSwing, bodyFillColor){
+  const k = ch.radius * chargeScale / 23;
+  if (ch._botSeed === undefined) ch._botSeed = Math.random() * 10;
+  const t = performance.now() / 1000;
+  // 새싹이 산들바람에 살랑거리는 아이들 애니메이션(캐릭터마다 위상이 달라 다 같이 흔들리지 않음)
+  const leafWobble = Math.sin(t * 1.8 + ch._botSeed) * 0.14;
+  // 이따금 눈을 깜빡임
+  const blinkPhase = (t * 0.55 + ch._botSeed * 2.7) % 3.4;
+  const blinking = blinkPhase > 3.25;
+
+  const potColor = bodyFillColor, rimColor = shadeColor(bodyFillColor, 18),
+        outline = '#7B341E', leafColor = '#48BB78', faceColor = '#5F2713', blushColor = '#FF8A8A';
+
+  // 시선 각도를 버디봇과 동일하게 45도씩 8구간으로 스냅
+  const a = ch.angle;
+  const seg = Math.round(a / (Math.PI/4));
+  const dirIndex = ((seg % 8) + 8) % 8;
+  const DIRS = ['right','front-right','front','front-left','left','back-left','back','back-right'];
+  const facing = DIRS[dirIndex];
+
+  ctx.save();
+  if (facing === 'front' || facing === 'back'){
+    drawSproutFrontBack(ctx, k, potColor, rimColor, outline, leafColor, faceColor, blushColor, leafWobble, blinking, facing === 'front');
+  } else if (facing === 'right' || facing === 'left'){
+    if (facing === 'left') ctx.scale(-1, 1);
+    drawSproutSide(ctx, k, potColor, rimColor, outline, leafColor, faceColor, blushColor, leafWobble, blinking);
+  } else {
+    const isFront = facing.startsWith('front');
+    if (facing.endsWith('left')) ctx.scale(-1, 1);
+    drawSproutDiag(ctx, k, potColor, rimColor, outline, leafColor, faceColor, blushColor, leafWobble, blinking, isFront);
+  }
+  ctx.restore();
+}
+
+// 새싹(줄기+오른쪽 이파리)을 공통으로 그리는 헬퍼: 화분 입구(대략 y=-3) 지점을 기준으로 살짝 흔들림
+function drawSproutSprig(ctx, k, leafColor, leafWobble){
+  ctx.save();
+  ctx.translate(0, -3*k);
+  ctx.rotate(leafWobble);
+  // 중앙 줄기(살짝 휘어진 잎)
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.quadraticCurveTo(3*k, -20*k, -8*k, -27*k);
+  ctx.bezierCurveTo(-8*k, -27*k, -2*k, -30*k, 4*k, -21*k);
+  ctx.quadraticCurveTo(2*k, -7*k, 0, 0);
+  ctx.closePath();
+  ctx.fillStyle = leafColor;
+  ctx.fill();
+  // 오른쪽으로 뻗은 작은 이파리
+  ctx.beginPath();
+  ctx.moveTo(1*k, -13*k);
+  ctx.quadraticCurveTo(15*k, -23*k, 12*k, -31*k);
+  ctx.bezierCurveTo(2*k, -30*k, -2*k, -19*k, 1*k, -13*k);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+// 앞모습(아래를 볼 때): 눈+입+볼터치 얼굴이 보임 / 뒷모습(위를 볼 때): 얼굴 대신 화분 뒷면 흙 결
+function drawSproutFrontBack(ctx, k, potColor, rimColor, outline, leafColor, faceColor, blushColor, leafWobble, blinking, isFront){
+  // 화분 몸체(사다리꼴)
+  ctx.beginPath();
+  ctx.moveTo(-18*k, -3*k);
+  ctx.lineTo(18*k, -3*k);
+  ctx.lineTo(13*k, 37*k);
+  ctx.lineTo(-13*k, 37*k);
+  ctx.closePath();
+  ctx.fillStyle = potColor;
+  ctx.fill();
+  ctx.strokeStyle = outline; ctx.lineWidth = 3.5*k; ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // 화분 윗 테두리
+  roundRectPath(ctx, -22*k, -8*k, 44*k, 8*k, 3*k);
+  ctx.fillStyle = rimColor;
+  ctx.fill();
+  ctx.strokeStyle = outline; ctx.lineWidth = 3.5*k;
+  ctx.stroke();
+
+  if (isFront){
+    // 눈(도트) - 깜빡일 땐 납작한 선으로
+    [ -7, 7 ].forEach(ex=>{
+      if (blinking){
+        ctx.fillStyle = faceColor;
+        ctx.fillRect(ex*k - 3*k, 14*k - 0.5*k, 6*k, 1*k);
+      } else {
+        ctx.beginPath();
+        ctx.arc(ex*k, 14*k, 3*k, 0, Math.PI*2);
+        ctx.fillStyle = faceColor;
+        ctx.fill();
+      }
+    });
+    // 입(웃는 곡선)
+    ctx.beginPath();
+    ctx.moveTo(-2*k, 20*k);
+    ctx.quadraticCurveTo(0, 23*k, 2*k, 20*k);
+    ctx.strokeStyle = faceColor; ctx.lineWidth = 2*k; ctx.lineCap = 'round';
+    ctx.stroke();
+    // 볼터치
+    [ -12, 12 ].forEach(ex=>{
+      ctx.beginPath();
+      ctx.arc(ex*k, 18*k, 3*k, 0, Math.PI*2);
+      ctx.fillStyle = blushColor;
+      ctx.fill();
+    });
+  } else {
+    // 뒷모습: 얼굴 대신 화분 뒷면에 흙 결(가로선 두 개)만 은은하게 표시
+    ctx.strokeStyle = shadeColor(outline, 25); ctx.lineWidth = 1.5*k;
+    [ 10, 20 ].forEach(ey=>{
+      ctx.beginPath();
+      ctx.moveTo(-9*k, ey*k);
+      ctx.lineTo(9*k, ey*k);
+      ctx.stroke();
+    });
+  }
+
+  drawSproutSprig(ctx, k, leafColor, leafWobble);
+}
+
+// 옆모습(오른쪽 기준, +x가 정면): 화분을 좀 더 좁게, 눈/볼터치는 하나만 앞쪽에 배치
+function drawSproutSide(ctx, k, potColor, rimColor, outline, leafColor, faceColor, blushColor, leafWobble, blinking){
+  ctx.beginPath();
+  ctx.moveTo(-14*k, -3*k);
+  ctx.lineTo(14*k, -3*k);
+  ctx.lineTo(10*k, 37*k);
+  ctx.lineTo(-10*k, 37*k);
+  ctx.closePath();
+  ctx.fillStyle = potColor;
+  ctx.fill();
+  ctx.strokeStyle = outline; ctx.lineWidth = 3.5*k; ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  roundRectPath(ctx, -17*k, -8*k, 34*k, 8*k, 3*k);
+  ctx.fillStyle = rimColor;
+  ctx.fill();
+  ctx.strokeStyle = outline; ctx.lineWidth = 3.5*k;
+  ctx.stroke();
+
+  // 눈(옆모습이라 앞쪽에 하나만)
+  if (blinking){
+    ctx.fillStyle = faceColor;
+    ctx.fillRect(5*k, 14*k - 0.5*k, 6*k, 1*k);
+  } else {
+    ctx.beginPath();
+    ctx.arc(8*k, 14*k, 3*k, 0, Math.PI*2);
+    ctx.fillStyle = faceColor;
+    ctx.fill();
+  }
+  // 입(살짝 보이는 웃는 곡선)
+  ctx.beginPath();
+  ctx.moveTo(4*k, 20*k);
+  ctx.quadraticCurveTo(6*k, 23*k, 8*k, 20*k);
+  ctx.strokeStyle = faceColor; ctx.lineWidth = 2*k; ctx.lineCap = 'round';
+  ctx.stroke();
+  // 볼터치(앞쪽 하나만)
+  ctx.beginPath();
+  ctx.arc(10*k, 18*k, 3*k, 0, Math.PI*2);
+  ctx.fillStyle = blushColor;
+  ctx.fill();
+
+  drawSproutSprig(ctx, k, leafColor, leafWobble);
+}
+
+// 대각선 모습(front-right/back-right 기준, front-left/back-left는 호출부에서 좌우 반전해서 재사용)
+function drawSproutDiag(ctx, k, potColor, rimColor, outline, leafColor, faceColor, blushColor, leafWobble, blinking, isFront){
+  ctx.beginPath();
+  ctx.moveTo(-16*k, -3*k);
+  ctx.lineTo(16*k, -3*k);
+  ctx.lineTo(11*k, 37*k);
+  ctx.lineTo(-11*k, 37*k);
+  ctx.closePath();
+  ctx.fillStyle = potColor;
+  ctx.fill();
+  ctx.strokeStyle = outline; ctx.lineWidth = 3.5*k; ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  roundRectPath(ctx, -19*k, -8*k, 38*k, 8*k, 3*k);
+  ctx.fillStyle = rimColor;
+  ctx.fill();
+  ctx.strokeStyle = outline; ctx.lineWidth = 3.5*k;
+  ctx.stroke();
+
+  if (isFront){
+    // 앞쪽(오른쪽) 눈은 크게, 뒤쪽 눈은 원근감 있게 작고 흐리게
+    [ { ex:7, s:1 }, { ex:-4, s:0.7 } ].forEach(eye=>{
+      if (blinking){
+        ctx.fillStyle = faceColor;
+        ctx.fillRect(eye.ex*k - 3*k*eye.s, 14*k - 0.5*k, 6*k*eye.s, 1*k);
+      } else {
+        ctx.beginPath();
+        ctx.arc(eye.ex*k, 14*k, 3*k*eye.s, 0, Math.PI*2);
+        ctx.fillStyle = faceColor;
+        ctx.fill();
+      }
+    });
+    ctx.beginPath();
+    ctx.moveTo(2*k, 20*k);
+    ctx.quadraticCurveTo(5*k, 23*k, 8*k, 20*k);
+    ctx.strokeStyle = faceColor; ctx.lineWidth = 2*k; ctx.lineCap = 'round';
+    ctx.stroke();
+    [ -9, 12 ].forEach(ex=>{
+      ctx.beginPath();
+      ctx.arc(ex*k, 18*k, 2.6*k, 0, Math.PI*2);
+      ctx.fillStyle = blushColor;
+      ctx.fill();
+    });
+  } else {
+    ctx.strokeStyle = shadeColor(outline, 25); ctx.lineWidth = 1.5*k;
+    [ 10, 20 ].forEach(ey=>{
+      ctx.beginPath();
+      ctx.moveTo(-7*k, ey*k);
+      ctx.lineTo(8*k, ey*k);
+      ctx.stroke();
+    });
+  }
+
+  drawSproutSprig(ctx, k, leafColor, leafWobble);
+}
+
+// ---- 버블티(보바) 전용 스킨: 사용자가 제공한 SVG(빨대 + 컵 + 돔 리드 + 타피오카 펄 + 얼굴)를 재현함.
+// 컵/돔/빨대/펄은 어느 방향에서 봐도 실루엣이 크게 달라지지 않는 소품이라 항상 같은 그림을 그리고,
+// 좌우로만 폭을 살짝 좁혀서(ctx.scale) 옆모습/대각선을 표현함(원근 압축). 얼굴은 버디봇과 같은 방식으로
+// 정면일 때만 두 눈, 대각선일 때는 비대칭 두 눈, 옆모습일 때는 눈 하나, 뒷모습일 때는 얼굴 없음.
+// 컵 몸체 색은 플레이어가 지정한 캐릭터 색을 따르고, 나머지(빨대/펄/얼굴)는 원본 SVG 색을 고정해서 씀.
+function drawBubbleTeaCanonical(ctx, k, cupColor, outline, strawColor, pearlColor, faceColor, eyeMode, blinking){
+  // 빨대(살짝 기울어진 둥근 사각형)
+  ctx.save();
+  ctx.translate(7*k, -30*k);
+  ctx.rotate(15*Math.PI/180);
+  roundRectPath(ctx, -5*k, -15*k, 10*k, 30*k, 3*k);
+  ctx.fillStyle = strawColor;
+  ctx.fill();
+  ctx.restore();
+
+  // 컵 몸체
+  ctx.beginPath();
+  ctx.moveTo(-18*k, -20*k);
+  ctx.lineTo(-12*k, 25*k);
+  ctx.bezierCurveTo(-11*k, 29*k, -8*k, 31*k, -4*k, 31*k);
+  ctx.lineTo(4*k, 31*k);
+  ctx.bezierCurveTo(8*k, 31*k, 11*k, 29*k, 12*k, 25*k);
+  ctx.lineTo(18*k, -20*k);
+  ctx.closePath();
+  ctx.fillStyle = cupColor;
+  ctx.fill();
+  ctx.strokeStyle = outline; ctx.lineWidth = 3.5*k; ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // 돔 리드(뚜껑) - 채우기 없이 테두리만
+  ctx.beginPath();
+  ctx.moveTo(-20*k, -20*k);
+  ctx.bezierCurveTo(-20*k, -33*k, 20*k, -33*k, 20*k, -20*k);
+  ctx.strokeStyle = outline; ctx.lineWidth = 3.5*k; ctx.lineCap = 'round';
+  ctx.stroke();
+
+  // 타피오카 펄
+  [ [-6,21], [6,23], [-2,15], [-11,13], [11,15] ].forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p[0]*k, p[1]*k, 4.5*k, 0, Math.PI*2);
+    ctx.fillStyle = pearlColor;
+    ctx.fill();
+  });
+
+  if (eyeMode === 'full'){
+    [ -6, 6 ].forEach(ex=>{
+      if (blinking){ ctx.fillStyle = faceColor; ctx.fillRect(ex*k-3*k, -7*k-0.5*k, 6*k, 1*k); }
+      else { ctx.beginPath(); ctx.arc(ex*k, -7*k, 3*k, 0, Math.PI*2); ctx.fillStyle = faceColor; ctx.fill(); }
+    });
+    ctx.beginPath();
+    ctx.moveTo(-2*k, -1*k);
+    ctx.quadraticCurveTo(0, 2*k, 2*k, -1*k);
+    ctx.strokeStyle = faceColor; ctx.lineWidth = 2*k; ctx.lineCap = 'round';
+    ctx.stroke();
+  } else if (eyeMode === 'single'){
+    if (blinking){ ctx.fillStyle = faceColor; ctx.fillRect(3*k, -7.5*k, 6*k, 1*k); }
+    else { ctx.beginPath(); ctx.arc(6*k, -7*k, 3*k, 0, Math.PI*2); ctx.fillStyle = faceColor; ctx.fill(); }
+    ctx.beginPath();
+    ctx.moveTo(4*k, -1*k);
+    ctx.quadraticCurveTo(6*k, 2*k, 8*k, -1*k);
+    ctx.strokeStyle = faceColor; ctx.lineWidth = 2*k; ctx.lineCap = 'round';
+    ctx.stroke();
+  } else if (eyeMode === 'diag'){
+    [ { ex:7, s:1 }, { ex:-4, s:0.7 } ].forEach(eye=>{
+      if (blinking){ ctx.fillStyle = faceColor; ctx.fillRect(eye.ex*k-3*k*eye.s, -7*k-0.5*k, 6*k*eye.s, 1*k); }
+      else { ctx.beginPath(); ctx.arc(eye.ex*k, -7*k, 3*k*eye.s, 0, Math.PI*2); ctx.fillStyle = faceColor; ctx.fill(); }
+    });
+    ctx.beginPath();
+    ctx.moveTo(2*k, -1*k);
+    ctx.quadraticCurveTo(5*k, 2*k, 8*k, -1*k);
+    ctx.strokeStyle = faceColor; ctx.lineWidth = 2*k; ctx.lineCap = 'round';
+    ctx.stroke();
+  }
+  // eyeMode === 'none'(뒷모습)일 땐 얼굴을 그리지 않음
+}
+
+function drawBubbleTea(ctx, ch, chargeScale, legSwing, bodyFillColor){
+  const k = ch.radius * chargeScale / 22;
+  if (ch._botSeed === undefined) ch._botSeed = Math.random() * 10;
+  const t = performance.now() / 1000;
+  const blinkPhase = (t * 0.55 + ch._botSeed * 2.7) % 3.4;
+  const blinking = blinkPhase > 3.25;
+  const cupColor = bodyFillColor, outline = '#6D5D4E', strawColor = '#FF6B6B',
+        pearlColor = '#4A3423', faceColor = '#6D5D4E';
+
+  const a = ch.angle;
+  const seg = Math.round(a / (Math.PI/4));
+  const dirIndex = ((seg % 8) + 8) % 8;
+  const DIRS = ['right','front-right','front','front-left','left','back-left','back','back-right'];
+  const facing = DIRS[dirIndex];
+
+  ctx.save();
+  if (facing === 'front' || facing === 'back'){
+    drawBubbleTeaCanonical(ctx, k, cupColor, outline, strawColor, pearlColor, faceColor, facing === 'front' ? 'full' : 'none', blinking);
+  } else if (facing === 'right' || facing === 'left'){
+    if (facing === 'left') ctx.scale(-1, 1);
+    ctx.scale(0.62, 1);
+    drawBubbleTeaCanonical(ctx, k, cupColor, outline, strawColor, pearlColor, faceColor, 'single', blinking);
+  } else {
+    const isFront = facing.startsWith('front');
+    if (facing.endsWith('left')) ctx.scale(-1, 1);
+    ctx.scale(0.82, 1);
+    drawBubbleTeaCanonical(ctx, k, cupColor, outline, strawColor, pearlColor, faceColor, isFront ? 'diag' : 'none', blinking);
+  }
+  ctx.restore();
+}
+
+// ---- 식빵(토스트) 전용 스킨: 사용자가 제공한 식빵 SVG(겉 테두리 + 안쪽 부드러운 부분 + 얼굴 + 볼터치)를
+// 재현함. 식빵도 버블티와 같은 이유로 앞/뒤 실루엣을 동일하게 두고 얼굴 유무만 바꾸며, 옆모습/대각선은
+// 폭을 좁혀서(ctx.scale) 표현함. 겉 테두리 색은 플레이어 지정 색을 따르고, 안쪽 색은 그 색을 밝게
+// 튀운 톤을 자동으로 만들어 씀(원본 SVG처럼 두 톤 대비를 유지).
+function drawToastBreadCanonical(ctx, k, breadColor, innerColor, outline, blushColor, faceColor, eyeMode){
+  // 겉 테두리(빵 껍질)
+  ctx.beginPath();
+  ctx.moveTo(-25*k, -24*k);
+  ctx.bezierCurveTo(-25*k, -34*k, -15*k, -37*k, 0, -31*k);
+  ctx.bezierCurveTo(15*k, -37*k, 25*k, -34*k, 25*k, -24*k);
+  ctx.bezierCurveTo(25*k, -9*k, 28*k, 26*k, 20*k, 31*k);
+  ctx.bezierCurveTo(12*k, 36*k, -12*k, 36*k, -20*k, 31*k);
+  ctx.bezierCurveTo(-28*k, 26*k, -25*k, -9*k, -25*k, -24*k);
+  ctx.closePath();
+  ctx.fillStyle = breadColor;
+  ctx.fill();
+  ctx.strokeStyle = outline; ctx.lineWidth = 4*k; ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // 안쪽 부드러운 부분
+  ctx.beginPath();
+  ctx.moveTo(-21*k, -21*k);
+  ctx.bezierCurveTo(-21*k, -29*k, -13*k, -32*k, 0, -27*k);
+  ctx.bezierCurveTo(13*k, -32*k, 21*k, -29*k, 21*k, -21*k);
+  ctx.bezierCurveTo(21*k, -9*k, 24*k, 22*k, 17*k, 27*k);
+  ctx.bezierCurveTo(11*k, 31*k, -11*k, 31*k, -17*k, 27*k);
+  ctx.bezierCurveTo(-24*k, 22*k, -21*k, -9*k, -21*k, -21*k);
+  ctx.closePath();
+  ctx.fillStyle = innerColor;
+  ctx.fill();
+
+  if (eyeMode === 'full'){
+    [ -8, 8 ].forEach(ex=>{
+      ctx.beginPath(); ctx.arc(ex*k, -1*k, 3.5*k, 0, Math.PI*2); ctx.fillStyle = faceColor; ctx.fill();
+    });
+    [ -15, 15 ].forEach(ex=>{
+      ctx.beginPath(); ctx.arc(ex*k, 5*k, 5*k, 0, Math.PI*2);
+      ctx.fillStyle = blushColor; ctx.globalAlpha = 0.8; ctx.fill(); ctx.globalAlpha = 1;
+    });
+    ctx.beginPath();
+    ctx.moveTo(-2*k, 4*k);
+    ctx.quadraticCurveTo(0, 7*k, 2*k, 4*k);
+    ctx.strokeStyle = faceColor; ctx.lineWidth = 2.5*k; ctx.lineCap = 'round';
+    ctx.stroke();
+  } else if (eyeMode === 'single'){
+    ctx.beginPath(); ctx.arc(6*k, -1*k, 3.5*k, 0, Math.PI*2); ctx.fillStyle = faceColor; ctx.fill();
+    ctx.beginPath(); ctx.arc(13*k, 5*k, 5*k, 0, Math.PI*2);
+    ctx.fillStyle = blushColor; ctx.globalAlpha = 0.8; ctx.fill(); ctx.globalAlpha = 1;
+    ctx.beginPath();
+    ctx.moveTo(4*k, 4*k);
+    ctx.quadraticCurveTo(6*k, 7*k, 8*k, 4*k);
+    ctx.strokeStyle = faceColor; ctx.lineWidth = 2.5*k; ctx.lineCap = 'round';
+    ctx.stroke();
+  } else if (eyeMode === 'diag'){
+    [ { ex:8, s:1 }, { ex:-5, s:0.7 } ].forEach(eye=>{
+      ctx.beginPath(); ctx.arc(eye.ex*k, -1*k, 3.5*k*eye.s, 0, Math.PI*2); ctx.fillStyle = faceColor; ctx.fill();
+    });
+    ctx.beginPath(); ctx.arc(16*k, 5*k, 4.5*k, 0, Math.PI*2);
+    ctx.fillStyle = blushColor; ctx.globalAlpha = 0.8; ctx.fill(); ctx.globalAlpha = 1;
+    ctx.beginPath();
+    ctx.moveTo(2*k, 4*k);
+    ctx.quadraticCurveTo(6*k, 7*k, 10*k, 4*k);
+    ctx.strokeStyle = faceColor; ctx.lineWidth = 2.5*k; ctx.lineCap = 'round';
+    ctx.stroke();
+  }
+  // eyeMode === 'none'(뒷모습)일 땐 얼굴을 그리지 않음
+}
+
+function drawToastBread(ctx, ch, chargeScale, legSwing, bodyFillColor){
+  const k = ch.radius * chargeScale / 24;
+  const breadColor = bodyFillColor, innerColor = shadeColor(bodyFillColor, 45),
+        outline = '#C68B59', blushColor = '#FFB0B0', faceColor = '#4A3423';
+
+  const a = ch.angle;
+  const seg = Math.round(a / (Math.PI/4));
+  const dirIndex = ((seg % 8) + 8) % 8;
+  const DIRS = ['right','front-right','front','front-left','left','back-left','back','back-right'];
+  const facing = DIRS[dirIndex];
+
+  ctx.save();
+  if (facing === 'front' || facing === 'back'){
+    drawToastBreadCanonical(ctx, k, breadColor, innerColor, outline, blushColor, faceColor, facing === 'front' ? 'full' : 'none');
+  } else if (facing === 'right' || facing === 'left'){
+    if (facing === 'left') ctx.scale(-1, 1);
+    ctx.scale(0.68, 1);
+    drawToastBreadCanonical(ctx, k, breadColor, innerColor, outline, blushColor, faceColor, 'single');
+  } else {
+    const isFront = facing.startsWith('front');
+    if (facing.endsWith('left')) ctx.scale(-1, 1);
+    ctx.scale(0.85, 1);
+    drawToastBreadCanonical(ctx, k, breadColor, innerColor, outline, blushColor, faceColor, isFront ? 'diag' : 'none');
+  }
+  ctx.restore();
+}
+
+// 상점 미리보기에서 실제 캐릭터 그림을 그대로 보여주기 위한 매핑(전용 그리기 함수가 있는 kind만 포함).
+// 나머지(원/사각/마름모 등 도형 kind)는 기존처럼 CSS clip-path 스와치를 그대로 사용함.
+const CUSTOM_SKIN_DRAW = { robot: drawBuddyBot, sprout: drawSproutPot, boba: drawBubbleTea, bread: drawToastBread };
+// 상점 스와치(44x44) 안에 실제 캐릭터를 정면 자세로 작게 그려서 미리보기로 보여줌
+function renderSkinPreviewCanvas(canvas, skin){
+  const kind = (SHAPE_PARAMS[skin.shape] || SHAPE_PARAMS.round).kind;
+  const drawFn = CUSTOM_SKIN_DRAW[kind];
+  if (!drawFn || !canvas) return;
+  const dpr = 2;
+  canvas.width = 44 * dpr;
+  canvas.height = 44 * dpr;
+  const c2d = canvas.getContext('2d');
+  c2d.clearRect(0, 0, canvas.width, canvas.height);
+  c2d.save();
+  c2d.scale(dpr, dpr);
+  c2d.translate(22, 27);
+  const fakeCh = { angle: Math.PI/2, radius: 15, color: skin.accent || '#ff6a6a', _botSeed: 0 };
+  drawFn(c2d, fakeCh, 1, 0, skin.accent || '#ff6a6a');
+  c2d.restore();
+}
+
+// ---- 레트로 픽셀 로봇 친구들 20종: 사용자가 제공한 SVG들을 일일이 전용 함수로 만드는 대신,
+// "도형 목록(spec)"으로 선언해두고 공용 인터프리터로 그리는 방식을 씀. 각 shape는
+// { t:'rect'|'circle'|'ellipse'|'line'|'polygon'|'path', ...좌표, fill, stroke, sw, cap, join,
+//   role:'body'(플레이어 색을 따르는 몸체) | 'face'(정면일 때만 보이는 눈/입) | 생략(항상 보이는 장식) }
+// 형태로 두고, 좌표는 원본 SVG(viewBox 0~100)의 값을 그대로 씀(인터프리터가 중심(50,50) 기준으로
+// 자동 변환/스케일함). 버디봇 등과 동일하게 시선 각도를 8구간으로 스냅해서 앞/뒤/좌/우/대각선을 표현함.
+function drawSpecShape(ctx, s, k, cx, cy, bodyColor){
+  const X = x=> (x-cx)*k, Y = y=> (y-cy)*k;
+  ctx.beginPath();
+  if (s.t === 'rect'){
+    if (s.rx) roundRectPath(ctx, X(s.x), Y(s.y), s.w*k, s.h*k, s.rx*k);
+    else ctx.rect(X(s.x), Y(s.y), s.w*k, s.h*k);
+  } else if (s.t === 'circle'){
+    ctx.arc(X(s.x), Y(s.y), s.r*k, 0, Math.PI*2);
+  } else if (s.t === 'ellipse'){
+    ctx.ellipse(X(s.x), Y(s.y), s.rx*k, s.ry*k, 0, 0, Math.PI*2);
+  } else if (s.t === 'line'){
+    ctx.moveTo(X(s.x1), Y(s.y1));
+    ctx.lineTo(X(s.x2), Y(s.y2));
+  } else if (s.t === 'polygon'){
+    s.pts.forEach((p,i)=>{ if (i===0) ctx.moveTo(X(p[0]), Y(p[1])); else ctx.lineTo(X(p[0]), Y(p[1])); });
+    ctx.closePath();
+  } else if (s.t === 'path'){
+    s.d.forEach(op=>{
+      const c = op[0];
+      if (c==='M') ctx.moveTo(X(op[1]), Y(op[2]));
+      else if (c==='L') ctx.lineTo(X(op[1]), Y(op[2]));
+      else if (c==='Q') ctx.quadraticCurveTo(X(op[1]), Y(op[2]), X(op[3]), Y(op[4]));
+      else if (c==='C') ctx.bezierCurveTo(X(op[1]), Y(op[2]), X(op[3]), Y(op[4]), X(op[5]), Y(op[6]));
+      else if (c==='Z') ctx.closePath();
+    });
+  }
+  if (s.fill){
+    ctx.fillStyle = (s.role === 'body') ? bodyColor : s.fill;
+    if (s.opacity !== undefined){ ctx.globalAlpha = s.opacity; ctx.fill(); ctx.globalAlpha = 1; }
+    else ctx.fill();
+  }
+  if (s.stroke){
+    ctx.strokeStyle = s.stroke;
+    ctx.lineWidth = (s.sw || 2) * k;
+    ctx.lineCap = s.cap || 'butt';
+    ctx.lineJoin = s.join || 'miter';
+    ctx.stroke();
+  }
+}
+function drawRetroBotFromSpec(ctx, spec, k, bodyColor, showFace){
+  spec.shapes.forEach(s=>{
+    // 'face'(눈/입)뿐 아니라 'front'(화면/버튼/렌즈 등 - 상식적으로 앞면에만 있는 부품)도
+    // 뒷모습(showFace=false)일 땐 함께 숨김. TV 화면이 뒤통수에도 달려있는 것처럼 보이는 문제 방지.
+    if ((s.role === 'face' || s.role === 'front') && !showFace) return;
+    drawSpecShape(ctx, s, k, 50, 50, bodyColor);
+  });
+}
+function drawRetroBot(ctx, ch, chargeScale, legSwing, bodyFillColor, spec){
+  const k = ch.radius * chargeScale / 23;
+  const a = ch.angle;
+  const seg = Math.round(a / (Math.PI/4));
+  const dirIndex = ((seg % 8) + 8) % 8;
+  const DIRS = ['right','front-right','front','front-left','left','back-left','back','back-right'];
+  const facing = DIRS[dirIndex];
+
+  ctx.save();
+  if (facing === 'front' || facing === 'back'){
+    drawRetroBotFromSpec(ctx, spec, k, bodyFillColor, facing === 'front');
+  } else if (facing === 'right' || facing === 'left'){
+    if (facing === 'left') ctx.scale(-1, 1);
+    ctx.scale(0.7, 1);
+    drawRetroBotFromSpec(ctx, spec, k, bodyFillColor, true);
+  } else {
+    const isFront = facing.startsWith('front');
+    if (facing.endsWith('left')) ctx.scale(-1, 1);
+    ctx.scale(0.85, 1);
+    drawRetroBotFromSpec(ctx, spec, k, bodyFillColor, isFront);
+  }
+  ctx.restore();
+}
+
+const RETRO_BOT_SPECS = {
+  crttubby: { shapes: [
+    { t:'line', x1:40,y1:25,x2:30,y2:12, stroke:'#4A5568', sw:3, cap:'round' },
+    { t:'line', x1:60,y1:25,x2:70,y2:12, stroke:'#4A5568', sw:3, cap:'round' },
+    { t:'rect', x:22,y:25,w:56,h:48,rx:12, fill:'#718096', stroke:'#2D3748', sw:3.5, role:'body' },
+    { t:'rect', x:28,y:31,w:36,h:36,rx:6, fill:'#A0AEC0', stroke:'#2D3748', sw:2, role:'front' },
+    { t:'rect', x:35,y:42,w:4,h:4, fill:'#1A202C', role:'face' },
+    { t:'rect', x:53,y:42,w:4,h:4, fill:'#1A202C', role:'face' },
+    { t:'path', d:[['M',42,52],['Q',46,55,50,52]], stroke:'#1A202C', sw:2, cap:'round', role:'face' },
+    { t:'circle', x:69,y:36,r:3, fill:'#E2E8F0', stroke:'#2D3748', sw:1.5 },
+    { t:'circle', x:69,y:45,r:3, fill:'#E2E8F0', stroke:'#2D3748', sw:1.5 },
+    { t:'rect', x:66,y:54,w:6,h:10,rx:1, fill:'#FF8A8A', stroke:'#2D3748', sw:1.5 },
+    { t:'rect', x:36,y:73,w:8,h:10,rx:2, fill:'#2D3748' },
+    { t:'rect', x:56,y:73,w:8,h:10,rx:2, fill:'#2D3748' }
+  ]},
+  beepypager: { shapes: [
+    { t:'rect', x:20,y:30,w:60,h:44,rx:8, fill:'#2D3748', stroke:'#1A202C', sw:3.5, role:'body' },
+    { t:'rect', x:32,y:24,w:36,h:6,rx:2, fill:'#4A5568' },
+    { t:'rect', x:26,y:36,w:48,h:22,rx:4, fill:'#C6F6D5', stroke:'#1A202C', sw:2, role:'front' },
+    { t:'rect', x:36,y:42,w:4,h:4, fill:'#22543D', role:'face' },
+    { t:'rect', x:56,y:42,w:4,h:4, fill:'#22543D', role:'face' },
+    { t:'rect', x:30,y:48,w:4,h:4, fill:'#F56565', role:'front' },
+    { t:'rect', x:62,y:48,w:4,h:4, fill:'#F56565', role:'front' },
+    { t:'rect', x:28,y:63,w:10,h:5,rx:1, fill:'#4A5568', role:'front' },
+    { t:'rect', x:45,y:63,w:10,h:5,rx:1, fill:'#ED8936', role:'front' },
+    { t:'rect', x:62,y:63,w:10,h:5,rx:1, fill:'#4A5568', role:'front' },
+    { t:'circle', x:35,y:78,r:5, fill:'#1A202C' },
+    { t:'circle', x:65,y:78,r:5, fill:'#1A202C' }
+  ]},
+  diskettebuddy: { shapes: [
+    { t:'path', d:[['M',22,25],['L',68,25],['L',78,35],['L',78,75],['C',78,78,75,80,72,80],['L',28,80],['C',25,80,22,78,22,75],['Z']], fill:'#3182CE', stroke:'#1A202C', sw:3.5, join:'round', role:'body' },
+    { t:'rect', x:30,y:44,w:40,h:30,rx:3, fill:'#FFF', stroke:'#1A202C', sw:2, role:'front' },
+    { t:'rect', x:38,y:52,w:4,h:4, fill:'#2B6CB0', role:'face' },
+    { t:'rect', x:58,y:52,w:4,h:4, fill:'#2B6CB0', role:'face' },
+    { t:'polygon', pts:[[46,60],[54,60],[54,62],[46,62]], fill:'#E53E3E', role:'face' },
+    { t:'rect', x:34,y:25,w:22,h:14, fill:'#A0AEC0', stroke:'#1A202C', sw:2 },
+    { t:'rect', x:40,y:29,w:4,h:6, fill:'#4A5568' },
+    { t:'rect', x:34,y:80,w:8,h:8,rx:1, fill:'#1A202C' },
+    { t:'rect', x:58,y:80,w:8,h:8,rx:1, fill:'#1A202C' }
+  ]},
+  joypadmini: { shapes: [
+    { t:'rect', x:25,y:20,w:50,h:60,rx:8, fill:'#ECC94B', stroke:'#744210', sw:3.5, role:'body' },
+    { t:'rect', x:32,y:27,w:36,h:24,rx:4, fill:'#4A5568', stroke:'#744210', sw:2, role:'front' },
+    { t:'circle', x:42,y:36,r:3, fill:'#FFF', role:'face' },
+    { t:'circle', x:58,y:36,r:3, fill:'#FFF', role:'face' },
+    { t:'path', d:[['M',47,43],['Q',50,46,53,43]], stroke:'#FFF', sw:2, cap:'round', role:'face' },
+    { t:'path', d:[['M',35,62],['L',41,62],['L',41,56],['L',45,56],['L',45,62],['L',51,62],['L',51,66],['L',45,66],['L',45,72],['L',41,72],['L',41,66],['L',35,66],['Z']], fill:'#2D3748', role:'front' },
+    { t:'circle', x:64,y:61,r:3.5, fill:'#F56565', role:'front' },
+    { t:'circle', x:58,y:68,r:3.5, fill:'#F56565', role:'front' },
+    { t:'rect', x:36,y:80,w:8,h:8,rx:2, fill:'#2D3748' },
+    { t:'rect', x:56,y:80,w:8,h:8,rx:2, fill:'#2D3748' }
+  ]},
+  radiotune: { shapes: [
+    { t:'line', x1:30,y1:30,x2:18,y2:12, stroke:'#4A5568', sw:3, cap:'round' },
+    { t:'circle', x:18,y:10,r:3, fill:'#4A5568' },
+    { t:'path', d:[['M',38,30],['L',38,22],['L',62,22],['L',62,30]], stroke:'#4A5568', sw:3, cap:'round' },
+    { t:'rect', x:25,y:30,w:50,h:42,rx:6, fill:'#ED8936', stroke:'#2D3748', sw:3.5, role:'body' },
+    { t:'rect', x:32,y:38,w:20,h:14,rx:2, fill:'#EDF2F7', stroke:'#2D3748', sw:1.5, role:'front' },
+    { t:'circle', x:38,y:45,r:2, fill:'#2D3748', role:'face' },
+    { t:'circle', x:46,y:45,r:2, fill:'#2D3748', role:'face' },
+    { t:'rect', x:56,y:38,w:12,h:24,rx:2, fill:'#4A5568', role:'front' },
+    { t:'line', x1:59,y1:42,x2:65,y2:42, stroke:'#1A202C', sw:1.5, role:'front' },
+    { t:'line', x1:59,y1:46,x2:65,y2:46, stroke:'#1A202C', sw:1.5, role:'front' },
+    { t:'line', x1:59,y1:50,x2:65,y2:50, stroke:'#1A202C', sw:1.5, role:'front' },
+    { t:'circle', x:42,y:60,r:4, fill:'#2D3748', role:'front' },
+    { t:'rect', x:35,y:72,w:7,h:10,rx:2, fill:'#2D3748' },
+    { t:'rect', x:58,y:72,w:7,h:10,rx:2, fill:'#2D3748' }
+  ]},
+  djbeat: { shapes: [
+    { t:'path', d:[['M',26,45],['C',26,20,74,20,74,45]], stroke:'#4A5568', sw:5, cap:'round' },
+    { t:'rect', x:28,y:32,w:44,h:40,rx:10, fill:'#E2E8F0', stroke:'#2D3748', sw:3, role:'body' },
+    { t:'rect', x:20,y:42,w:10,h:20,rx:3, fill:'#ED64A6', stroke:'#2D3748', sw:2.5 },
+    { t:'rect', x:70,y:42,w:10,h:20,rx:3, fill:'#ED64A6', stroke:'#2D3748', sw:2.5 },
+    { t:'rect', x:35,y:39,w:30,h:20,rx:4, fill:'#1A202C', role:'front' },
+    { t:'rect', x:40,y:44,w:4,h:8, fill:'#4FD1C5', role:'face' },
+    { t:'rect', x:56,y:44,w:4,h:8, fill:'#4FD1C5', role:'face' },
+    { t:'rect', x:47,y:50,w:6,h:3, fill:'#F6E05E', role:'face' },
+    { t:'rect', x:38,y:72,w:6,h:11,rx:2, fill:'#2D3748' },
+    { t:'rect', x:56,y:72,w:6,h:11,rx:2, fill:'#2D3748' }
+  ]},
+  ticktock: { shapes: [
+    { t:'path', d:[['M',25,25],['C',25,18,37,18,37,25],['Z']], fill:'#E53E3E', stroke:'#1A202C', sw:2.5, join:'round' },
+    { t:'path', d:[['M',75,25],['C',75,18,63,18,63,25],['Z']], fill:'#E53E3E', stroke:'#1A202C', sw:2.5, join:'round' },
+    { t:'circle', x:50,y:50,r:28, fill:'#FC8181', stroke:'#1A202C', sw:3.5, role:'body' },
+    { t:'circle', x:50,y:50,r:21, fill:'#FFF', role:'front' },
+    { t:'line', x1:50,y1:50,x2:50,y2:36, stroke:'#1A202C', sw:3, cap:'round', role:'front' },
+    { t:'line', x1:50,y1:50,x2:62,y2:50, stroke:'#1A202C', sw:3, cap:'round', role:'front' },
+    { t:'circle', x:40,y:44,r:2, fill:'#1A202C', role:'face' },
+    { t:'circle', x:60,y:44,r:2, fill:'#1A202C', role:'face' },
+    { t:'line', x1:32,y1:75,x2:24,y2:84, stroke:'#1A202C', sw:4, cap:'round' },
+    { t:'line', x1:68,y1:75,x2:76,y2:84, stroke:'#1A202C', sw:4, cap:'round' }
+  ]},
+  polaroidpippo: { shapes: [
+    { t:'rect', x:24,y:28,w:52,h:44,rx:8, fill:'#4FD1C5', stroke:'#2D3748', sw:3.5, role:'body' },
+    { t:'rect', x:30,y:20,w:10,h:8,rx:2, fill:'#2D3748', role:'front' },
+    { t:'circle', x:50,y:46,r:14, fill:'#2D3748', role:'front' },
+    { t:'circle', x:50,y:46,r:8, fill:'#1A202C', role:'front' },
+    { t:'circle', x:47,y:43,r:2.5, fill:'#FFF', role:'front' },
+    { t:'rect', x:62,y:20,w:10,h:8,rx:2, fill:'#F6E05E', stroke:'#2D3748', sw:2, role:'front' },
+    { t:'rect', x:36,y:66,w:28,h:3, fill:'#1A202C', role:'front' },
+    { t:'rect', x:40,y:69,w:20,h:12, fill:'#FFF', stroke:'#2D3748', sw:1.5, role:'front' },
+    { t:'rect', x:43,y:72,w:14,h:6, fill:'#F56565', role:'front' },
+    { t:'rect', x:32,y:81,w:8,h:6,rx:2, fill:'#2D3748' },
+    { t:'rect', x:60,y:81,w:8,h:6,rx:2, fill:'#2D3748' }
+  ]},
+  sparkybattery: { shapes: [
+    { t:'rect', x:44,y:16,w:12,h:8,rx:2, fill:'#A0AEC0', stroke:'#1A202C', sw:3 },
+    { t:'rect', x:28,y:23,w:44,h:52,rx:8, fill:'#4299E1', stroke:'#1A202C', sw:3.5, role:'body' },
+    { t:'polygon', pts:[[28,29],[72,29],[72,39],[28,39]], fill:'#F6E05E', stroke:'#1A202C', sw:1.5 },
+    { t:'path', d:[['M',36,46],['L',42,46],['L',38,52],['L',44,52],['L',40,58]], stroke:'#FFF', sw:2.5, cap:'round', role:'face' },
+    { t:'path', d:[['M',56,46],['L',62,46],['L',58,52],['L',64,52],['L',60,58]], stroke:'#FFF', sw:2.5, cap:'round', role:'face' },
+    { t:'path', d:[['M',47,62],['Q',50,65,53,62]], stroke:'#FFF', sw:2, cap:'round', role:'face' },
+    { t:'rect', x:36,y:75,w:7,h:9,rx:2, fill:'#1A202C' },
+    { t:'rect', x:57,y:75,w:7,h:9,rx:2, fill:'#1A202C' }
+  ]},
+  pluggy: { shapes: [
+    { t:'rect', x:38,y:12,w:6,h:14,rx:2, fill:'#CBD5E0', stroke:'#1A202C', sw:2.5 },
+    { t:'rect', x:56,y:12,w:6,h:14,rx:2, fill:'#CBD5E0', stroke:'#1A202C', sw:2.5 },
+    { t:'rect', x:26,y:24,w:48,h:48,rx:12, fill:'#EDF2F7', stroke:'#1A202C', sw:3.5, role:'body' },
+    { t:'path', d:[['M',36,42],['L',42,46],['L',36,50]], stroke:'#2D3748', sw:3, cap:'round', join:'round', role:'face' },
+    { t:'path', d:[['M',64,42],['L',58,46],['L',64,50]], stroke:'#2D3748', sw:3, cap:'round', join:'round', role:'face' },
+    { t:'ellipse', x:50,y:54,rx:2,ry:3, fill:'#2D3748', role:'face' },
+    { t:'circle', x:36,y:54,r:4, fill:'#FF8A8A', role:'face' },
+    { t:'circle', x:64,y:54,r:4, fill:'#FF8A8A', role:'face' },
+    { t:'rect', x:36,y:72,w:7,h:11,rx:2, fill:'#4A5568' },
+    { t:'rect', x:57,y:72,w:7,h:11,rx:2, fill:'#4A5568' }
+  ]},
+  brightwatt: { shapes: [
+    { t:'path', d:[['M',32,45],['C',32,25,68,25,68,45],['C',68,55,58,62,58,68],['L',42,68],['C',42,62,32,55,32,45],['Z']], fill:'#FEFCBF', stroke:'#D69E2E', sw:3.5, join:'round', role:'body' },
+    { t:'path', d:[['M',44,46],['C',44,42,47,40,50,43],['C',53,40,56,42,56,46]], stroke:'#D69E2E', sw:2.5, cap:'round', role:'face' },
+    { t:'rect', x:40,y:34,w:3,h:5,rx:1, fill:'#744210', role:'face' },
+    { t:'rect', x:57,y:34,w:3,h:5,rx:1, fill:'#744210', role:'face' },
+    { t:'rect', x:44,y:68,w:12,h:5, fill:'#718096', stroke:'#1A202C', sw:2 },
+    { t:'rect', x:45,y:73,w:10,h:5, fill:'#A0AEC0', stroke:'#1A202C', sw:2 },
+    { t:'polygon', pts:[[47,78],[53,78],[50,82]], fill:'#1A202C' }
+  ]},
+  tapycassette: { shapes: [
+    { t:'rect', x:20,y:30,w:60,h:42,rx:6, fill:'#9F7AEA', stroke:'#1A202C', sw:3.5, role:'body' },
+    { t:'rect', x:28,y:38,w:44,h:26,rx:3, fill:'#FFF', stroke:'#1A202C', sw:2, role:'front' },
+    { t:'circle', x:40,y:50,r:6, fill:'#1A202C', role:'face' },
+    { t:'circle', x:60,y:50,r:6, fill:'#1A202C', role:'face' },
+    { t:'circle', x:40,y:50,r:3, fill:'#FFF', role:'face' },
+    { t:'circle', x:60,y:50,r:3, fill:'#FFF', role:'face' },
+    { t:'path', d:[['M',48,58],['Q',50,61,52,58]], stroke:'#1A202C', sw:2, cap:'round', role:'face' },
+    { t:'rect', x:34,y:72,w:7,h:10,rx:2, fill:'#1A202C' },
+    { t:'rect', x:59,y:72,w:7,h:10,rx:2, fill:'#1A202C' }
+  ]},
+  captainenter: { shapes: [
+    { t:'path', d:[['M',25,25],['L',75,25],['L',75,50],['L',55,50],['L',55,75],['L',25,75],['Z']], fill:'#EDF2F7', stroke:'#2D3748', sw:3.5, join:'round', role:'body' },
+    { t:'path', d:[['M',28,28],['L',72,28],['L',72,47],['L',52,47],['L',52,72],['L',28,72],['Z']], fill:'#FFF', opacity:0.5, role:'front' },
+    { t:'rect', x:36,y:38,w:4,h:4, fill:'#2D3748', role:'face' },
+    { t:'rect', x:58,y:38,w:4,h:4, fill:'#2D3748', role:'face' },
+    { t:'path', d:[['M',42,54],['L',46,50]], stroke:'#F56565', sw:2.5, cap:'round', join:'round', role:'face' },
+    { t:'path', d:[['M',42,54],['L',46,58]], stroke:'#F56565', sw:2.5, cap:'round', join:'round', role:'face' },
+    { t:'path', d:[['M',42,54],['L',58,54],['L',58,46]], stroke:'#F56565', sw:2.5, cap:'round', join:'round', role:'face' },
+    { t:'rect', x:32,y:75,w:8,h:8,rx:2, fill:'#2D3748' },
+    { t:'rect', x:45,y:75,w:8,h:8,rx:2, fill:'#2D3748' }
+  ]},
+  clickymouse: { shapes: [
+    { t:'path', d:[['M',50,15],['Q',50,5,30,8]], stroke:'#A0AEC0', sw:3, cap:'round' },
+    { t:'rect', x:28,y:25,w:44,h:56,rx:20, fill:'#E2E8F0', stroke:'#2D3748', sw:3.5, role:'body' },
+    { t:'line', x1:50,y1:25,x2:50,y2:48, stroke:'#2D3748', sw:2, role:'front' },
+    { t:'line', x1:28,y1:48,x2:72,y2:48, stroke:'#2D3748', sw:2, role:'front' },
+    { t:'rect', x:47,y:32,w:6,h:10,rx:2, fill:'#E53E3E', role:'front' },
+    { t:'circle', x:40,y:58,r:3, fill:'#2D3748', role:'face' },
+    { t:'circle', x:60,y:58,r:3, fill:'#2D3748', role:'face' },
+    { t:'path', d:[['M',47,66],['Q',50,69,53,66]], stroke:'#2D3748', sw:2, cap:'round', role:'face' },
+    { t:'rect', x:34,y:81,w:8,h:5,rx:1.5, fill:'#1A202C' },
+    { t:'rect', x:58,y:81,w:8,h:5,rx:1.5, fill:'#1A202C' }
+  ]},
+  sodapop: { shapes: [
+    { t:'polygon', pts:[[50,16],[56,12],[62,15],[56,19]], fill:'#A0AEC0', stroke:'#1A202C', sw:2, join:'round' },
+    { t:'circle', x:53,y:17,r:2, fill:'#1A202C' },
+    { t:'ellipse', x:50,y:24,rx:20,ry:5, fill:'#CBD5E0', stroke:'#1A202C', sw:3 },
+    { t:'rect', x:30,y:24,w:40,h:52, fill:'#ED64A6', stroke:'#1A202C', sw:3.5, role:'body' },
+    { t:'path', d:[['M',30,38],['Q',50,44,70,38]], stroke:'#FFF', sw:4 },
+    { t:'rect', x:40,y:48,w:4,h:4, fill:'#1A202C', role:'face' },
+    { t:'rect', x:56,y:48,w:4,h:4, fill:'#1A202C', role:'face' },
+    { t:'path', d:[['M',46,58],['Q',50,61,54,58]], stroke:'#1A202C', sw:2.5, cap:'round', role:'face' },
+    { t:'ellipse', x:50,y:76,rx:20,ry:5, fill:'#CBD5E0', stroke:'#1A202C', sw:3 },
+    { t:'rect', x:38,y:81,w:6,h:6,rx:2, fill:'#1A202C' },
+    { t:'rect', x:56,y:81,w:6,h:6,rx:2, fill:'#1A202C' }
+  ]},
+  sweetcube: { shapes: [
+    { t:'polygon', pts:[[50,15],[80,27],[80,63],[50,75],[20,63],[20,27]], fill:'#EBF8FF', stroke:'#3182CE', sw:3.5, join:'round', role:'body' },
+    { t:'polygon', pts:[[50,15],[80,27],[50,39],[20,27]], fill:'#BEE3F8', stroke:'#3182CE', sw:2 },
+    { t:'polygon', pts:[[50,46],[52,50],[56,50],[53,53],[54,57],[50,55],[46,57],[47,53],[44,50],[48,50]], fill:'#FFF' },
+    { t:'circle', x:38,y:48,r:3, fill:'#2B6CB0', role:'face' },
+    { t:'circle', x:62,y:48,r:3, fill:'#2B6CB0', role:'face' },
+    { t:'path', d:[['M',47,55],['Q',50,58,53,55]], stroke:'#2B6CB0', sw:2, cap:'round', role:'face' },
+    { t:'circle', x:32,y:53,r:3, fill:'#FF8A8A', role:'face' },
+    { t:'circle', x:68,y:53,r:3, fill:'#FF8A8A', role:'face' }
+  ]},
+  retrotoasty: { shapes: [
+    { t:'path', d:[['M',40,25],['C',40,20,44,18,50,20],['C',56,18,60,20,60,25],['L',60,35],['L',40,35],['Z']], fill:'#FCE0AD', stroke:'#C68B59', sw:2 },
+    { t:'rect', x:22,y:32,w:56,h:42,rx:12, fill:'#FC8181', stroke:'#2D3748', sw:3.5, role:'body' },
+    { t:'rect', x:22,y:66,w:56,h:8, fill:'#CBD5E0', stroke:'#2D3748', sw:2 },
+    { t:'rect', x:14,y:44,w:8,h:18,rx:2, fill:'#2D3748' },
+    { t:'rect', x:10,y:50,w:8,h:6,rx:1.5, fill:'#E53E3E' },
+    { t:'rect', x:36,y:46,w:4,h:4, fill:'#2D3748', role:'face' },
+    { t:'rect', x:60,y:46,w:4,h:4, fill:'#2D3748', role:'face' },
+    { t:'path', d:[['M',46,54],['Q',50,57,54,54]], stroke:'#2D3748', sw:2.5, cap:'round', role:'face' },
+    { t:'circle', x:34,y:78,r:4, fill:'#2D3748' },
+    { t:'circle', x:66,y:78,r:4, fill:'#2D3748' }
+  ]},
+  gumballbot: { shapes: [
+    { t:'circle', x:50,y:38,r:22, fill:'#E2E8F0', stroke:'#2D3748', sw:3, role:'body' },
+    { t:'circle', x:42,y:40,r:4.5, fill:'#FF6B6B' },
+    { t:'circle', x:50,y:44,r:4.5, fill:'#4FD1C5' },
+    { t:'circle', x:56,y:36,r:4.5, fill:'#F6E05E' },
+    { t:'circle', x:46,y:32,r:4.5, fill:'#9F7AEA' },
+    { t:'path', d:[['M',34,56],['L',66,56],['L',70,80],['L',30,80],['Z']], fill:'#E53E3E', stroke:'#2D3748', sw:3.5, join:'round' },
+    { t:'circle', x:50,y:64,r:6, fill:'#A0AEC0', stroke:'#2D3748', sw:2, role:'front' },
+    { t:'line', x1:45,y1:64,x2:55,y2:64, stroke:'#2D3748', sw:3.5, cap:'round', role:'front' },
+    { t:'path', d:[['M',42,52],['L',46,52]], stroke:'#2D3748', sw:2.5, cap:'round', role:'face' },
+    { t:'circle', x:58,y:52,r:1.5, fill:'#2D3748', role:'face' },
+    { t:'rect', x:47,y:72,w:6,h:8,rx:1, fill:'#1A202C' }
+  ]},
+  signalsam: { shapes: [
+    { t:'rect', x:34,y:20,w:32,h:60,rx:8, fill:'#2D3748', stroke:'#1A202C', sw:3.5, role:'body' },
+    { t:'circle', x:50,y:32,r:7, fill:'#F56565', stroke:'#1A202C', sw:2, role:'front' },
+    { t:'path', d:[['M',47,29],['L',53,29]], stroke:'#FFF', sw:1.5, cap:'round', role:'front' },
+    { t:'circle', x:50,y:50,r:7, fill:'#F6E05E', stroke:'#1A202C', sw:2, role:'front' },
+    { t:'ellipse', x:50,y:50,rx:1,ry:2, fill:'#744210', role:'front' },
+    { t:'circle', x:50,y:68,r:7, fill:'#48BB78', stroke:'#1A202C', sw:2, role:'front' },
+    { t:'path', d:[['M',47,67],['Q',50,70,53,67]], stroke:'#FFF', sw:1.5, cap:'round', role:'front' },
+    { t:'rect', x:47,y:80,w:6,h:10, fill:'#718096', stroke:'#1A202C', sw:2 },
+    { t:'path', d:[['M',40,90],['L',60,90]], stroke:'#1A202C', sw:4, cap:'round' }
+  ]},
+  retrostick: { shapes: [
+    { t:'line', x1:50,y1:35,x2:50,y2:18, stroke:'#4A5568', sw:4, cap:'round' },
+    { t:'circle', x:50,y:14,r:8, fill:'#E53E3E', stroke:'#1A202C', sw:2 },
+    { t:'polygon', pts:[[26,42],[74,42],[80,78],[20,78]], fill:'#4A5568', stroke:'#1A202C', sw:3.5, join:'round', role:'body' },
+    { t:'rect', x:36,y:52,w:4,h:4, fill:'#FFF', role:'face' },
+    { t:'rect', x:60,y:52,w:4,h:4, fill:'#FFF', role:'face' },
+    { t:'path', d:[['M',46,60],['Q',50,63,54,60]], stroke:'#FFF', sw:2, cap:'round', role:'face' },
+    { t:'circle', x:32,y:70,r:3.5, fill:'#48BB78', role:'front' },
+    { t:'circle', x:45,y:70,r:3.5, fill:'#F6E05E', role:'front' },
+    { t:'circle', x:58,y:70,r:3.5, fill:'#3182CE', role:'front' },
+    { t:'rect', x:28,y:78,w:10,h:8,rx:3, fill:'#1A202C' },
+    { t:'rect', x:62,y:78,w:10,h:8,rx:3, fill:'#1A202C' }
+  ]}
+};
+// 상점 미리보기(CUSTOM_SKIN_DRAW)에도 레트로 로봇 20종을 자동으로 등록함
+Object.keys(RETRO_BOT_SPECS).forEach(kindKey=>{
+  CUSTOM_SKIN_DRAW[kindKey] = (ctx, fakeCh, cs, ls, bc) => drawRetroBot(ctx, fakeCh, cs, ls, bc, RETRO_BOT_SPECS[kindKey]);
+});
 
 // ================= 참가자(플레이어 슬롯들 + AI들) 관리 =================
 let aiList = [];           // AI 캐릭터 목록
@@ -2650,6 +3915,30 @@ function netHandleEvent(msg){
     if (msg.sessionId === netMySessionId){
       addCoins(msg.amount || COIN_VALUE);
     }
+  } else if (msg.type === 'coinPickupFx' && !netIsHost){
+    // 코인 습득 판정(updateCoinPickup)은 호스트에서만 실행되기 때문에, 그 순간의 스파클/파편/
+    // 효과음 연출은 원래 호스트 화면에만 보였음. 누가 주웠든(나 자신 포함) 이 연출을 그대로
+    // 재생해서 게스트 화면에서도 코인을 먹었을 때의 느낌이 나게 함.
+    spawnFloatingText(msg.x, msg.y - CHAR_R - 10, '+' + (msg.amount||COIN_VALUE) + ' 🪙', msg.color || '#ffd23d');
+    spawnHitFx(msg.x, msg.y, 1.1, '#ffd23d');
+    spawnDebris(msg.x, msg.y, '#ffd23d');
+    sfxItemPickup();
+  } else if (msg.type === 'koMessage' && !netIsHost){
+    // 호스트가 판정한 KO 메시지를 그대로 받아, 킬러가 나(이 세션)인지 스스로 비교해서
+    // 내가 킬했으면 화면 중앙에, 아니면 우측 상단 킬 로그에 표시함 (triggerDeath와 동일한 규칙)
+    const iAmKiller = !!msg.killerId && msg.killerId === netMySessionId;
+    if (iAmKiller){
+      showMessage(msg.msg, msg.color, msg.scale || 1);
+    } else {
+      addKillFeedEntry(msg.msg, msg.color);
+    }
+    // 콤보 킬이었다면 그 파티클 연출도 재생(spawnComboKillFx와 동일한 연출)
+    if (msg.comboX !== null && msg.comboX !== undefined){
+      spawnHitFx(msg.comboX, msg.comboY, 1.4 * msg.comboScale, msg.comboColor);
+      const debrisCount = Math.min(16, 4 + Math.round((msg.comboScale-1) * 12));
+      for (let i=0; i<debrisCount; i++) spawnDebris(msg.comboX, msg.comboY, msg.comboColor);
+      spawnFloatingText(msg.comboX, msg.comboY - CHAR_R - 30, msg.comboText, msg.comboColor);
+    }
   }
 }
 
@@ -2745,7 +4034,28 @@ function netApplySnapshot(snap){
   bricks = snap.bricks.slice();
   items = snap.items.slice();
   bombs = snap.bombs.slice();
-  coins = snap.coins.slice();
+
+  // 코인은 캐릭터와 마찬가지로 id로 짝을 맞춰서, 기존에 이미 있던 코인은 위치만 "목표값"으로
+  // 갱신해두고 아래 netInterpolateEntities()가 매 프레임 부드럽게 따라가게 함. 예전에는 스냅샷마다
+  // coins 배열을 통째로 교체해서, 마그넷에 끌려가는 코인이 20Hz 스냅샷 그대로 계단식(순간이동식)
+  // 으로 움직이는 것처럼 보였음.
+  const seenCoinIds = {};
+  snap.coins.forEach(sc=>{
+    seenCoinIds[sc.id] = true;
+    let c = coins.find(cc=> cc.id === sc.id);
+    if (!c){
+      // 새로 생긴 코인: 목표값 = 현재 위치로 두고 바로 그 자리에 나타나게 함(순간이동이 자연스러움)
+      c = { ...sc, _netTargetX: sc.x, _netTargetY: sc.y };
+      coins.push(c);
+    } else {
+      // 이미 있던 코인: x/y를 제외한 나머지 필드(반지름/스핀/낙하 상태/가치 등)는 그대로 최신값으로
+      // 덮어쓰고, x/y는 목표값만 갱신해서 다음 프레임부터 부드럽게 이동하게 함
+      Object.assign(c, { radius: sc.radius, spin: sc.spin, value: sc.value,
+        fallHeight: sc.fallHeight, fallVel: sc.fallVel, landed: sc.landed });
+      c._netTargetX = sc.x; c._netTargetY = sc.y;
+    }
+  });
+  coins = coins.filter(c=> seenCoinIds[c.id]);
 }
 
 // 매 프레임(60fps) 호출: 각 캐릭터의 실제 렌더 위치(x/y/angle)를 최신 목표값 쪽으로 부드럽게 당겨줌.
@@ -2781,6 +4091,23 @@ function netInterpolateEntities(dt){
     const tRatio = 1 - b.timer / b.maxTimer;
     const ringSpin = BOMB_RING_SPIN_MIN + (BOMB_RING_SPIN_MAX - BOMB_RING_SPIN_MIN) * tRatio;
     b.ringAngle = (b.ringAngle || 0) + ringSpin * dt;
+  });
+
+  // 코인도 캐릭터와 동일하게 목표 위치(_netTargetX/Y)를 향해 매 프레임 부드럽게 따라가게 함.
+  // 특히 마그넷에 끌려가는 코인은 호스트 쪽에서 매 프레임 위치가 바뀌는데, 예전처럼 스냅샷을
+  // 그대로 스냅(순간이동)했으면 20Hz라 뚝뚝 끊겨 보였을 것 - 이제는 캐릭터와 같은 방식으로 매끄럽게 날아옴.
+  // 낙하 중인(fallHeight>0) 코인은 같은 이유로 20Hz 스냅샷만으로는 낙하가 계단식으로 보일 수 있어서,
+  // 호스트의 updateCoinFalling()과 완전히 같은 공식으로 로컬에서 조금씩 진행시켜 부드럽게 보이게 함
+  const COIN_FALL_GRAVITY = 1100;
+  coins.forEach(c=>{
+    if (c._netTargetX !== undefined){
+      const ct = Math.min(1, dt * NET_POS_SMOOTH);
+      c.x += (c._netTargetX - c.x) * ct;
+      c.y += (c._netTargetY - c.y) * ct;
+    }
+    if (!c.fallHeight || c.fallHeight <= 0) return;
+    c.fallVel = (c.fallVel||0) + COIN_FALL_GRAVITY*dt;
+    c.fallHeight = Math.max(0, c.fallHeight - c.fallVel*dt);
   });
 }
 
@@ -2905,6 +4232,7 @@ function startGame(aiCount){
     ai.team = team;
     ai.skill = Math.random(); // 0(허당) ~ 1(고수) 랜덤 실력 - AI마다 다르게 부여
     ai.rankTierIndex = skillToRankTierIndex(ai.skill); // 실력치에 맞춰 등급 엠블럼도 표시
+    ai.shape = randomSkinShape(); // 상점에 있는 캐릭터 모양 중 하나를 랜덤으로 배정(모양은 색과 무관)
     aiList.push(ai);
   }
   characters = [...playerSlots, ...aiList];
@@ -3372,8 +4700,16 @@ function spawnItem(){
     if (!isNearAnyBrick(x, y, 34)){ pos = {x, y}; break; }
   }
   if (!pos) return; // 마땅한 자리를 못 찾으면 다음 타이머에 재시도
+  // 기본 확률은 6종 균등(각 1/6). 대신 맵에 코인이 최대 개수(COIN_TOTAL_CAP)에 가까워질수록
+  // 마그넷이 나올 확률이 따로 크게 올라감 - 코인을 정리(흡수)할 수단이 자연스럽게 더 자주 등장하게 함
   const roll = Math.random();
-  const type = roll < 0.167 ? 'speed' : (roll < 0.333 ? 'power' : (roll < 0.5 ? 'heal' : (roll < 0.667 ? 'ram' : (roll < 0.833 ? 'range' : 'magnet'))));
+  let type = roll < 0.167 ? 'speed' : (roll < 0.333 ? 'power' : (roll < 0.5 ? 'heal' : (roll < 0.667 ? 'ram' : (roll < 0.833 ? 'range' : 'magnet'))));
+  const coinFullness = coins.length / COIN_TOTAL_CAP; // 0(코인 없음) ~ 1(최대 개수 꽉 참)
+  if (coinFullness >= COIN_FULLNESS_MAGNET_THRESHOLD){
+    // 임계치를 넘은 뒤부터는, 꽉 찰수록(1에 가까울수록) 마그넷으로 바뀔 확률이 점점 100%에 가까워짐
+    const extraChance = (coinFullness - COIN_FULLNESS_MAGNET_THRESHOLD) / (1 - COIN_FULLNESS_MAGNET_THRESHOLD);
+    if (Math.random() < extraChance) type = 'magnet';
+  }
   items.push({ x: pos.x, y: pos.y, radius: 10, type });
   spawnItemSpawnFx(pos.x, pos.y, type); // 아이템이 새로 등장했다는 걸 알 수 있게 등장 이펙트
 }
@@ -3387,6 +4723,10 @@ const COIN_PICK_RADIUS = 22;
 const COIN_VALUE = 5;
 let coins = [];
 let coinSpawnTimer = 0;
+// 코인마다 고유 id를 매겨서, 온라인 모드에서 게스트가 스냅샷을 받을 때 "같은 코인"을 알아보고
+// 위치를 부드럽게 보간할 수 있게 함(기존엔 코인을 통째로 교체해서 마그넷에 끌려가는 움직임이
+// 20Hz 스냅샷 그대로 계단식으로 보였음 - 아래 netApplySnapshot/netInterpolateEntities 참고)
+let nextCoinId = 1;
 
 function spawnCoin(){
   if (coins.length >= COIN_MAX_COUNT) return;
@@ -3400,7 +4740,7 @@ function spawnCoin(){
     if (!isNearAnyBrick(x, y, 34)){ pos = {x, y}; break; }
   }
   if (!pos) return;
-  coins.push({ x: pos.x, y: pos.y, radius: 8, spin: Math.random()*Math.PI*2, value: COIN_VALUE });
+  coins.push({ id: nextCoinId++, x: pos.x, y: pos.y, radius: 8, spin: Math.random()*Math.PI*2, value: COIN_VALUE });
 }
 
 // ---- 킬 보상 코인: 적을 날려버린(KO한) 자리에서 위에서 쏟아지듯 떨어지는 코인 ----
@@ -3408,8 +4748,23 @@ function spawnCoin(){
 // 캐릭터가 있던 자리에서 "맵 중앙 방향"으로 흩날리며 하늘에서 낙하하는 연출(fallHeight)을 갖고 시작함.
 // 캐릭터 바로 발밑에 떨어지면 죽자마자(혹은 근처에 있던 다른 캐릭터에게) 바로 흡수돼버리는 문제가
 // 있었기 때문에, 죽은 자리에서 일정 거리 이상 중앙 쪽으로 날아가 떨어지도록 함.
-const COIN_DROP_HARD_CAP = 120; // 코인이 무한정 쌓이지 않도록 전체 코인 개수에 안전장치
 const COIN_DROP_VALUE = Math.max(1, Math.round(COIN_VALUE / 3)); // 킬 코인은 개수가 많아진 대신 개당 가치를 낮춰 총량 균형을 맞춤
+// 코인은 시간이 지난다고 사라지지 않음(모으고 줍는 재미가 핵심이라 시간제 소멸은 쓰지 않음).
+// 대신 맵에 동시에 존재할 수 있는 코인 총 개수에 상한을 두고, 그 개수를 넘으면 "가장 오래
+// 놓여있던(=가장 먼저 생긴)" 코인부터 하나씩 정리해서 개수 자체를 관리함 - 새로 주울 기회가
+// 생기는 코인은 그대로 유지되고, 아주 오래 안 주워진 옛날 코인만 자리를 비켜주는 방식.
+const COIN_TOTAL_CAP = 140;
+// 코인이 이 비율(맵에 쌓인 양 / COIN_TOTAL_CAP) 이상 쌓이면 그때부터 마그넷 아이템이 나올 확률이
+// 올라가기 시작함(spawnItem() 참고) - 코인이 거의 다 찼을 때 자연스럽게 정리 수단을 쥐어주기 위함
+const COIN_FULLNESS_MAGNET_THRESHOLD = 0.6;
+// coins 배열은 항상 push()로만 추가되므로 앞쪽(인덱스 0)이 가장 오래된 코인임 - 초과분을
+// 앞에서부터 잘라내면 자연히 "가장 오래된 코인부터" 제거하는 게 됨
+function enforceCoinCap(){
+  if (coins.length > COIN_TOTAL_CAP){
+    coins.splice(0, coins.length - COIN_TOTAL_CAP);
+  }
+}
+
 function spawnCoinDrop(x, y, count, value){
   const maxR = currentBoundRadius() - 20;
   const coinValue = value === undefined ? COIN_DROP_VALUE : value;
@@ -3420,7 +4775,6 @@ function spawnCoinDrop(x, y, count, value){
   else { const a = Math.random()*Math.PI*2; dirX = Math.cos(a); dirY = Math.sin(a); }
   const perpX = -dirY, perpY = dirX; // 진행 방향에 수직인 축(부채꼴 폭 방향)
   for (let i=0; i<count; i++){
-    if (coins.length >= COIN_DROP_HARD_CAP) break;
     // 중앙 방향으로 날아가는 거리 (기존 대비 3배 더 안쪽까지 날아가도록). 단, 중앙을 넘어 반대쪽까지
     // 날아가 버리지 않도록 죽은 자리~중앙 거리의 92%를 넘지 않게 제한함
     const rawAlong = 180 + Math.random() * 600;
@@ -3436,6 +4790,7 @@ function spawnCoinDrop(x, y, count, value){
       ly = CENTER.y + (ly - CENTER.y) * s;
     }
     coins.push({
+      id: nextCoinId++,
       x: lx, y: ly, radius: 8, spin: Math.random()*Math.PI*2,
       fallHeight: 110 + Math.random()*70, // 하늘 위 시작 높이(연출용, 실제 좌표는 이미 착지 지점)
       fallVel: 0,
@@ -3443,6 +4798,7 @@ function spawnCoinDrop(x, y, count, value){
       value: coinValue
     });
   }
+  enforceCoinCap(); // 이번 드롭까지 반영한 뒤 총 개수가 상한을 넘으면 가장 오래된 코인부터 정리
 }
 
 // 매 프레임 코인의 낙하 연출(fallHeight)을 갱신. fallHeight가 없는(원래부터 바닥에 있던) 코인은 무시함.
@@ -3463,12 +4819,43 @@ function updateCoinFalling(dt){
   });
 }
 
-// 코인은 AI가 아니라 사람이 조종하는 캐릭터가 주웠을 때만 지갑에 저장됨.
-// AI가 지나가도 코인은 사라지지 않게 해서, 사람이 직접 찾아가 모으는 재미를 유지함.
+// ---- 코인 렌더링 최적화: 코인이 많아질 수 있게 된 뒤로(킬 콤보 보상 등), 코인마다 매 프레임
+// ctx.shadowBlur로 광택을 새로 계산해서 그리면(캔버스에서 shadowBlur는 특히 무거운 연산) 코인
+// 수십~백여 개가 동시에 떠 있을 때 눈에 띄게 렉이 생김. 대신 코인 모양(원+광택+테두리+"$")을
+// 딱 한 번만 오프스크린 캔버스에 그려서 스프라이트로 저장해두고, 매 프레임에는 그 스프라이트를
+// drawImage()로 붙여넣기만 함(훨씬 저렴함) ----
+const COIN_SPRITE_SIZE = 40;
+let coinSprite = null;
+function buildCoinSprite(){
+  const c = document.createElement('canvas');
+  c.width = COIN_SPRITE_SIZE; c.height = COIN_SPRITE_SIZE;
+  const g = c.getContext('2d');
+  const cx = COIN_SPRITE_SIZE/2, cy = COIN_SPRITE_SIZE/2, r = 8; // 실제 코인 반지름(8)과 동일한 크기로 구움
+  g.beginPath();
+  g.arc(cx, cy, r, 0, Math.PI*2);
+  g.fillStyle = '#ffd23d';
+  g.shadowColor = '#ffd23d';
+  g.shadowBlur = 12;
+  g.fill();
+  g.shadowBlur = 0;
+  g.strokeStyle = '#a8790a';
+  g.lineWidth = 1.5;
+  g.stroke();
+  g.fillStyle = '#a8790a';
+  g.font = 'bold 10px sans-serif';
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText('$', cx, cy+1);
+  coinSprite = c;
+}
+buildCoinSprite();
+
+// 사람이 조종하는 캐릭터가 코인을 주우면 지갑(walletCoins)에 저장됨. AI도 코인을 주울 수 있지만
+// (순찰 중 코인을 인지하고 챙겨가서, 사람과 코인을 두고 경쟁하는 재미가 생김) AI는 이 기기의
+// 지갑과 무관하므로 코인만 사라질 뿐 지갑은 늘지 않음.
 // 주의: 싱글플레이에서는 "사람 = 내 화면의 플레이어 슬롯(isHuman)"과 같지만, 멀티플레이 호스트 쪽
 // 시뮬레이션에서는 게스트가 조종하는 캐릭터(netPeerList)도 사람이 조종하는 캐릭터임. isHuman()만
 // 검사하면 호스트 화면 기준 "내 캐릭터"만 인정되어 게스트는 코인을 아무리 밟아도 못 줍는 문제가
-// 있었음. AI로 넘어간 캐릭터(ch.isAI)만 제외하는 방식으로 바꿔서 게스트도 코인을 주울 수 있게 함.
+// 있었음. AI로 넘어간 캐릭터(ch.isAI)는 지갑 적립만 건너뛰는 방식으로 처리함.
 //
 // 지갑(walletCoins) 귀속: walletCoins는 브라우저(기기)마다 따로 저장되는 개인 지갑이라서, 호스트
 // 컴퓨터에서 addCoins()를 호출하면 그 코인은 "호스트의" 지갑에 쌓임. 게스트가 주운 코인을 그대로
@@ -3476,25 +4863,37 @@ function updateCoinFalling(dt){
 // 캐릭터가 게스트(ch.netSessionId)면 지갑을 직접 늘리지 않고, 그 게스트에게만 전달되는 이벤트를
 // 보내서 게스트 자신의 브라우저에서 addCoins()가 실행되도록 함(아래 netHandleEvent의 'coinPickup').
 function updateCoinPickup(ch){
-  if (ch.isAI || ch.dead || ch.invincible) return;
+  if (ch.dead || ch.invincible) return;
   for (let i = coins.length-1; i>=0; i--){
     const c = coins[i];
     if (c.fallHeight > 0) continue; // 아직 하늘에서 떨어지는 중인 코인은 주울 수 없음(착지 후에만 획득 가능)
     if (dist(ch.x, ch.y, c.x, c.y) < COIN_PICK_RADIUS){
       const amount = c.value || COIN_VALUE;
-      if (ch.netSessionId && netOnlineMode && netIsHost){
+      const fxColor = ch.isAI ? '#bdbdbd' : '#ffd23d';
+      if (ch.isAI){
+        // AI가 주움: 지갑에는 아무 영향 없이 코인만 챙겨감(사람과 코인 쟁탈전이 되도록)
+        spawnFloatingText(ch.x, ch.y - ch.radius - 10, '+' + amount + ' 🪙', fxColor);
+      } else if (ch.netSessionId && netOnlineMode && netIsHost){
         // 게스트가 주움: 호스트 자신의 지갑을 늘리지 않고, 그 게스트에게만 알림을 보냄
         if (netRoom && netConnected){
           netRoom.send('event', { type: 'coinPickup', sessionId: ch.netSessionId, amount: amount });
         }
+        spawnFloatingText(ch.x, ch.y - ch.radius - 10, '+' + amount + ' 🪙', fxColor);
       } else {
         // 싱글플레이 또는 호스트 자신의 캐릭터: 지금까지처럼 바로 지갑에 저장
         addCoins(amount);
+        spawnFloatingText(ch.x, ch.y - ch.radius - 10, '+' + amount + ' 🪙', fxColor);
       }
-      spawnFloatingText(ch.x, ch.y - ch.radius - 10, '+' + amount + ' 🪙', '#ffd23d');
       spawnHitFx(ch.x, ch.y, 1.1, '#ffd23d');
       spawnDebris(ch.x, ch.y, '#ffd23d');
       sfxItemPickup();
+
+      // 이 pickup 판정(updateCoinPickup)은 온라인 모드에서 호스트에서만 실행되므로, 위의 스파클/
+      // 파편/효과음은 호스트 화면에만 보임. 다른 참가자들(그 코인을 주운 당사자 포함) 화면에도
+      // 같은 연출이 보이도록 좌표/색을 브로드캐스트함 - 지갑 적립 여부와는 무관한 순수 연출용 이벤트.
+      if (netOnlineMode && netIsHost && netRoom && netConnected){
+        netRoom.send('event', { type: 'coinPickupFx', x: ch.x, y: ch.y, amount, color: fxColor });
+      }
       coins.splice(i, 1);
     }
   }
@@ -4163,15 +5562,30 @@ function triggerDeath(ch){
   const fullMsg = (comboMeta ? (baseMsg + '  ' + comboMeta.text) : baseMsg) + strongTag;
   const msgColor = comboMeta ? comboMeta.color : (strongBonus >= 1 ? '#ff8a3d' : ch.color);
 
+  const msgScale = comboMeta ? comboMeta.scale : 1;
   if (isHuman(killer)){
     // 내가(이 화면의 플레이어가) 직접 킬했을 때만 화면 정중앙에 크게 표시
-    showMessage(fullMsg, msgColor, comboMeta ? comboMeta.scale : 1);
+    showMessage(fullMsg, msgColor, msgScale);
   } else {
     // 그 외(다른 플레이어의 킬, AI끼리의 킬, 내가 당한 경우 포함)는 화면 중앙을 가리지 않도록
     // 우측 상단 킬 로그에 기록으로만 남김
     addKillFeedEntry(fullMsg, msgColor);
   }
   if (comboMeta) spawnComboKillFx(killer, comboMeta);
+
+  // ---- 온라인 모드: 이 메시지 판정(triggerDeath)은 호스트에서만 실행되므로, 다른 참가자들
+  // 화면에는 그냥 두면 KO 메시지/킬 로그가 전혀 안 보임. killerId를 함께 보내서, 각자의 화면에서
+  // "킬러가 바로 나인지"를 스스로 판단해 중앙 표시/킬 로그 중 알맞은 쪽에 띄우도록 함 ----
+  if (netOnlineMode && netIsHost && netRoom && netConnected){
+    const killerId = killer ? (killer.netSessionId || ('ai:' + (killer.label || ''))) : null;
+    netRoom.send('event', {
+      type: 'koMessage', msg: fullMsg, color: msgColor, scale: msgScale, killerId,
+      // 콤보 킬 파티클 연출(spawnComboKillFx)도 다른 참가자 화면에 그대로 재생되도록 함께 보냄
+      comboX: (comboMeta && killer) ? killer.x : null, comboY: (comboMeta && killer) ? killer.y : null,
+      comboColor: comboMeta ? comboMeta.color : null, comboScale: comboMeta ? comboMeta.scale : null,
+      comboText: comboMeta ? comboMeta.text : null
+    });
+  }
 
   // ---- 킬 보상 코인: 적을 날려버린 자리 위에서 콤보 수에 따라 코인이 쏟아짐 ----
   if (killer){
@@ -4354,6 +5768,14 @@ function findNearestItemForAI(ai, detectRadius){
     const it = items[i];
     const d = dist(ai.x, ai.y, it.x, it.y);
     if (d < detectRadius && d < bestD){ bestD = d; best = it; }
+  }
+  // 코인도 버프 아이템과 마찬가지로 순찰 중 인지해서 주우러 감(AI도 코인을 모을 수 있게 됨).
+  // 단, 아직 하늘에서 떨어지는 중인(착지 전) 코인은 제외 - 착지한 코인만 대상으로 삼음
+  for (let i=0;i<coins.length;i++){
+    const c = coins[i];
+    if (c.fallHeight > 0) continue;
+    const d = dist(ai.x, ai.y, c.x, c.y);
+    if (d < detectRadius && d < bestD){ bestD = d; best = c; }
   }
   return best;
 }
@@ -4654,6 +6076,9 @@ function updateItemPickup(ch){
 
 // ================= 마그넷 버프: 범위 안 코인을 캐릭터 쪽으로 끌어당김 =================
 function updateMagnetPull(dt){
+  // 아무도 마그넷 버프를 안 갖고 있으면(대부분의 시간) 캐릭터x코인 이중 반복문을 아예 돌지 않도록
+  // 빠르게 빠져나감 - 코인 개수가 많아진 뒤로는 이 사전 체크가 프레임당 비용을 크게 줄여줌
+  if (!characters.some(c=> !c.dead && c.buffMagnet > 0)) return;
   characters.forEach(ch=>{
     if (ch.dead || !(ch.buffMagnet > 0)) return;
     coins.forEach(c=>{
@@ -4822,9 +6247,14 @@ function update(dt){
 
       // 조준: 게임패드 오른쪽 스틱 > 오른쪽 화면 터치드래그 > 마우스 방향, 순으로 우선순위를 둠
       // camZoom(모바일 줌아웃)만큼 화면이 축소되어 있으므로 마우스 좌표를 월드 좌표로 되돌릴 때도
-      // 그 배율을 나눠서 보정해야 조준 방향이 정확히 맞음
-      const worldMouseX = ch.cam.x + (mouse.x - VIEW_W/2) / camZoom;
-      const worldMouseY = ch.cam.y + (mouse.y - VIEW_H/2) / camZoom;
+      // 그 배율을 나눠서 보정해야 조준 방향이 정확히 맞음.
+      // 분할화면일 때는 마우스 좌표(캔버스 전체 기준)를 "전체 화면 중앙"이 아니라 1P가 실제로
+      // 그려지는 패널(항상 좌상단 ox:0, oy:0에 위치)의 중앙 기준으로 되돌려야 조준이 그 패널
+      // 안에서 캐릭터를 정확히 겨눔. 분할화면이 아니면 패널 크기 = 캔버스 전체 크기와 같아서
+      // 결과는 기존과 동일함.
+      const p1Pane = isSplitScreen() ? computePaneLayout(playerSlots.length, canvas.width, canvas.height)[0] : { w: VIEW_W, h: VIEW_H };
+      const worldMouseX = ch.cam.x + (mouse.x - p1Pane.w/2) / camZoom;
+      const worldMouseY = ch.cam.y + (mouse.y - p1Pane.h/2) / camZoom;
       if (!ch.dead){
         if (gpInput.hasAim){
           ch.angle = Math.atan2(gpInput.aimY, gpInput.aimX);
@@ -5033,11 +6463,131 @@ function computeShake(){
   }
 }
 
+// 배경 테마별 벽돌(장애물) 재질 - hp(3=멀쩡~1=거의 부서짐)별로 색이 점점 어두워지는 건 공통이고,
+// 재질(pattern)에 따라 이음선 무늬가 완전히 달라짐: 정글=나무상자, 바다=산호암반, 사무실=골판지상자,
+// 마을=돌담, 들판=건초더미
+const BRICK_THEME_STYLES = {
+  jungle:  { pattern:'plank', hp3:{base:'#6b4423', mortar:'#3f2814'}, hp2:{base:'#5f3b1e', mortar:'#33210f'}, hp1:{base:'#4f3018', mortar:'#2a1a0c'} },
+  ocean:   { pattern:'coral', hp3:{base:'#4a6b74', mortar:'#2c4148'}, hp2:{base:'#41616a', mortar:'#26383e'}, hp1:{base:'#39555d', mortar:'#203035'} },
+  office:  { pattern:'box',   hp3:{base:'#c9a876', mortar:'#8a6d43'}, hp2:{base:'#b89865', mortar:'#785d38'}, hp1:{base:'#a68a58', mortar:'#66502f'} },
+  village: { pattern:'stone', hp3:{base:'#8a8578', mortar:'#55503f'}, hp2:{base:'#7d7869', mortar:'#4a4636'}, hp1:{base:'#6e6a5c', mortar:'#3d3a2e'} },
+  field:   { pattern:'hay',   hp3:{base:'#d9b04c', mortar:'#a4791f'}, hp2:{base:'#c9a03e', mortar:'#8f6a1a'}, hp1:{base:'#b89031', mortar:'#7a5a15'} }
+};
+function getBrickStyle(themeId, hp){
+  const t = BRICK_THEME_STYLES[themeId] || BRICK_THEME_STYLES.village;
+  const tier = hp >= 3 ? t.hp3 : (hp === 2 ? t.hp2 : t.hp1);
+  return { base: tier.base, mortar: tier.mortar, pattern: t.pattern };
+}
+
+// 타일 하나(s.x,s.y 화면 좌표, 한 변 길이 TILE) 위에 배경 테마별 장식을 그림. seed는 그 타일의
+// 월드 좌표에서 고정으로 계산된 의사난수값(매 프레임 다시 뽑지 않아 장식이 항상 같은 자리에 고정됨).
+function drawTileDecor(ctx, s, seed, TILE, themeId){
+  const cx = s.x + TILE/2, cy = s.y + TILE/2;
+  if (themeId === 'jungle'){
+    // 6타일 중 1개꼴로 작은 나무(줄기+수풀 뭉치)를 심어 정글 바닥처럼 보이게 함
+    if (seed % 6 === 0){
+      ctx.fillStyle = '#4a3323';
+      ctx.fillRect(cx - 1.5, cy - 2, 3, TILE*0.32);
+      const leafColors = ['#2f6b3a', '#3a7a44', '#276030'];
+      [[-4,-8,7],[4,-10,6],[0,-14,7]].forEach((p,i)=>{
+        ctx.beginPath();
+        ctx.arc(cx + p[0], cy + p[1], p[2], 0, Math.PI*2);
+        ctx.fillStyle = leafColors[i % leafColors.length];
+        ctx.fill();
+      });
+    } else if (seed % 5 === 0){
+      // 나머지 타일 일부에는 작은 잎사귀 얼룩만 은은하게
+      ctx.beginPath();
+      ctx.ellipse(s.x + (seed*3)%TILE, s.y + (seed*11)%TILE, 4, 2, (seed%7)*0.4, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(120,200,120,0.12)';
+      ctx.fill();
+    }
+  } else if (themeId === 'ocean'){
+    // 파도 물결선(자주 등장) + 이따금 하얀 포말 점
+    if (seed % 3 === 0){
+      ctx.beginPath();
+      ctx.moveTo(s.x, cy + Math.sin(seed) * 4);
+      ctx.quadraticCurveTo(cx, cy + Math.cos(seed*1.7) * 6, s.x + TILE, cy + Math.sin(seed*2.3) * 4);
+      ctx.strokeStyle = 'rgba(180,230,255,0.22)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+    if (seed % 9 === 0){
+      ctx.beginPath();
+      ctx.arc(s.x + (seed*5)%TILE, s.y + (seed*13)%TILE, 1.6, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.fill();
+    }
+  } else if (themeId === 'office'){
+    // 카펫 타일 특유의 자잘한 십자 플렉(fleck) 무늬를 드문드문
+    if (seed % 5 === 0){
+      const fx = s.x + (seed*4)%(TILE-6)+3, fy = s.y + (seed*9)%(TILE-6)+3;
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(fx-2, fy); ctx.lineTo(fx+2, fy);
+      ctx.moveTo(fx, fy-2); ctx.lineTo(fx, fy+2);
+      ctx.stroke();
+    }
+    // 큰 사무실 바닥 타일 이음새 느낌을 강조하는 옅은 대각선 하이라이트
+    if (seed % 11 === 0){
+      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(s.x, s.y + TILE);
+      ctx.lineTo(s.x + TILE, s.y);
+      ctx.stroke();
+    }
+  } else if (themeId === 'village'){
+    // 흙길 위 자갈 무더기(어두운 점 3~4개 뭉침)를 드문드문
+    if (seed % 6 === 0){
+      ctx.fillStyle = 'rgba(60,42,24,0.55)';
+      [[-3,-2],[2,-3],[-1,3],[4,2]].forEach(p=>{
+        ctx.beginPath();
+        ctx.arc(cx + p[0], cy + p[1], 1.6, 0, Math.PI*2);
+        ctx.fill();
+      });
+    } else if (seed % 7 === 0){
+      // 길가에 삐져나온 작은 풀포기
+      ctx.strokeStyle = 'rgba(90,150,70,0.5)';
+      ctx.lineWidth = 1.5;
+      const gx = s.x + (seed*3)%TILE, gy = s.y + (seed*8)%TILE;
+      ctx.beginPath();
+      ctx.moveTo(gx, gy+4); ctx.lineTo(gx-2, gy-2);
+      ctx.moveTo(gx, gy+4); ctx.lineTo(gx, gy-4);
+      ctx.moveTo(gx, gy+4); ctx.lineTo(gx+2, gy-2);
+      ctx.stroke();
+    }
+  } else if (themeId === 'field'){
+    // 풀잎 결(짧은 사선 여러 개)을 촘촘히 깔고, 이따금 작은 들꽃을 점으로 찍음
+    ctx.strokeStyle = 'rgba(90,160,80,0.28)';
+    ctx.lineWidth = 1;
+    for (let i=0;i<3;i++){
+      const gx = s.x + ((seed*(3+i*5)) % (TILE-4)) + 2;
+      const gy = s.y + ((seed*(7+i*3)) % (TILE-4)) + 2;
+      ctx.beginPath();
+      ctx.moveTo(gx, gy+3);
+      ctx.lineTo(gx + ((seed+i)%3 - 1), gy - 3);
+      ctx.stroke();
+    }
+    if (seed % 8 === 0){
+      const flowerColors = ['#fff7cc', '#ffd6e8', '#ffffff'];
+      ctx.beginPath();
+      ctx.arc(cx + (seed%5)-2, cy + (seed%3)-1, 2, 0, Math.PI*2);
+      ctx.fillStyle = flowerColors[seed % flowerColors.length];
+      ctx.fill();
+    }
+  }
+}
+
 // 캔버스(또는 분할화면의 한 패널) 하나 분량을 그림. 호출 전에 activeCam/viewOwner/VIEW_W/VIEW_H가
 // 이 패널에 맞게 설정되어 있어야 함.
 function renderPane(){
+  // 선택한 배경(경기장) 테마에 따라 심연/바닥 타일/비네트 색이 달라짐(순전히 로컬 취향 설정)
+  const bgTheme = getEquippedBgTheme();
+
   // 배경(심연) - 줌 적용 전에 패널 전체를 먼저 채워야 줌아웃해도 가장자리에 빈 공간이 안 생김
-  ctx.fillStyle = '#070a12';
+  ctx.fillStyle = bgTheme.space;
   ctx.fillRect(0,0,VIEW_W,VIEW_H);
 
   // 모바일에서는 화면이 좁아 시야가 답답할 수 있으므로 camZoom(<1)만큼 패널 중심을 기준으로
@@ -5071,25 +6621,16 @@ function renderPane(){
       const tileIndexY = Math.round(wy / TILE);
       const isDark = (tileIndexX + tileIndexY) % 2 === 0;
       const s = worldToScreen(wx, wy);
-      // 좀 더 게임(경기장) 바닥 같은 어두운 그래파이트 톤 + 타일 이음새 라인
-      ctx.fillStyle = isDark ? '#33394a' : '#3c4356';
+      // 좀 더 게임(경기장) 바닥 같은 톤(선택한 배경 테마에 따라 색만 바뀜) + 타일 이음새 라인
+      ctx.fillStyle = isDark ? bgTheme.tileDark : bgTheme.tileLight;
       ctx.fillRect(s.x, s.y, TILE, TILE);
       ctx.strokeStyle = 'rgba(0,0,0,0.22)';
       ctx.lineWidth = 1;
       ctx.strokeRect(s.x + 0.5, s.y + 0.5, TILE - 1, TILE - 1);
-      // 타일 좌표 기반의 고정 패턴(매 프레임 랜덤이 아니라 항상 같은 자리)으로 미세한 스크래치 텍스처를 얹어
-      // 밋밋한 단색 바닥이 아니라 약간 낡고 사용감 있는 경기장 바닥처럼 보이게 함
+      // 타일 좌표 기반의 고정 패턴(매 프레임 랜덤이 아니라 항상 같은 자리)으로 테마별 장식(나무/파도/
+      // 자갈/꽃 등)을 얹어서 밋밋한 체크무늬 바닥이 아니라 실제 그 장소처럼 보이게 함
       const seed = ((tileIndexX * 928371 + tileIndexY * 136781) % 997 + 997) % 997;
-      if (seed % 4 === 0){
-        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-        ctx.lineWidth = 1;
-        const sx = s.x + (seed * 7) % (TILE - 6) + 3;
-        const sy = s.y + (seed * 17) % (TILE - 6) + 3;
-        ctx.beginPath();
-        ctx.moveTo(sx, sy);
-        ctx.lineTo(sx + 4 + (seed % 5), sy + 2 + (seed % 3));
-        ctx.stroke();
-      }
+      drawTileDecor(ctx, s, seed, TILE, bgTheme.id);
     }
   }
   // 경기장 중심은 밝고 가장자리로 갈수록 어두워지는 비네트(음영)를 얹어서 입체감/거리감을 줌
@@ -5098,7 +6639,7 @@ function renderPane(){
     centerScreen.x, centerScreen.y, currentBoundRadius()
   );
   vignette.addColorStop(0, 'rgba(0,0,0,0)');
-  vignette.addColorStop(1, 'rgba(0,0,0,0.4)');
+  vignette.addColorStop(1, bgTheme.vignette);
   ctx.fillStyle = vignette;
   ctx.fillRect(
     centerScreen.x - currentBoundRadius(), centerScreen.y - currentBoundRadius(),
@@ -5135,15 +6676,14 @@ function renderPane(){
     const s = worldToScreen(b.x, b.y);
     if (s.x < brickCullLeft || s.x > brickCullRight || s.y < brickCullTop || s.y > brickCullBottom) return;
 
-    let baseColor, mortarColor;
-    if (b.hp >= 3){ baseColor = '#8a4a3a'; mortarColor = '#5c2f24'; }      // 멀쩡한 벽돌: 붉은 벽돌색
-    else if (b.hp === 2){ baseColor = '#7d4335'; mortarColor = '#4a2a22'; } // 금이 가기 시작
-    else { baseColor = '#6e3c30'; mortarColor = '#3a2018'; }                // 거의 다 부서짐
+    // 배경 테마에 맞춰 벽돌 자체도 다른 재질(나무 상자/산호암반/골판지 상자/돌담/건초더미)로 바뀜
+    const brickStyle = getBrickStyle(bgTheme.id, b.hp);
+    const baseColor = brickStyle.base, mortarColor = brickStyle.mortar;
 
     ctx.fillStyle = baseColor;
     ctx.fillRect(s.x, s.y, b.w, b.h);
 
-    // 위/왼쪽 하이라이트 + 아래/오른쪽 그림자로 살짝 입체적인 벽돌 블록처럼 보이게 함
+    // 위/왼쪽 하이라이트 + 아래/오른쪽 그림자로 살짝 입체적인 블록처럼 보이게 함(재질과 무관하게 공통)
     ctx.fillStyle = 'rgba(255,255,255,0.14)';
     ctx.fillRect(s.x, s.y, b.w, 2);
     ctx.fillRect(s.x, s.y, 2, b.h);
@@ -5151,15 +6691,50 @@ function renderPane(){
     ctx.fillRect(s.x, s.y + b.h - 2, b.w, 2);
     ctx.fillRect(s.x + b.w - 2, s.y, 2, b.h);
 
-    // 위/아래 줄이 반 칸씩 어긋나는 실제 벽돌쌓기 패턴의 줄눈(모르타르 선)
+    // 재질별 이음선/무늬: 나무상자는 세로 판자선, 산호암반은 불규칙 균열선, 골판지상자는 테이프 십자선,
+    // 돌담은 기존 벽돌 줄눈, 건초더미는 가로 묶음선
     ctx.strokeStyle = mortarColor;
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(s.x, s.y + b.h/2); ctx.lineTo(s.x + b.w, s.y + b.h/2);
-    ctx.moveTo(s.x + b.w/2, s.y); ctx.lineTo(s.x + b.w/2, s.y + b.h/2);
-    ctx.moveTo(s.x + b.w/4, s.y + b.h/2); ctx.lineTo(s.x + b.w/4, s.y + b.h);
-    ctx.moveTo(s.x + b.w*3/4, s.y + b.h/2); ctx.lineTo(s.x + b.w*3/4, s.y + b.h);
+    if (brickStyle.pattern === 'plank'){
+      ctx.moveTo(s.x + b.w/3, s.y); ctx.lineTo(s.x + b.w/3, s.y + b.h);
+      ctx.moveTo(s.x + b.w*2/3, s.y); ctx.lineTo(s.x + b.w*2/3, s.y + b.h);
+    } else if (brickStyle.pattern === 'coral'){
+      ctx.moveTo(s.x, s.y + b.h*0.3); ctx.lineTo(s.x + b.w*0.4, s.y + b.h*0.5); ctx.lineTo(s.x + b.w, s.y + b.h*0.35);
+      ctx.moveTo(s.x + b.w*0.2, s.y); ctx.lineTo(s.x + b.w*0.35, s.y + b.h);
+    } else if (brickStyle.pattern === 'box'){
+      ctx.moveTo(s.x, s.y + b.h/2); ctx.lineTo(s.x + b.w, s.y + b.h/2);
+      ctx.moveTo(s.x + b.w/2, s.y); ctx.lineTo(s.x + b.w/2, s.y + b.h);
+    } else if (brickStyle.pattern === 'hay'){
+      ctx.moveTo(s.x, s.y + b.h*0.3); ctx.lineTo(s.x + b.w, s.y + b.h*0.3);
+      ctx.moveTo(s.x, s.y + b.h*0.7); ctx.lineTo(s.x + b.w, s.y + b.h*0.7);
+    } else { // stone(돌담): 기존 벽돌쌓기 줄눈 패턴
+      ctx.moveTo(s.x, s.y + b.h/2); ctx.lineTo(s.x + b.w, s.y + b.h/2);
+      ctx.moveTo(s.x + b.w/2, s.y); ctx.lineTo(s.x + b.w/2, s.y + b.h/2);
+      ctx.moveTo(s.x + b.w/4, s.y + b.h/2); ctx.lineTo(s.x + b.w/4, s.y + b.h);
+      ctx.moveTo(s.x + b.w*3/4, s.y + b.h/2); ctx.lineTo(s.x + b.w*3/4, s.y + b.h);
+    }
     ctx.stroke();
+
+    // 재질별 자잘한 포인트 장식(나무 옹이/따개비/테이프 조각/짚 결)
+    if (brickStyle.pattern === 'box'){
+      ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      ctx.fillRect(s.x + b.w*0.35, s.y, b.w*0.3, 3);
+    } else if (brickStyle.pattern === 'coral'){
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.beginPath(); ctx.arc(s.x + b.w*0.7, s.y + b.h*0.25, 1.5, 0, Math.PI*2); ctx.fill();
+    } else if (brickStyle.pattern === 'plank'){
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.beginPath(); ctx.arc(s.x + b.w*0.5, s.y + b.h*0.35, 2, 0, Math.PI*2); ctx.fill();
+    } else if (brickStyle.pattern === 'hay'){
+      ctx.strokeStyle = 'rgba(120,80,10,0.4)'; ctx.lineWidth = 0.8;
+      for (let i=0;i<3;i++){
+        ctx.beginPath();
+        ctx.moveTo(s.x+3+i*(b.w-6)/2, s.y+2);
+        ctx.lineTo(s.x+1+i*(b.w-6)/2, s.y+b.h-2);
+        ctx.stroke();
+      }
+    }
 
     // 데미지를 한 번이라도 입었으면(hp<=2) 금이 가기 시작하고, 거의 다 부서지면(hp===1) 균열이
     // 더 늘어나면서 모서리 한쪽이 아예 떨어져나간 것처럼 표시
@@ -5228,9 +6803,13 @@ function renderPane(){
     ctx.fillText(itemIcon, s.x, s.y+1);
   });
 
-  // 코인: 회전하는 듯한 느낌을 주기 위해 가로 폭을 사인파로 눌러 스핀 효과를 줌
+  // 코인: 회전하는 듯한 느낌을 주기 위해 가로 폭을 사인파로 눌러 스핀 효과를 줌.
+  // (최적화) 매 프레임 shadowBlur로 다시 그리는 대신 미리 구워둔 coinSprite를 drawImage로
+  // 붙여넣고, 화면 밖 코인은 브릭과 같은 방식으로 컬링해서 코인이 많아져도 가볍게 유지함
   coins.forEach(c=>{
     const s = worldToScreen(c.x, c.y);
+    if (s.x < brickCullLeft || s.x > brickCullRight || s.y < brickCullTop || s.y > brickCullBottom) return;
+
     const fallOffset = c.fallHeight || 0;
     // 하늘에서 떨어지는 중이면 바닥(착지 지점)에 옅은 그림자를 먼저 그려서 높이감을 줌
     if (fallOffset > 2){
@@ -5242,26 +6821,12 @@ function renderPane(){
     const sy = s.y - fallOffset;
     const spin = Math.sin(performance.now()/280 + c.spin);
     const squashX = Math.max(0.25, Math.abs(spin));
+
     ctx.save();
     ctx.translate(s.x, sy);
-    ctx.scale(squashX, 1);
-    ctx.beginPath();
-    ctx.arc(0, 0, c.radius || 8, 0, Math.PI*2);
-    ctx.fillStyle = '#ffd23d';
-    ctx.shadowColor = '#ffd23d';
-    ctx.shadowBlur = 12;
-    ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.strokeStyle = '#a8790a';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
+    ctx.scale(squashX * ((c.radius||8)/8), (c.radius||8)/8);
+    ctx.drawImage(coinSprite, -COIN_SPRITE_SIZE/2, -COIN_SPRITE_SIZE/2);
     ctx.restore();
-    if (squashX > 0.5){
-      ctx.fillStyle = '#a8790a';
-      ctx.font = 'bold 10px sans-serif';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('$', s.x, sy+1);
-    }
   });
 
   // 폭탄: 은은한 채움 원 + 회전하는 점선 테두리로 범위를 표시함. 크기가 커졌다 작아졌다 하는
@@ -5653,12 +7218,24 @@ function renderPane(){
 
     ctx.save();
     ctx.translate(s.x, s.y);
-    ctx.rotate(ch.angle); // 이후로는 +x축이 "정면" 방향이 됨
 
     const skinShade = shadeColor(bodyFillColor, -35); // 손/발(맨살 느낌) 음영
     // 상점에서 장착한 모양(기본/로봇/닌자/자이언트)에 따라 몸통·머리·팔다리를 원/사각/마름모 중
     // 무엇으로 그릴지, 그리고 각 부위 크기를 얼마나 키우거나 줄일지가 결정됨
     const sp = getShapeParams(ch);
+
+    if (sp.kind === 'robot' || sp.kind === 'sprout' || sp.kind === 'boba' || sp.kind === 'bread' || RETRO_BOT_SPECS[sp.kind]){
+      // 버디봇/새싹 화분/버블티/식빵/레트로 픽셀 로봇 20종: 캐릭터가 계속 빙글빙글 도는 대신,
+      // 시선 각도(ch.angle)에 따라 8방향(동서남북+대각선) 중 하나를 골라서 그림(스프라이트 자체는
+      // 회전시키지 않음). 몸체의 주 색상은 플레이어가 지정한 색을 따름.
+      if (sp.kind === 'robot') drawBuddyBot(ctx, ch, chargeScale, legSwing, bodyFillColor);
+      else if (sp.kind === 'sprout') drawSproutPot(ctx, ch, chargeScale, legSwing, bodyFillColor);
+      else if (sp.kind === 'boba') drawBubbleTea(ctx, ch, chargeScale, legSwing, bodyFillColor);
+      else if (sp.kind === 'bread') drawToastBread(ctx, ch, chargeScale, legSwing, bodyFillColor);
+      else drawRetroBot(ctx, ch, chargeScale, legSwing, bodyFillColor, RETRO_BOT_SPECS[sp.kind]);
+      ctx.restore();
+    } else {
+      ctx.rotate(ch.angle); // 이후로는 +x축이 "정면" 방향이 됨
 
     // 다리 (몸통 뒤쪽, 좌우 번갈아 앞뒤로 스윙) + 발끝에 작은 신발 포인트
     [legSwing, -legSwing].forEach(off=>{
@@ -5722,6 +7299,7 @@ function renderPane(){
     ctx.fill();
 
     ctx.restore();
+    } // else (sp.kind !== 'robot') 끝
 
     // 캐릭터 머리 위 체력(데미지%) 바: 예전엔 좌상단 목록에서만 보였는데, 전투 중 누가 위험한지
     // 한눈에 보이도록 캐릭터 본인 위에 직접 표시함 (죽어서 관전 대기 중일 땐 표시하지 않음).
