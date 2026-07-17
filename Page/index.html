@@ -515,6 +515,26 @@
   #wrap.mobileUI .skinCard { padding: 8px 6px; }
   #wrap.mobileUI #shopBackBtn, #wrap.mobileUI #pauseButtons button { padding: 9px 22px; font-size: 12px; }
 </style>
+<!-- ===== Firebase (Google 로그인 + Firestore 저장) =====
+     아래 firebaseConfig 값은 실제 값으로 바꿔야 동작합니다. Firebase 콘솔(console.firebase.google.com)에서
+     프로젝트를 만들고 "웹 앱 추가" 후 나오는 설정 객체를 그대로 붙여넣으세요.
+     - Authentication > Sign-in method 에서 "Google" 제공업체를 사용 설정해야 합니다.
+     - Firestore Database를 생성해야 합니다(테스트 모드로 시작 가능, 이후 보안 규칙 설정 권장). -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDZ4AS1I3HPz22Q-NP-9RnxoEcmMlw2Kng",
+    authDomain: "impactdash-b1011.firebaseapp.com",
+    projectId: "impactdash-b1011",
+    storageBucket: "impactdash-b1011.firebasestorage.app",
+    messagingSenderId: "333141644742",
+    appId: "1:333141644742:web:e56003417ff9b700cfcec7",
+    measurementId: "G-159NMS0TRR"
+  };
+  firebase.initializeApp(firebaseConfig);
+</script>
 </head>
 <body>
 <div id="wrap">
@@ -522,6 +542,10 @@
   <div id="pauseBtn">⏸</div>
   <!-- 게임 시작 전 메뉴 화면 최상단 우측에 항상 떠 있는 상태 요약(레벨/등급/보유 코인) -->
   <div id="topStatusHeader" style="display:none;">
+    <div id="topStatusAccount" class="topStatusItem" style="cursor:pointer; display:flex; align-items:center; gap:4px; pointer-events:auto;">
+      <img id="topStatusAccountPhoto" src="" style="display:none; width:18px; height:18px; border-radius:50%; vertical-align:middle;">
+      <span id="topStatusAccountLabel">🔐 Google 로그인</span>
+    </div>
     <div id="topStatusRank" class="topStatusItem"></div>
     <div id="topStatusLevel" class="topStatusItem"></div>
     <div id="topStatusCoins" class="topStatusItem"></div>
@@ -1066,6 +1090,7 @@ function loadWallet(){
 let walletCoins = loadWallet();
 function saveWallet(){
   try { localStorage.setItem(WALLET_STORAGE_KEY, String(walletCoins)); } catch(e){}
+  scheduleCloudSync();
 }
 function addCoins(n){
   walletCoins += n;
@@ -1116,6 +1141,7 @@ function loadRankStats(){
 let rankStats = loadRankStats();
 function saveRankStats(){
   try{ localStorage.setItem(RANK_STATS_STORAGE_KEY, JSON.stringify(rankStats)); } catch(e){}
+  scheduleCloudSync();
 }
 
 // ---- 20단계 등급: 5개 "밴드"(루키/브레이커/스매셔/임팩터/레전드) x 밴드당 4단계(IV~I, I가 최고) ----
@@ -1311,6 +1337,7 @@ function loadOwnedSkins(){
 let ownedSkins = loadOwnedSkins();
 function saveOwnedSkins(){
   try { localStorage.setItem(OWNED_SKINS_STORAGE_KEY, JSON.stringify([...ownedSkins])); } catch(e){}
+  scheduleCloudSync();
 }
 
 function loadEquippedSkin(){
@@ -1322,7 +1349,130 @@ function loadEquippedSkin(){
 let equippedSkinId = loadEquippedSkin();
 function saveEquippedSkin(){
   try { localStorage.setItem(EQUIPPED_SKIN_STORAGE_KEY, equippedSkinId); } catch(e){}
+  scheduleCloudSync();
 }
+
+// ================= Google 로그인 + Firestore 클라우드 저장 =================
+// 로그인하지 않은 상태(게스트)에서는 지금처럼 이 브라우저(localStorage)에만 저장됨.
+// 구글 로그인을 하면: (1) 화면에 표시되는 이름이 구글 계정 이름/프로필 사진으로 바뀌고,
+// (2) 로그인 시 Firestore에 저장돼 있던 레벨(xp)/코인/보유 스킨을 불러와 이 브라우저 값을 덮어쓰며,
+// (3) 이후 코인/경험치가 바뀔 때마다 Firestore의 내 계정 문서(players/{uid})에도 함께 저장됨 ->
+//     다른 기기/브라우저에서 같은 구글 계정으로 로그인해도 같은 레벨/코인이 이어짐.
+const auth = firebase.auth();
+const db = firebase.firestore();
+let currentUser = null; // 로그인 중이면 firebase User 객체, 아니면 null(게스트)
+let cloudSyncTimer = null;
+
+function firestorePlayerDocRef(uid){
+  return db.collection('players').doc(uid);
+}
+
+// 코인/경험치/스킨이 바뀔 때마다 매번 즉시 쓰지 않고 살짝 모아서(0.8초) 한 번에 저장 -> 짧은 시간에
+// 여러 번 바뀌어도(코인을 연달아 여러 개 주울 때 등) Firestore 쓰기 횟수를 과하게 늘리지 않기 위함.
+function scheduleCloudSync(){
+  if (!currentUser) return; // 게스트면 클라우드에 저장할 계정이 없으니 아무것도 안 함
+  clearTimeout(cloudSyncTimer);
+  cloudSyncTimer = setTimeout(()=>{
+    firestorePlayerDocRef(currentUser.uid).set({
+      name: currentUser.displayName || '플레이어',
+      photoURL: currentUser.photoURL || null,
+      walletCoins,
+      rankStats,
+      ownedSkins: [...ownedSkins],
+      equippedSkinId,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true }).catch((e)=> console.warn('[cloud] 저장 실패:', e));
+  }, 800);
+}
+
+// 로그인 직후: Firestore에 저장된 값이 있으면 그 값으로 현재 값을 덮어써서 "이어서" 플레이할 수 있게 함.
+// 저장된 값이 없으면(첫 로그인) 지금 이 브라우저에 있던 값을 그대로 클라우드에 처음 올려줌.
+async function pullCloudDataOnLogin(user){
+  try {
+    const snap = await firestorePlayerDocRef(user.uid).get();
+    if (snap.exists){
+      const data = snap.data() || {};
+      if (typeof data.walletCoins === 'number'){ walletCoins = Math.max(0, data.walletCoins|0); saveWallet(); }
+      if (data.rankStats && typeof data.rankStats === 'object'){
+        rankStats = {
+          totalKO: Math.max(0, data.rankStats.totalKO|0),
+          totalDeaths: Math.max(0, data.rankStats.totalDeaths|0),
+          roundsPlayed: Math.max(0, data.rankStats.roundsPlayed|0),
+          wins: Math.max(0, data.rankStats.wins|0),
+          xp: Math.max(0, data.rankStats.xp|0),
+          strongKillScore: Math.max(0, data.rankStats.strongKillScore||0)
+        };
+        saveRankStats();
+      }
+      if (Array.isArray(data.ownedSkins)){
+        ownedSkins = new Set(data.ownedSkins); ownedSkins.add('default'); saveOwnedSkins();
+      }
+      if (data.equippedSkinId && SKINS.some(s=> s.id === data.equippedSkinId)){
+        equippedSkinId = data.equippedSkinId; saveEquippedSkin();
+      }
+    } else {
+      scheduleCloudSync(); // 클라우드에 아직 기록이 없으면 지금 값을 그대로 최초 업로드
+    }
+  } catch(e){
+    console.warn('[cloud] 불러오기 실패:', e);
+  } finally {
+    updateWalletDisplays();
+    updateTopStatusHeader();
+    if (typeof refreshShopUI === 'function') { try { refreshShopUI(); } catch(e){} }
+  }
+}
+
+function googleSignIn(){
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch((e)=>{
+    console.warn('[auth] 구글 로그인 실패:', e);
+    alert('구글 로그인에 실패했습니다: ' + (e && e.message ? e.message : e));
+  });
+}
+function googleSignOut(){ auth.signOut(); }
+
+function updateAccountUI(){
+  const labelEl = document.getElementById('topStatusAccountLabel');
+  const photoEl = document.getElementById('topStatusAccountPhoto');
+  if (!labelEl || !photoEl) return;
+  if (currentUser){
+    labelEl.textContent = currentUser.displayName || '플레이어';
+    if (currentUser.photoURL){ photoEl.src = currentUser.photoURL; photoEl.style.display = 'inline-block'; }
+    else { photoEl.style.display = 'none'; }
+  } else {
+    labelEl.textContent = '🔐 Google 로그인';
+    photoEl.style.display = 'none';
+  }
+}
+
+auth.onAuthStateChanged((user)=>{
+  currentUser = user;
+  updateAccountUI();
+  if (user){
+    // 닉네임 입력칸을 구글 계정 이름으로 바꾸고, 직접 못 고치게 잠가서 "플레이어 정보 = 구글 정보"가 되게 함
+    netLocalName = user.displayName || '플레이어';
+    const nameEl = document.getElementById('onlineName');
+    if (nameEl){ nameEl.value = netLocalName; nameEl.readOnly = true; }
+    pullCloudDataOnLogin(user);
+  } else {
+    const nameEl = document.getElementById('onlineName');
+    if (nameEl){ nameEl.readOnly = false; }
+  }
+});
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  const accountEl = document.getElementById('topStatusAccount');
+  if (accountEl){
+    accountEl.addEventListener('click', ()=>{
+      if (currentUser){
+        if (confirm('로그아웃 하시겠어요?')) googleSignOut();
+      } else {
+        googleSignIn();
+      }
+    });
+  }
+});
+
 function getEquippedShape(){
   const skin = SKINS.find(s=> s.id === equippedSkinId);
   return skin ? skin.shape : SKINS[0].shape;
@@ -4370,7 +4520,8 @@ function startGame(aiCount){
     const ch = makeCharacter(positions[i].x, positions[i].y, color, false);
     // 상점에서 산 캐릭터 모양은 색상과 무관하므로 팀전/개인전 상관없이 1P(슬롯 0)에 항상 적용됨
     if (i === 0) ch.shape = getEquippedShape();
-    ch.label = (i === 0) ? 'PLAYER' : ('PLAYER ' + (i+1));
+    // 1P(슬롯 0)는 구글 로그인 중이면 구글 계정 이름을 그대로 표시함
+    ch.label = (i === 0) ? ((currentUser && currentUser.displayName) || 'PLAYER') : ('PLAYER ' + (i+1));
     ch.slotIndex = i;
     ch.cam = { x: positions[i].x, y: positions[i].y };
     ch.gamepadIndex = connectedPads[i] ? connectedPads[i].index : null;
