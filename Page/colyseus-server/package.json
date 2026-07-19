@@ -16,6 +16,6 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.4",
-    "colyseus.js": "0.15.28"
+    "colyseus.js": "^0.16.22"
   }
 }
