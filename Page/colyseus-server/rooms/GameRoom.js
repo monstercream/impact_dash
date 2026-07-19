@@ -78,7 +78,10 @@ class GameRoom extends Room {
     // rankTier: 클라이언트(index.html)가 접속 시 자기 기기에 저장된 등급(0~19)을 함께 보내줌.
     // 서버는 이 값의 의미를 모르고 그냥 그대로 보관/중계만 함 - 실제 등급 계산/표시는 클라이언트가 함.
     const rankTier = (options && typeof options.rankTier === 'number') ? options.rankTier : null;
-    this.playerMeta.set(client.sessionId, { index, name, ready: false, rankTier });
+    // photoURL: 클라이언트가 구글 로그인 중이면 프로필 사진 주소를 함께 보내줌(없으면 null 그대로
+    // 두고, 클라이언트가 기본 아이콘을 표시함). 서버는 이 값의 의미를 모르고 그냥 보관/중계만 함.
+    const photoURL = (options && typeof options.photoURL === 'string') ? options.photoURL : null;
+    this.playerMeta.set(client.sessionId, { index, name, ready: false, rankTier, photoURL });
 
     if (!this.hostSessionId) {
       this.hostSessionId = client.sessionId;
@@ -114,7 +117,8 @@ class GameRoom extends Room {
       name: meta.name,
       ready: !!meta.ready,
       isHost: sessionId === this.hostSessionId,
-      rankTier: meta.rankTier
+      rankTier: meta.rankTier,
+      photoURL: meta.photoURL || null
     }));
     this.broadcast('room-info', { hostSessionId: this.hostSessionId, players, maxClients: ROOM_MAX_CLIENTS });
   }

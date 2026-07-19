@@ -125,6 +125,23 @@
     background: linear-gradient(90deg,#ffe45b,#ff8c00); color: #221800; cursor: pointer;
     letter-spacing: 1px;
   }
+  /* 결과 화면의 "광고 보고 코인 2배 받기" 버튼: 코인 색(금색) 테마로 다른 게임 버튼들과 통일감 있게 */
+  #watchAdDoubleBtn {
+    padding: 10px 26px; font-size: 13px; font-weight: bold; border-radius: 8px;
+    border: 1px solid #ffd23d; background: rgba(255,210,61,0.14); color: #ffd23d;
+    cursor: pointer; letter-spacing: 0.5px; margin: 8px 0 4px;
+  }
+  #watchAdDoubleBtn:hover { background: rgba(255,210,61,0.26); }
+  #watchAdDoubleBtn:disabled { opacity: 0.5; cursor: default; }
+  /* 캐릭터 이름 옆에 붙는 아이콘(구글 로그인 프로필 사진, 또는 로그인 안 했을 때/AI용 기본 아이콘) */
+  .playerIcon {
+    width: 16px; height: 16px; border-radius: 50%; object-fit: cover;
+    vertical-align: -3px; margin-right: 3px; flex-shrink: 0;
+  }
+  .playerIconDefault {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.12); font-size: 10px; line-height: 1;
+  }
   /* ===== 싱글/멀티 모드 선택 + 멀티플레이 로비 UI ===== */
   .stackPanel { display: flex; flex-direction: column; align-items: center; }
   .bigChoiceRow { display: flex; gap: 14px; justify-content: center; margin-bottom: 18px; }
@@ -589,7 +606,7 @@
   <div id="roundHud" style="display:none;">
     <span id="roundTimer">60s</span>
     <span id="myKoCount">내 KO 0</span>
-    <span id="roundWalletAmount">🪙 0</span>
+    <span id="roundWalletAmount" style="display:none;">🪙 0</span>
   </div>
   <div id="msg"></div>
   <div id="killFeed"></div>
@@ -611,7 +628,7 @@
   <div id="startScreen">
     <div id="startPanel">
       <h1>IMPACT DASH 2.0</h1>
-      <p id="walletDisplay">🪙 보유 코인: <span id="walletAmount">0</span></p>
+      <p id="walletDisplay" style="display:none;">🪙 보유 코인: <span id="walletAmount">0</span></p>
 
       <!-- ===== 0단계: 싱글/멀티 모드 선택 ===== -->
       <div id="modeSelectPanel" class="stackPanel">
@@ -751,7 +768,7 @@
   <div id="shopScreen">
     <div id="shopPanel">
       <h2>🛒 캐릭터 상점</h2>
-      <p id="shopWalletDisplay">🪙 보유 코인: <span id="shopWalletAmount">0</span></p>
+      <p id="shopWalletDisplay" style="display:none;">🪙 보유 코인: <span id="shopWalletAmount">0</span></p>
       <p style="color:#bbb;font-size:12px;margin:0 0 14px;">캐릭터 모양(형태)을 구매하고 장착해보세요 (장착한 모양은 1P 캐릭터에 적용됩니다)</p>
       <div id="shopGrid"></div>
       <button id="shopBackBtn">돌아가기</button>
@@ -1311,6 +1328,32 @@ function rankEmblemHtml(tierIndex){
   if (typeof tierIndex !== 'number') return '';
   const info = getRankTierInfo(tierIndex);
   return '<img class="rankEmblem" src="' + getRankBadgeDataUri(tierIndex) + '" title="' + info.name + '" alt="' + info.name + '">';
+}
+
+// 캐릭터 이름 옆에 붙는 아이콘: 구글 로그인 프로필 사진이 있으면 그걸, 없으면(로그인 안 함/AI)
+// 기본 아이콘(이모지)을 보여줌.
+function playerIconHtml(photoURL, isAI){
+  if (photoURL){
+    return '<img class="playerIcon" src="' + photoURL + '" referrerpolicy="no-referrer" alt="">';
+  }
+  return '<span class="playerIcon playerIconDefault">' + (isAI ? '🤖' : '👤') + '</span>';
+}
+
+// 캐릭터 객체(ch)에 맞는 프로필 사진 주소를 찾음.
+// - 온라인 모드에서 나 또는 다른 참가자(netSessionId가 있음): netRoomInfo.players에서 같은
+//   sessionId를 찾아 그 사람이 접속할 때 함께 보낸 photoURL을 씀(구글 로그인 중이었다면 채워져 있음).
+// - 그 외 로컬 1P(온라인이 아니거나, 슬롯 0)는 내 currentUser.photoURL을 그대로 씀.
+// - AI나 로그인 안 한 사람은 null을 반환해 기본 아이콘이 쓰이게 함.
+function getCharacterPhotoURL(ch){
+  if (ch.netSessionId){
+    const players = (netRoomInfo && netRoomInfo.players) || [];
+    const p = players.find(pl=> pl.sessionId === ch.netSessionId);
+    return (p && p.photoURL) || null;
+  }
+  if (isHuman(ch) && ch.slotIndex === 0){
+    return (currentUser && currentUser.photoURL) || null;
+  }
+  return null;
 }
 // 라운드 종료 팝업(경험치 게이지/등급 변경)에 쓰이는 더 큰 원형 등급 엠블럼. HUD용 rankEmblemHtml()과
 // 달리 배지 자체가 원형 컨테이너(.popupRankEmblemSmall/.popupRankEmblemBig)라서, innerHTML로 작은
@@ -1974,7 +2017,7 @@ if (watchAdDoubleBtnEl){
     showFakeRewardAd(()=>{
       addCoins(lastRoundCoinEarned); // 같은 금액을 한 번 더 지급 -> 결과적으로 2배
       adDoubleUsedThisRound = true;
-      resultsCoinGainEl.textContent = '🪙 라운드 보상 +' + (lastRoundCoinEarned*2) + ' 코인 (광고 2배 적용, 보유 ' + walletCoins + ')';
+      resultsCoinGainEl.textContent = '🪙 라운드 보상 +' + (lastRoundCoinEarned*2) + ' 코인 (광고 2배 적용됨)';
       watchAdDoubleBtnEl.style.display = 'none';
     });
   });
@@ -3727,7 +3770,8 @@ let lastAiCount = 1;       // 다시 플레이시 재사용할 AI 인원수
 let isSpectatingNow = false; // (레거시) 게임 시작 전 기본값 렌더용
 
 const AI_COLORS = ['#3b7bff', '#3bffa0', '#ffb03b', '#c060ff', '#ff5fc0'];
-const AI_LABELS = ['AI 1', 'AI 2', 'AI 3', 'AI 4', 'AI 5'];
+// AI 캐릭터 닉네임 - 게임의 레트로 가젯 컨셉에 맞춘 이름 몇 개를 골라 순서대로 배정함
+const AI_LABELS = ['토스티', '삐삐봇', '디스켓군', '라디오냥', '캐시테잎', '조이스틱', '플러기', '캔디봇'];
 const PLAYER_COLORS = ['#ff3b3b', '#3bd0ff', '#8cff5b', '#ffb84d']; // 개인전일 때 1P~4P 기본 색
 
 // 캐릭터 수에 맞춰 중심 주위에 고르게 배치될 스폰 좌표를 만들어줌
@@ -3918,7 +3962,7 @@ async function netConnectAsHost(){
   try{
     netClient = new Colyseus.Client(serverUrl);
     // rankTier: 접속하는 시점의 내 등급을 함께 보내서, 다른 참가자들 화면에도 내 등급 엠블럼이 보이게 함
-    netRoom = await netClient.create('game', { roomCode, name, rankTier: computeRankTierIndex(rankStats) }); // 항상 새 방을 만듦 = 내가 호스트
+    netRoom = await netClient.create('game', { roomCode, name, rankTier: computeRankTierIndex(rankStats), photoURL: (currentUser && currentUser.photoURL) || null }); // 항상 새 방을 만듦 = 내가 호스트
     netMySessionId = netRoom.sessionId;
     netConnected = true;
     netIsHost = true;
@@ -3939,7 +3983,7 @@ async function netConnectAsGuest(){
   netSetConnectStatus('방 찾는 중...', '#ffd23d');
   try{
     netClient = new Colyseus.Client(serverUrl);
-    netRoom = await netClient.join('game', { roomCode, name, rankTier: computeRankTierIndex(rankStats) }); // 이미 존재하는(호스트가 만든) 방에만 참가
+    netRoom = await netClient.join('game', { roomCode, name, rankTier: computeRankTierIndex(rankStats), photoURL: (currentUser && currentUser.photoURL) || null }); // 이미 존재하는(호스트가 만든) 방에만 참가
     netMySessionId = netRoom.sessionId;
     netConnected = true;
     netIsHost = false;
@@ -4001,7 +4045,7 @@ async function netJoinRoomById(serverUrl, roomId){
   netSaveRememberedConnectInfo(name);
   try{
     netClient = new Colyseus.Client(serverUrl);
-    netRoom = await netClient.joinById(roomId, { name, rankTier: computeRankTierIndex(rankStats) });
+    netRoom = await netClient.joinById(roomId, { name, rankTier: computeRankTierIndex(rankStats), photoURL: (currentUser && currentUser.photoURL) || null });
     netMySessionId = netRoom.sessionId;
     netConnected = true;
     netIsHost = false;
@@ -4081,7 +4125,7 @@ function netRenderLobby(){
       else tagsHtml += p.ready ? '<span class="lobbyReadyTag">준비완료</span>' : '<span class="lobbyWaitTag">대기중</span>';
       let kickHtml = '';
       if (netIsHost && !p.isHost) kickHtml = '<button class="lobbyKickBtn" data-kick="' + p.sessionId + '">추방</button>';
-      row.innerHTML = '<span class="lobbyPlayerName">' + p.name + (p.sessionId === netMySessionId ? ' (나)' : '') + '</span>' + tagsHtml + kickHtml;
+      row.innerHTML = '<span class="lobbyPlayerName">' + playerIconHtml(p.photoURL, false) + p.name + (p.sessionId === netMySessionId ? ' (나)' : '') + '</span>' + tagsHtml + kickHtml;
       listEl.appendChild(row);
     });
     listEl.querySelectorAll('[data-kick]').forEach(btn=>{
@@ -4758,7 +4802,7 @@ function showResultsScreen(){
       row.innerHTML =
         '<div class="resultRank">' + RANK_MEDALS[i] + '</div>' +
         '<span class="colorDot" style="background:' + ch.color + ';"></span>' +
-        '<div class="resultName" style="color:' + ch.color + ';">' + rankEmblemHtml(ch.rankTierIndex) + ch.label + (isHuman(ch) ? ' (나)' : '') + '</div>' +
+        '<div class="resultName" style="color:' + ch.color + ';">' + playerIconHtml(getCharacterPhotoURL(ch), !isHuman(ch) && !ch.netSessionId) + rankEmblemHtml(ch.rankTierIndex) + ch.label + (isHuman(ch) ? ' (나)' : '') + '</div>' +
         '<div class="resultStats">KO ' + (ch.koScore||0) + ' · 사망 ' + (ch.deathCount||0) +
           ((ch.maxComboCount||0) >= 2 ? ' · 최대 연속킬 ' + ch.maxComboCount : '') + '</div>';
       resultsListEl.appendChild(row);
@@ -4769,7 +4813,7 @@ function showResultsScreen(){
   adDoubleUsedThisRound = false;
   if (totalEarned > 0){
     addCoins(totalEarned);
-    resultsCoinGainEl.textContent = '🪙 라운드 보상 +' + totalEarned + ' 코인 (보유 ' + walletCoins + ')';
+    resultsCoinGainEl.textContent = '🪙 라운드 보상 +' + totalEarned + ' 코인';
     resultsCoinGainEl.style.display = 'block';
     if (watchAdDoubleBtnEl){ watchAdDoubleBtnEl.style.display = 'block'; watchAdDoubleBtnEl.disabled = false; }
   } else {
@@ -6096,8 +6140,10 @@ function buildHud(){
     row.style.borderLeft = '4px solid ' + ch.color;
     // 체력(데미지%) 바는 이제 여기(좌상단 목록)가 아니라 캐릭터 머리 위에 표시되므로,
     // 이 목록에는 이름과 KO/사망 숫자만 보여줌
+    const isAiChar = !isHuman(ch) && !ch.netSessionId;
     row.innerHTML =
       '<div class="hudName"><span class="colorDot" style="background:' + ch.color + ';"></span>' +
+        playerIconHtml(getCharacterPhotoURL(ch), isAiChar) +
         rankEmblemHtml(ch.rankTierIndex) +
         ch.label + (isHuman(ch) ? ' (나)' : '') +
         (isHuman(ch) ? ' <span id="hudctl_' + idx + '" style="font-weight:normal;color:#ffb84d;"></span>' : '') +
