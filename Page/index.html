@@ -4307,6 +4307,14 @@ function netSerializeState(){
 // 오히려 이상해 보이므로 그런 경우엔 즉시 스냅(순간 이동)시킴.
 const NET_TELEPORT_DIST = 260; // 이보다 더 멀리 떨어져 있으면 보간 대신 즉시 스냅(부활/순간이동으로 간주)
 
+// ---- 클라이언트 예측 보정값: 게스트 자신의 캐릭터는 이제 서버 응답을 기다리지 않고 로컬에서
+// 먼저 움직인 뒤(updateOnlineClient의 예측 이동), 스냅샷이 도착할 때마다 그 결과와 살짝 어긋난
+// 만큼만 부드럽게 보정함. 다른 참가자처럼 매 프레임 강하게 서버 값 쪽으로 당기면(NET_POS_SMOOTH와
+// 동일하게) 예측한 의미가 없어져서 다시 둔하게 느껴지므로, 훨씬 약하게만 당김. ----
+const NET_PREDICT_CORRECT_DIST = 60;   // 이보다 오차가 크면(넉백 등으로 예측이 크게 못 따라간 경우) 더 강하게 보정
+const NET_PREDICT_CORRECT_SOFT = 0.10; // 평소(오차가 작을 때) 프레임당 보정 비율
+const NET_PREDICT_CORRECT_STRONG = 0.35; // 오차가 클 때 프레임당 보정 비율
+
 function netApplySnapshot(snap){
   if (!snap) return;
   roundTimeLeft = snap.t;
@@ -4348,7 +4356,18 @@ function netApplySnapshot(snap){
     });
 
     ch._netTargetX = sc.x; ch._netTargetY = sc.y; ch._netTargetAngle = sc.angle;
-    if (teleport){ ch.x = sc.x; ch.y = sc.y; ch.angle = sc.angle; }
+    if (teleport){
+      ch.x = sc.x; ch.y = sc.y; ch.angle = sc.angle;
+    } else if (sc.id === netMySessionId && !sc.dead){
+      // 내 캐릭터는 클라이언트 예측으로 이미 로컬에서 먼저 움직이고 있음(updateOnlineClient 참고).
+      // 매 프레임 서버 값 쪽으로 강하게 끌어당기면(다른 사람과 같은 방식) 예측 효과가 사라지므로,
+      // 예측이 서버와 어긋난 만큼("드리프트")만 살짝씩 보정함(오차가 크면 조금 더 강하게).
+      const driftX = sc.x - ch.x, driftY = sc.y - ch.y;
+      const drift = Math.hypot(driftX, driftY);
+      const pull = drift > NET_PREDICT_CORRECT_DIST ? NET_PREDICT_CORRECT_STRONG : NET_PREDICT_CORRECT_SOFT;
+      ch.x += driftX * pull;
+      ch.y += driftY * pull;
+    }
   });
   characters = characters.filter(c => seen[c.netSessionId || ('ai:' + (c.label||''))]);
   if (rosterChanged || characters.length !== prevCount){
@@ -4392,10 +4411,16 @@ const NET_POS_SMOOTH = 16;
 function netInterpolateEntities(dt){
   characters.forEach(ch=>{
     if (ch._netTargetX === undefined) return; // 스냅샷을 아직 한 번도 못 받은 캐릭터(있을 수 없지만 방어적으로)
-    const t = Math.min(1, dt * NET_POS_SMOOTH);
-    ch.x += (ch._netTargetX - ch.x) * t;
-    ch.y += (ch._netTargetY - ch.y) * t;
-    ch.angle = lerpAngle(ch.angle, ch._netTargetAngle, t);
+    // 내 캐릭터(살아있는 동안)는 updateOnlineClient에서 이미 예측으로 매 프레임 직접 움직이고
+    // 조준도 즉시 반영하므로, 여기서 또 서버 목표값 쪽으로 끌어당기면(다른 참가자와 같은 방식)
+    // 예측 효과가 사라짐 - 그래서 이 캐릭터만 위치/각도 보간을 건너뜀(보정은 netApplySnapshot에서 따로 함).
+    const isLocalPredicted = (netOnlineMode && !netIsHost && ch === player && !ch.dead);
+    if (!isLocalPredicted){
+      const t = Math.min(1, dt * NET_POS_SMOOTH);
+      ch.x += (ch._netTargetX - ch.x) * t;
+      ch.y += (ch._netTargetY - ch.y) * t;
+      ch.angle = lerpAngle(ch.angle, ch._netTargetAngle, t);
+    }
 
     // 스냅샷은 20Hz로만 오기 때문에, 그 사이 프레임에서는 로컬에서 차징/스윙 진행 상태를
     // 미리 조금씩 진행시켜서(호스트와 동일한 규칙으로) 애니메이션이 뚝뚝 끊기지 않고
@@ -4480,6 +4505,16 @@ function updateOnlineClient(dt){
   ch._prevMouseDown = !!mouse.down;
   ch._prevGpTrigger = gpInput.triggerHeld;
   if (releasedTouch) touchAim.justReleased = false;
+
+  // ---- 클라이언트 예측: 서버 왕복 지연(핑)을 기다리지 않고, 호스트와 완전히 동일한 물리 함수
+  // (updatePhysics)로 내 캐릭터를 로컬에서 바로 움직이고 조준도 즉시 반영함. 전투 판정(차징/스윙/
+  // 피격/점수)은 여전히 전부 호스트가 계산해서 스냅샷으로 내려주는 값만 그대로 따르고 여기서는
+  // 손대지 않으므로, 예측이 서버와 살짝 어긋나더라도 실제 게임 결과(승패/점수/피격)에는 영향이
+  // 없고 위치/조준의 "체감 반응 속도"만 좋아짐. 오차는 netApplySnapshot에서 조금씩 보정됨.
+  if (!ch.dead){
+    ch.angle = angle;
+    updatePhysics(ch, dt, px, py);
+  }
 
   // 입력은 초당 NET_INPUT_INTERVAL 주기로만 서버에 보냄(매 프레임 60회씩 보낼 필요는 없음).
   // wantRelease(스윙 놓기 등 순간 입력)는 놓치면 안 되므로, 그 프레임만큼은 주기를 무시하고 즉시 보냄.
