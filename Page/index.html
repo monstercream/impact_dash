@@ -677,13 +677,6 @@
         <div id="multiConnectPanel" class="stackPanel" style="display:none;">
           <p id="multiConnectTitle">방 접속 정보를 입력하세요</p>
           <div class="onlineFormCol">
-            <!-- 서버 주소는 한 번 입력해두면 이 기기에 기억되어 다음부터는 안 보여도 됨(방 이름/닉네임만
-                 입력하면 되게 하기 위함). 다른 서버로 바꿔야 할 때만 아래 링크로 펼쳐서 수정 가능함 -->
-            <button id="onlineServerUrlToggleBtn" type="button" class="onlineLinkBtn">⚙ 서버 주소 확인/변경</button>
-            <!-- ws://나 포트 번호(:2567) 없이 IP만 입력하면 됨 - 실제 접속 시 자동으로 붙여줌.
-                 IP 형태(숫자.숫자.숫자.숫자)나 localhost면 ws://+2567번을, 그 외(ngrok 같은 도메인
-                 형태)면 wss://(보안 터널)로 자동 판단함. -->
-            <input id="onlineServerUrl" type="text" placeholder="예: xxxx.trycloudflare.com (같은 기기면 localhost)" value="" class="onlineInput" style="display:none;">
             <!-- 게스트일 때만 보임: 방 코드를 직접 안 치고, 서버 주소만 입력한 뒤 지금 열려 있는 방
                  목록을 불러와서 그중 하나를 클릭해 바로 참가할 수 있게 함 -->
             <div id="onlineRoomListSection" style="display:none;">
@@ -1870,15 +1863,12 @@ function showMultiConnectPanel(mode){
   const statusEl = document.getElementById('multiConnectStatus');
   if (statusEl){ statusEl.textContent = ''; }
 
-  // 서버 주소는 호스트/게스트 둘 다 기본적으로 접어둠(한 번 입력해두면 이 기기에 계속 기억되므로
-  // 방 이름/닉네임만 입력하고 바로 진행 가능) - 다른 서버로 바꿔야 할 때만 위의 "⚙ 서버 주소 확인/변경"
-  // 링크를 눌러 펼쳐서 수정함. 게스트 화면은 여기에 더해 방 코드 입력과 접속 버튼도 숨기고 방 목록으로
-  // 바로 참가하는 방식으로 단순화함.
+  // 서버 주소는 Railway에 고정 배포한 주소 하나로 고정되어 있어서 더 이상 화면에 입력칸 자체가
+  // 없음(방 만들기/방 참가 버튼만 누르면 바로 그 서버로 연결됨). 게스트 화면은 방 코드 입력과
+  // 접속 버튼을 숨기고 방 목록에서 바로 골라 참가하는 방식으로 단순화함.
   const isGuest = (mode === 'guest');
-  const urlEl = document.getElementById('onlineServerUrl');
   const codeEl = document.getElementById('onlineRoomCode');
   const submitBtnEl = document.getElementById('multiConnectSubmitBtn');
-  if (urlEl) urlEl.style.display = 'none'; // 패널을 열 때마다 항상 접힌 상태로 초기화
   if (codeEl) codeEl.style.display = isGuest ? 'none' : 'block';
   if (submitBtnEl) submitBtnEl.style.display = isGuest ? 'none' : 'block';
 
@@ -3801,52 +3791,34 @@ function netMakeCharacterForPeer(meta, x, y, color){
   return ch;
 }
 
-// 서버 주소/닉네임은 매번 새로 입력하지 않아도 되도록 이 기기(브라우저)에 기억해둠 - 방 이름(코드)은
-// 판마다 다를 수 있어서 저장하지 않음. 이 덕분에 접속 화면을 열 때마다 주소 입력칸이 접혀 있어도
-// 예전에 입력해둔 값이 그대로 쓰임(다른 서버로 옮겼을 때만 "⚙ 서버 주소 확인/변경"으로 펼쳐서 수정).
-const NET_LAST_SERVER_URL_KEY = 'impactDash2_lastServerUrl';
+// 멀티플레이 서버 주소는 Railway에 고정 배포해둔 주소 하나로 고정함(더 이상 유저가 서버 주소를
+// 직접 입력할 필요가 없음 - 방 만들기/방 참가만 누르면 바로 이 서버로 연결됨).
+// 서버를 다른 곳으로 옮기게 되면 이 상수 하나만 바꾸면 됨.
+const NET_FIXED_SERVER_URL = 'wss://calm-eagerness-production-b9ab.up.railway.app';
+
+// 닉네임은 매번 새로 입력하지 않아도 되도록 이 기기(브라우저)에 기억해둠 - 방 이름(코드)은
+// 판마다 다를 수 있어서 저장하지 않음.
 const NET_LAST_PLAYER_NAME_KEY = 'impactDash2_lastPlayerName';
 function netLoadRememberedConnectInfo(){
   try {
-    const urlEl = document.getElementById('onlineServerUrl');
     const nameEl = document.getElementById('onlineName');
-    const savedUrl = localStorage.getItem(NET_LAST_SERVER_URL_KEY);
     const savedName = localStorage.getItem(NET_LAST_PLAYER_NAME_KEY);
-    if (urlEl && savedUrl) urlEl.value = savedUrl;
     if (nameEl && savedName) nameEl.value = savedName;
   } catch(e){}
 }
-function netSaveRememberedConnectInfo(serverUrl, name){
+function netSaveRememberedConnectInfo(name){
   try {
-    localStorage.setItem(NET_LAST_SERVER_URL_KEY, serverUrl);
     localStorage.setItem(NET_LAST_PLAYER_NAME_KEY, name);
   } catch(e){}
 }
-// 입력칸엔 "192.168.2.107"처럼 IP(또는 localhost)만 적으면 되게 하고, 실제 접속에 필요한
-// ws://.../:2567 형태는 여기서 자동으로 만들어줌.
-// - 이미 ws:// 또는 wss://로 직접 완전한 주소를 적었으면 그대로 존중함(고급 사용자용)
-// - "숫자.숫자.숫자.숫자" 또는 "localhost" 형태(뒤에 :포트를 직접 붙여도 됨)면 같은 기기/같은 네트워크/
-//   포트포워딩용 로컬·공인 IP로 보고 ws:// + 기본 포트(2567, 직접 포트를 안 적었을 때만)를 붙임
-// - 그 외(점이 있지만 숫자만은 아닌 문자, 예: cloudflared가 주는 xxxx.trycloudflare.com 같은 도메인)는
-//   암호화된 터널 주소로 보고 wss://를 붙이고 포트는 안 붙임(터널 서비스가 443으로 알아서 받아주므로)
-function netNormalizeServerAddress(raw){
-  const v = (raw || '').trim();
-  if (!v) return 'ws://localhost:2567';
-  if (/^wss?:\/\//i.test(v)) return v;
-  const m = v.match(/^((?:\d{1,3}\.){3}\d{1,3}|localhost)(?::(\d+))?$/i);
-  if (m) return 'ws://' + m[1] + ':' + (m[2] || '2567');
-  return 'wss://' + v;
-}
 
 function netReadConnectForm(){
-  const urlEl = document.getElementById('onlineServerUrl');
   const codeEl = document.getElementById('onlineRoomCode');
   const nameEl = document.getElementById('onlineName');
-  const rawUrl = (urlEl && urlEl.value.trim()) || 'localhost';
   const name = (nameEl && nameEl.value.trim()) || '플레이어';
-  netSaveRememberedConnectInfo(rawUrl, name); // 입력한 그대로(IP만) 기억해둠 - 다음에 열어도 IP만 보이게
+  netSaveRememberedConnectInfo(name);
   return {
-    serverUrl: netNormalizeServerAddress(rawUrl),
+    serverUrl: NET_FIXED_SERVER_URL,
     roomCode: (codeEl && codeEl.value.trim()) || 'default',
     name
   };
@@ -3989,9 +3961,7 @@ async function netRefreshRoomList(){
     netSetConnectStatus('Colyseus 클라이언트 스크립트를 불러오지 못했습니다 (인터넷 연결/CDN 확인)', '#ff6b6b');
     return;
   }
-  const urlEl = document.getElementById('onlineServerUrl');
-  const rawUrl = (urlEl && urlEl.value.trim()) || 'localhost';
-  const serverUrl = netNormalizeServerAddress(rawUrl);
+  const serverUrl = NET_FIXED_SERVER_URL;
   listEl.innerHTML = '<div class="onlineRoomListEmpty">불러오는 중...</div>';
   try {
     // 방 목록 조회 전용으로 임시 클라이언트를 하나 만듦(실제 참가는 아래에서 클릭 시 joinById로 함)
@@ -4028,10 +3998,7 @@ async function netJoinRoomById(serverUrl, roomId){
   const nameEl = document.getElementById('onlineName');
   const name = (nameEl && nameEl.value.trim()) || '플레이어';
   netLocalName = name;
-  // 기억해두는 값은 입력한 그대로(IP만)여야 다음에 열어도 IP만 보이므로, 이미 ws://로 완성된
-  // serverUrl 대신 입력칸의 원본 값을 다시 읽어서 저장함
-  const urlElForSave = document.getElementById('onlineServerUrl');
-  netSaveRememberedConnectInfo((urlElForSave && urlElForSave.value.trim()) || 'localhost', name);
+  netSaveRememberedConnectInfo(name);
   try{
     netClient = new Colyseus.Client(serverUrl);
     netRoom = await netClient.joinById(roomId, { name, rankTier: computeRankTierIndex(rankStats) });
@@ -4045,13 +4012,6 @@ async function netJoinRoomById(serverUrl, roomId){
   }
 }
 document.getElementById('onlineRoomListRefreshBtn').addEventListener('click', netRefreshRoomList);
-// "⚙ 서버 주소 확인/변경" 링크를 누르면 접혀 있던 서버 주소 입력칸을 펼쳐서 보여줌(다른 서버로
-// 바꿔야 할 때만 씀 - 평소엔 기억해둔 값 그대로 접속되므로 안 눌러도 됨)
-document.getElementById('onlineServerUrlToggleBtn').addEventListener('click', ()=>{
-  const urlEl = document.getElementById('onlineServerUrl');
-  if (!urlEl) return;
-  urlEl.style.display = (urlEl.style.display === 'none') ? 'block' : 'none';
-});
 netLoadRememberedConnectInfo();
 
 // 라운드 도중 원래 호스트가 나가버렸을 때 호출됨.
