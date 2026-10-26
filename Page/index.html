@@ -229,6 +229,10 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
 .board-shake{animation:board-shake .3s}
 
 /* ---------- Mobile app layout ---------- */
+*,*::before,*::after{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none;-webkit-tap-highlight-color:transparent}
+input,textarea{-webkit-user-select:text;user-select:text}
+::selection{background:transparent;color:inherit}
+svg,img{-webkit-user-drag:none;pointer-events:auto}
 html,body{height:100%;overflow:hidden;overscroll-behavior:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 .hidden{display:none !important}
 #app{position:relative;z-index:1;height:100vh;height:100dvh;max-width:560px;margin:0 auto;display:flex;flex-direction:column;
@@ -1170,6 +1174,10 @@ function focusTile(r, c, smooth = true) {
   const a = area.getBoundingClientRect(), t = el.getBoundingClientRect();
   area.scrollBy({ left: t.left + t.width / 2 - (a.left + a.width / 2), top: t.top + t.height / 2 - (a.top + a.height / 2), behavior: smooth ? 'smooth' : 'auto' });
 }
+
+// 아이폰 사파리: 길게 누르기/드래그 시 텍스트 선택·돋보기·메뉴·확대가 뜨지 않도록 막는다
+['selectstart', 'contextmenu', 'dragstart', 'gesturestart', 'gesturechange', 'gestureend'].forEach(ev => document.addEventListener(ev, e => { if (!(e.target && e.target.closest && e.target.closest('input,textarea'))) e.preventDefault(); }, { passive: false }));
+document.addEventListener('selectionchange', () => { try { const sel = window.getSelection(); if (sel && sel.rangeCount && !sel.isCollapsed && !(document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName))) sel.removeAllRanges(); } catch (e) {} });
 window.addEventListener('resize', resizeBoard);
 window.addEventListener('orientationchange', () => setTimeout(resizeBoard, 200));
 
