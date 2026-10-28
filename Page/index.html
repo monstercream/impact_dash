@@ -23,6 +23,9 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
 .board-frame{--frame1:#8a5d33;--frame2:#4d3018;background:linear-gradient(135deg,var(--frame1),var(--frame2) 45%,var(--frame1));padding:10px;border-radius:18px;
   box-shadow:0 24px 50px rgba(0,0,0,.65),inset 0 0 0 2px #e7c36a,inset 0 0 0 6px #3a2411}
 .board-grid{display:grid;touch-action:none;border-radius:10px;overflow:hidden;box-shadow:0 0 0 2px #2b1a0c}
+/* 터치 기기: 드래그 시작 때 보드를 다시 그리면 터치가 시작된 요소가 DOM에서 사라져 iOS 사파리가 touchend/pointerup 을 전달하지 않는다.
+   그래서 보드 안쪽 요소는 터치를 받지 않게 하고(보드 자체가 항상 터치 대상), 좌표로 타일을 찾는다. */
+@media (hover:none) and (pointer:coarse){#chessboard .tile,#chessboard .tile *{pointer-events:none!important}}
 .tile{position:relative;display:flex;align-items:center;justify-content:center;
   background-image:radial-gradient(circle at 25% 20%,rgba(255,255,255,.16),transparent 55%),linear-gradient(0deg,rgba(0,0,0,.07),transparent);
   box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
@@ -38,7 +41,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
 .cap-ai{border-color:#dc2626;color:#dc2626}.cap-player{border-color:#2563eb;color:#2563eb}
 .hl{position:absolute;inset:0;pointer-events:none;z-index:0}
 .hl-mark{position:absolute;top:2px;left:4px;font-size:11px;opacity:.9;text-shadow:0 1px 2px rgba(0,0,0,.6)}
-.tile-range-me{background:rgba(239,68,68,.16);box-shadow:inset 0 0 0 1.5px rgba(248,113,113,.65)}
+.tile-range-me{background:rgba(244,114,182,.26);box-shadow:inset 0 0 0 1.5px rgba(249,168,212,.9)}
 .tile-range-foe{background:rgba(168,85,247,.2);box-shadow:inset 0 0 0 1.5px rgba(192,132,252,.8)}
 .tile.drag-over{outline:3px solid #fde047;outline-offset:-3px;z-index:5}
 .tile.drag-attack{outline:3px solid #ef4444;outline-offset:-3px;z-index:5}
@@ -154,7 +157,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
 .shot-badge{bottom:8px;right:-6px;background:#b45309;color:#ffedd5;border:1px solid #f59e0b}
 .tile-chip{position:absolute;bottom:1px;left:2px;font-size:10px;font-weight:800;z-index:6;color:#fde68a;text-shadow:0 1px 2px #000,0 0 3px #000;pointer-events:none}
 .evade-badge{top:-4px;left:-6px;background:#0369a1;color:#e0f2fe;border:1px solid #38bdf8}
-.match-badge{position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:800;padding:1px 5px;border-radius:5px;z-index:11;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+.match-badge{position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-size:7px;font-weight:800;padding:0 3px;border-radius:5px;z-index:11;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.5)}
 .match-up{background:#15803d;color:#bbf7d0;border:1px solid #22c55e}.match-down{background:#991b1b;color:#fecaca;border:1px solid #ef4444}.match-even{background:#334155;color:#e2e8f0;border:1px solid #64748b}
 .evade-badge{top:auto !important;bottom:12px}
 .adv-up{background:#15803d;color:#bbf7d0;border:1px solid #22c55e}
@@ -240,7 +243,7 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none;-webkit-tap-highl
 .fog{position:absolute;inset:0;z-index:13;pointer-events:none}
 .fog1{background:rgba(255,255,255,.4)}
 .fog2{background:rgba(255,255,255,.75)}
-#hud{flex:none;position:relative;display:flex;align-items:center;gap:8px;margin:6px 10px 0;padding:5px 8px;border-radius:12px;background:linear-gradient(180deg,rgba(30,41,59,.95),rgba(15,23,42,.95));border:1px solid rgba(250,204,21,.4)}
+#hud{flex:none;position:relative;display:flex;align-items:center;gap:8px;margin:4px 6px 0;padding:3px 8px;border-radius:12px;background:linear-gradient(180deg,rgba(30,41,59,.95),rgba(15,23,42,.95));border:1px solid rgba(250,204,21,.4)}
 #hud .lv-badge{min-width:42px;height:26px;font-size:13px;flex:none}
 #hud-xp{flex:1;min-width:0}
 #hud .xp-bar{height:18px;position:relative}
@@ -249,6 +252,21 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none;-webkit-tap-highl
 #hud-gold{flex:none;font-weight:900;font-size:14px;color:#fde047;background:rgba(2,6,23,.6);border:1px solid rgba(250,204,21,.5);border-radius:999px;padding:3px 10px;min-width:84px;text-align:center}
 #hud .lvup-banner{font-size:24px;z-index:10}
 .hud-pulse{animation:hud-pulse .35s ease-out}
+#res-hud-in{position:relative;display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:12px;background:linear-gradient(180deg,rgba(30,41,59,.97),rgba(15,23,42,.97));border:1px solid rgba(250,204,21,.5);box-shadow:0 4px 14px rgba(0,0,0,.5)}
+#res-hud .lv-badge{min-width:42px;height:26px;font-size:13px;flex:none}
+#res-xp{flex:1;min-width:0}
+#res-hud .xp-bar{height:18px;position:relative}
+#res-hud .xp-fill{transition:width .3s ease-out}
+#res-xptext{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
+#res-gold{flex:none;font-weight:900;font-size:14px;color:#fde047;background:rgba(2,6,23,.6);border:1px solid rgba(250,204,21,.5);border-radius:999px;padding:3px 10px;min-width:84px;text-align:center}
+#res-hud .lvup-banner{font-size:24px;z-index:10}
+.res-hidden{opacity:0;pointer-events:none}
+#res-btns{transition:opacity .5s}
+.res-row{display:flex;justify-content:space-between;padding:2px 0;animation:resRowIn .3s ease-out both}
+@keyframes resRowIn{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+.res-pop{animation:resPop .7s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes resPop{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:none}}
+.res-src{transition:opacity .4s}
 @keyframes hud-pulse{0%{transform:scale(1);filter:brightness(1)}35%{transform:scale(1.14);filter:brightness(1.7) drop-shadow(0 0 8px #fde047)}100%{transform:scale(1);filter:none}}
 .reward-orb{position:fixed;left:0;top:0;width:22px;height:22px;margin:-11px 0 0 -11px;z-index:400;pointer-events:none;will-change:transform;filter:drop-shadow(0 0 6px rgba(253,224,71,.9))}
 .reward-orb.xp{filter:drop-shadow(0 0 7px rgba(125,211,252,.95))}
@@ -264,12 +282,13 @@ body.ai-turn #turn-badge{animation:aiPulse 1s ease-in-out infinite}
 #enemy-banner{position:fixed;left:50%;top:150px;transform:translateX(-50%);z-index:30;pointer-events:none;padding:4px 14px;border-radius:99px;background:rgba(127,29,29,.9);border:1px solid #f87171;color:#fecaca;font-weight:900;letter-spacing:1px;font-size:12px;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,.5);display:none;animation:aiPulse 1s ease-in-out infinite}
 body.ai-turn #enemy-banner{display:block}
 .top-btn{width:36px;height:36px;border-radius:999px;background:rgba(30,41,59,.9);color:#fcd34d;border:1px solid #475569;font-size:18px;font-weight:800;line-height:1}
-#mo-strip{flex:none;display:flex;gap:6px;padding:0 10px 2px}
-.mo-pill{flex:1;min-width:0;border-radius:10px;padding:3px 8px 4px;background:rgba(15,23,42,.85);border:1px solid rgba(96,165,250,.45);font-size:10px;line-height:1.25;color:#cbd5e1;transition:box-shadow .3s,border-color .3s}
+#mo-strip{flex:none;display:flex;align-items:center;gap:4px;padding:3px 6px 2px}
+#turn-badge{flex:none;line-height:1.2;max-width:34%;text-align:center}
+.mo-pill{flex:1;min-width:0;border-radius:8px;padding:1px 5px 2px;background:rgba(15,23,42,.85);border:1px solid rgba(96,165,250,.45);font-size:8px;line-height:1.15;color:#cbd5e1;transition:box-shadow .3s,border-color .3s}
 .mo-pill.foe{border-color:rgba(248,113,113,.45)}
-.mo-pill .mo-top{display:flex;align-items:center;justify-content:space-between;gap:4px;font-weight:800;font-size:11px;white-space:nowrap}
-.mo-pips{display:flex;gap:2px;margin:2px 0}
-.mo-pips i{flex:1;height:6px;border-radius:3px;background:#1e293b;border:1px solid #334155}
+.mo-pill .mo-top{display:flex;align-items:center;justify-content:space-between;gap:3px;font-weight:800;font-size:9px;white-space:nowrap}
+.mo-pips{display:flex;gap:2px;margin:1px 0}
+.mo-pips i{flex:1;height:4px;border-radius:2px;background:#1e293b;border:1px solid #334155}
 .mo-pips i.on-up{background:linear-gradient(90deg,#f59e0b,#fde047);border-color:#fde047;box-shadow:0 0 5px #f59e0b}
 .mo-pips i.on-down{background:linear-gradient(90deg,#64748b,#38bdf8);border-color:#7dd3fc}
 .mo-pips i.mid{background:#475569}
@@ -277,16 +296,17 @@ body.ai-turn #enemy-banner{display:block}
 .mo-pill.cold{box-shadow:0 0 10px rgba(56,189,248,.45)}
 .mo-pill.bump{animation:mo-bump .6s ease-out}
 @keyframes mo-bump{0%{transform:scale(1)}30%{transform:scale(1.08)}100%{transform:scale(1)}}
-#board-area{flex:1 1 auto;min-height:0;display:flex;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:2px 6px;scrollbar-width:thin;scrollbar-color:#64748b transparent;position:relative}
+#board-area{flex:1 1 auto;min-height:0;display:flex;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:0 2px;scrollbar-width:thin;scrollbar-color:#64748b transparent;position:relative}
 #board-area::-webkit-scrollbar{width:5px;height:5px}#board-area::-webkit-scrollbar-thumb{background:#64748b;border-radius:3px}
 #scroll-hint{position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:8;pointer-events:none;font-size:11px;font-weight:800;color:#fde68a;background:rgba(15,23,42,.88);border:1px solid rgba(245,158,11,.5);border-radius:999px;padding:3px 10px;animation:hint-fade 4.5s ease-out forwards}
 @keyframes hint-fade{0%,70%{opacity:1}100%{opacity:0}}
-#board-frame{padding:6px;border-radius:14px;flex:none;margin:auto;position:relative}
+#board-frame{padding:4px;border-radius:12px;flex:none;margin:auto;position:relative}
 #board-frame .board-grid{border-radius:8px}
 #unit-chip{flex:none;min-height:30px;margin:2px 8px 0;padding:4px 10px;border-radius:10px;background:rgba(15,23,42,.85);border:1px solid rgba(148,163,184,.25);font-size:12px;color:#cbd5e1;display:flex;align-items:center;gap:8px;white-space:nowrap;overflow:hidden}
 #unit-chip:empty{display:none}
 #unit-chip .uc-name{font-weight:800}
-#phase-panel{flex:none;margin:4px 8px 6px;padding:8px 10px;min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-radius:12px;
+#phase-instruction{display:none}
+#phase-panel{flex:none;margin:2px 8px 4px;padding:6px 10px;min-height:0;justify-content:center;display:flex;align-items:center;justify-content:space-between;gap:8px;border-radius:12px;
   background:linear-gradient(180deg,rgba(30,41,59,.92),rgba(15,23,42,.95));border:1px solid rgba(148,163,184,.25);font-size:13px;line-height:1.35;color:#e2e8f0}
 #post-move-actions{display:flex;gap:6px;flex:none}
 .act-btn{min-height:40px;padding:0 12px;border-radius:10px;font-weight:800;font-size:13px;border:1px solid #475569}
@@ -304,9 +324,42 @@ body.ai-turn #enemy-banner{display:block}
 .menu-btn{min-height:46px;border-radius:12px;font-weight:800;background:#334155;color:#e2e8f0;border:1px solid #475569;font-size:14px}
 .menu-btn.amber{background:#f59e0b;color:#0f172a;border-color:#f59e0b}
 .tile-chip{font-size:8px}
-@media (max-width:600px){.match-badge{top:-1px}.tile-chip,.mb-x{display:none}.match-badge,.evade-badge,.shot-badge{font-size:8px;padding:0 3px}}
+@media (max-width:600px){.match-badge{top:-1px}.tile-chip{display:none}.match-badge{font-size:7px;padding:0 2px}.evade-badge,.shot-badge{font-size:8px;padding:0 3px}}
 @media (max-height:700px){#unit-chip{display:none}}
 @media (min-width:700px){body{background-attachment:fixed}}
+
+/* ---------- 월드맵 ---------- */
+#stage-select{background:#0b1220}
+#wm-head{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:calc(8px + env(safe-area-inset-top)) 12px 8px;background:linear-gradient(180deg,#0f172a,#1e293b);border-bottom:1px solid rgba(148,163,184,.3);z-index:5}
+#wm-scroll{flex:1 1 auto;min-height:0;position:relative;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:#4b3732}
+#wm-wrap{max-width:560px;margin:0 auto;position:relative}
+#wm-canvas{position:relative;width:100%;overflow:hidden}
+.wm-node{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:translate(-50%,-50%);border-radius:50%;font-weight:900;line-height:1;z-index:3;padding:0;font-family:inherit}
+.wm-node.cleared{width:44px;height:44px;background:radial-gradient(circle at 35% 28%,#fff7ae,#fbbf24 60%,#b45309);border:3px solid #fff7ae;color:#451a03;font-size:15px;box-shadow:0 3px 8px rgba(0,0,0,.5)}
+.wm-node.cleared small{font-size:9px;font-weight:900;margin-top:1px;color:#7c2d12}
+.wm-node.open{width:50px;height:50px;background:radial-gradient(circle at 35% 28%,#fff,#fecaca 55%,#ef4444);border:3px solid #fff;color:#7f1d1d;font-size:18px;animation:wmPulse 1.3s ease-in-out infinite;z-index:4}
+.wm-node.locked{width:30px;height:30px;background:rgba(30,41,59,.88);border:2px solid #64748b;color:#94a3b8;font-size:12px}
+.wm-node.locked.far{opacity:.35}
+.wm-node.pend{width:40px;height:40px;border-color:#fbbf24;font-size:18px}
+@keyframes wmPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.75),0 3px 8px rgba(0,0,0,.5)}50%{box-shadow:0 0 0 13px rgba(239,68,68,0),0 3px 8px rgba(0,0,0,.5)}}
+.wm-node.unlock-anim{animation:wmLockShake .9s ease-in forwards}
+@keyframes wmLockShake{0%{transform:translate(-50%,-50%)}15%{transform:translate(-50%,-50%) rotate(-16deg)}30%{transform:translate(-50%,-50%) rotate(16deg)}45%{transform:translate(-50%,-50%) rotate(-14deg)}60%{transform:translate(-50%,-50%) rotate(12deg) scale(1.2)}100%{transform:translate(-50%,-50%) scale(1.9);opacity:0}}
+.wm-node.pop{animation:wmPop .7s cubic-bezier(.2,1.6,.4,1) both,wmPulse 1.3s .7s ease-in-out infinite}
+@keyframes wmPop{0%{transform:translate(-50%,-50%) scale(.2);opacity:0}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
+.wm-banner{position:absolute;transform:translate(-50%,-50%);z-index:2;padding:6px 18px;border-radius:999px;font-weight:900;font-size:15px;letter-spacing:1px;background:rgba(15,23,42,.74);color:#fde68a;border:1px solid rgba(250,204,21,.55);white-space:nowrap;pointer-events:none;font-family:'Black Han Sans','Noto Sans KR',sans-serif}
+.wm-size{position:absolute;transform:translate(-50%,-50%);z-index:2;font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;background:rgba(15,23,42,.66);color:#e2e8f0;border:1px solid rgba(255,255,255,.25);pointer-events:none;white-space:nowrap}
+.wm-castle{position:absolute;transform:translate(-50%,-50%);z-index:1;pointer-events:none}
+#wm-avatar{position:absolute;width:58px;height:58px;margin:-50px 0 0 -29px;z-index:6;pointer-events:none}
+#wm-avatar:before{content:'';position:absolute;left:12%;right:12%;bottom:-3px;height:10px;border-radius:50%;background:rgba(0,0,0,.4);filter:blur(2px)}
+.wm-av-in{position:relative;width:100%;height:100%;filter:drop-shadow(0 3px 2px rgba(0,0,0,.45))}
+#wm-avatar[data-flip="1"] .wm-av-in .portrait{transform:scaleX(-1)}
+#wm-avatar.walking .wm-av-in{animation:wmBob .26s ease-in-out infinite}
+@keyframes wmBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+#wm-info{flex:none;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(30,41,59,.98),rgba(15,23,42,.99));border-top:1px solid rgba(250,204,21,.45);animation:wmUp .25s ease-out;z-index:6}
+#wm-info > *{max-width:560px;margin-left:auto;margin-right:auto}
+@keyframes wmUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+#wm-toast{position:absolute;left:50%;bottom:18%;transform:translate(-50%,10px);z-index:20;padding:8px 14px;border-radius:999px;background:rgba(15,23,42,.92);color:#fde68a;font-weight:800;font-size:12px;border:1px solid rgba(250,204,21,.5);opacity:0;pointer-events:none;transition:.25s;white-space:nowrap}
+#wm-toast.show{opacity:1;transform:translate(-50%,0)}
 </style>
 </head>
 <body>
@@ -317,14 +370,10 @@ body.ai-turn #enemy-banner{display:block}
     <div id="hud-gold">💰 0</div>
     <div class="lvup-banner" id="hud-banner">LEVEL UP!</div>
   </div>
-  <div id="topbar">
-    <span id="stage-name" class="chip-stage"></span>
-    <div id="enemy-banner">⚔️ 적군 턴 · 상대가 움직이는 중...</div>
-    <div id="turn-badge" class="px-3 py-1 rounded-full font-bold bg-blue-600 text-white shadow text-sm"><span id="turn-text">플레이어 턴</span></div>
-    <button id="btn-quick-restart" onclick="initGame()" class="top-btn" aria-label="재시작">↻</button>
-  </div>
+  <div id="enemy-banner">⚔️ 적군 턴 · 상대가 움직이는 중...</div>
   <div id="mo-strip">
     <div class="mo-pill" id="mo-player"></div>
+    <div id="turn-badge" class="px-2.5 py-1 rounded-full font-bold bg-blue-600 text-white shadow text-[11px]"><span id="turn-text">플레이어 턴</span></div>
     <div class="mo-pill foe" id="mo-ai"></div>
   </div>
   <div id="board-area">
@@ -362,7 +411,7 @@ body.ai-turn #enemy-banner{display:block}
           <div class="flex items-center justify-between gap-3 mb-2"><span class="font-bold text-amber-200 text-sm">전장의 안개 (안개 맵 한정)</span><button id="fog-toggle" onclick="toggleFog()" class="menu-btn" style="min-height:38px;padding:0 16px;font-size:13px">🌫 켜짐</button></div>
           <div class="flex items-center justify-between gap-3"><span class="font-bold text-amber-200 text-sm">효과음</span><button id="sfx-toggle" onclick="toggleSfx()" class="menu-btn" style="min-height:38px;padding:0 16px;font-size:13px">🔊 켜짐</button></div>
           <button onclick="toggleTab(null);openUpgrade()" class="menu-btn" style="background:#4f46e5;border-color:#6366f1;color:#fff">🛠 병종 강화 <span id="menu-gold" class="text-yellow-300"></span></button>
-          <button onclick="toggleTab(null);openStageSelect()" class="menu-btn">🗺 스테이지 선택</button>
+          <button onclick="toggleTab(null);openStageSelect()" class="menu-btn">🗺 월드맵</button>
           <button onclick="toggleTab(null);initGame()" class="menu-btn amber">↻ 현재 스테이지 다시 시작</button>
           <p class="text-[11px] text-slate-400 leading-relaxed">조작: 아군 캐릭터를 <b>터치</b>해 선택 → 파란 칸을 터치해 이동 → 빨간 칸의 적을 터치해 공격. 제자리 타일을 터치하면 이동 없이 공격할 수 있고, <b>유닛을 끌어서 적 위에 놓으면 알아서 이동해 공격</b>하며, 적을 터치하면 이동 가능 범위를 볼 수 있습니다.</p>
         </div>
@@ -399,7 +448,7 @@ body.ai-turn #enemy-banner{display:block}
         <div class="flex items-start gap-2 bg-slate-950/40 border border-slate-700 rounded-lg p-1.5"><span class="text-base">🛡</span><div><div class="font-bold text-slate-200">성 수비 구역 (포탑)</div><div class="text-[10px] text-slate-400 leading-tight">자기 성 상하좌우 칸에 서 있으면 <b class="text-amber-300">공격력 ×2</b>, 턴 시작 때 <b class="text-emerald-300">체력 10% 회복</b></div></div></div>
         <div class="flex items-start gap-2 bg-slate-950/40 border border-slate-700 rounded-lg p-1.5"><span class="text-base">🧱</span><div><div class="font-bold text-slate-200">부술 수 있는 장애물</div><div class="text-[10px] text-slate-400 leading-tight">이동·점프로 통과 불가. 공격해서 <b class="text-amber-300">HP 30</b>를 깎으면 부서져 길이 열립니다. (회피 없음, 방어 2)</div></div></div>
         <div class="flex items-start gap-2 bg-slate-950/40 border border-slate-700 rounded-lg p-1.5"><span class="text-base">📦</span><div><div class="font-bold text-slate-200">보물상자</div><div class="text-[10px] text-slate-400 leading-tight">유닛이 올라서면 열리고 <b class="text-emerald-300">그 팀 전원의 체력이 완전 회복</b>됩니다. 상자마다 <b>1회</b> (적도 열 수 있어요!)</div></div></div>
-        <div class="flex items-start gap-2 bg-slate-950/40 border border-slate-700 rounded-lg p-1.5"><span class="text-base">🪨</span><div><div class="font-bold text-slate-200">투석기 포탑 (맵 곳곳)</div><div class="text-[10px] text-slate-400 leading-tight">그 위에서 공격하면 <b class="text-amber-300">사거리 3칸(대각선 포함)</b>까지 가능. 대신 <b>위력 60%</b>, 투석기마다 <b>1회만</b> 사용 가능 (사용 후 파괴)</div></div></div>
+        <div class="flex items-start gap-2 bg-slate-950/40 border border-slate-700 rounded-lg p-1.5"><span class="text-base">🪨</span><div><div class="font-bold text-slate-200">투석기 포탑 (맵 곳곳)</div><div class="text-[10px] text-slate-400 leading-tight">그 위에서 공격하면 <b class="text-amber-300">사거리 3~5칸(맵이 클수록 길어짐, 대각선 포함)</b>까지 가능. 대신 <b>위력 60%</b>, 투석기마다 <b>1회만</b> 사용 가능 (사용 후 파괴)</div></div></div>
       </div>
     </div>
       </section>
@@ -414,23 +463,25 @@ body.ai-turn #enemy-banner{display:block}
       </section>
       <section data-tab="rules" class="hidden">
     <div class="p-3 text-xs text-slate-400">
+      <div class="font-bold text-slate-200 mb-1">📚 오브젝트 도감 <span class="font-normal text-slate-500">(눌러서 다시 보기)</span></div>
+      <div id="obj-codex" class="grid grid-cols-2 gap-1.5 mb-3"></div>
       <div class="font-bold text-slate-200 mb-1">💡 전투 규칙</div>
       <ul class="list-disc list-inside space-y-1 text-[11px] leading-relaxed">
         <li>이동한 뒤 공격/회복하거나, <b>제자리 타일(⚔/✚ 표시)을 눌러 이동 없이 바로 공격/회복</b>할 수 있습니다. 제자리에 대상이 없으면 선택이 취소되어 다른 캐릭터를 고를 수 있습니다.</li>
-        <li><b>힐러</b>는 자기 자신을 회복할 수 없으며, <b>상하좌우·대각선 1칸(주변 8방향)</b>의 부상당한 아군만 회복합니다.</li>
+        <li><b>힐러</b>는 자기 자신을 회복할 수 없으며, <b>반경 2칸(대각선 포함, 주변 24칸)</b>의 부상당한 아군만 회복합니다.</li>
         <li><b>늪</b>에 서 있는 유닛은 다음 이동이 1칸 줄어듭니다. (나이트는 대각선 1칸만 이동) <b>물</b> 타일은 들어가거나 지나갈 수 없습니다. (공격은 물 너머로 가능)</li>
         <li><b>성 수비 구역</b>(자기 성 상하좌우 칸)에서는 공격력이 <b>2배</b>가 되고, 매 턴 시작 때 <b>최대 체력의 10%</b>를 회복합니다.</li>
         <li><b>장애물</b>(🧱)은 공격으로 부술 수 있습니다. 적 AI는 장애물을 공격하지 않습니다.</li>
         <li><b>턴 제한</b>: 상단의 턴 수가 제한에 도달하면 남은 체력 합계가 더 많은 쪽이 승리합니다.</li>
         <li><b>보물상자</b>(📦) 칸에 올라서면 상자가 열리며 우리 팀 전원의 체력이 완전히 회복됩니다. 상자마다 한 번뿐이고, 적도 열 수 있습니다.</li>
-        <li><b>투석기</b> 위에서 공격하면 사거리가 3칸까지 늘어납니다. 위력은 60%이고, 투석기마다 <b>1번만</b> 쓸 수 있습니다.</li>
+        <li><b>투석기</b> 위에서 공격하면 사거리가 맵 크기에 따라 3~5칸까지 늘어납니다(작은 맵 3칸, 큰 맵일수록 길어짐). 위력은 60%이고, 투석기마다 <b>1번만</b> 쓸 수 있습니다.</li>
         <li>이동할 때 <b>아군은 뛰어넘을 수 있지만 적은 뛰어넘을 수 없습니다</b>(나이트의 L자 점프 제외).</li>
         <li>이동 후 범위 내 대상이 없으면 <b>자동으로 대기</b>하고 턴이 넘어갑니다.</li>
         <li>이동 칸 중 <b>흐린 빨강(⚔)/초록(✚)</b>은 그 자리로 이동하면 공격/회복이 가능한 위치입니다.</li>
         <li><b>성(🏰)</b>: 자기 성에는 들어갈 수 없고, <b>적 성 칸에 정확히 도달</b>하면 승리합니다. 성 앞 길목을 막으세요!</li>
-        <li><b>🌫 전장의 안개</b>(안개 맵 2·7 스테이지 전용): 아군 캐릭터 주변 <b>3칸 안</b>에 들어온 적만 보입니다. 시야 밖에서는 배경과 지형·오브젝트만 보이고 적은 숨어 있어요. 메뉴에서 끌 수 있습니다.</li>
-        <li><b>🔥 기세</b>(화면 위 게이지): 턴마다 <b>적 성 방향(두 성을 잇는 축)으로 전진</b>하거나 <b>공격</b>하면(옆으로 이동은 전진이 아님) 기세가 +1(둘 다 하면 +2), 전진도 공격도 안 하면 <b>-1</b>(힐러가 회복하면 유지). <b>-3 ~ +3</b>단계이며 한 단계마다 <b>공격력 ±8%, 회피율 ±3%p</b>가 팀 전체에 적용됩니다. 적도 똑같이 적용됩니다!</li>
-        <li>공격은 대상의 <b>회피율</b>만큼 빗나갈 수 있습니다. 회피율 = 병종 기본값 + 서 있는 지형 보정이며, 최대 30%입니다(기세 보너스 제외).</li>
+        <li><b>🌫 전장의 안개</b>(🌫 안개가 표시된 일부 스테이지 전용): 아군 캐릭터 주변 <b>3칸 안</b>에 들어온 적만 보입니다. 시야 밖에서는 배경과 지형·오브젝트만 보이고 적은 숨어 있어요. 메뉴에서 끌 수 있습니다.</li>
+        <li><b>🔥 기세</b>(화면 위 게이지): 턴마다 <b>적 성 방향(두 성을 잇는 축)으로 전진</b>하거나 <b>공격</b>하면(옆으로 이동은 전진이 아님) 기세가 +1(둘 다 하면 +2), 전진도 공격도 안 하면 <b>-1</b>(힐러가 회복하면 유지). <b>-3 ~ +3</b>단계이며 한 단계마다 <b>공격력 ±8%, 회피율 ±1.5%p</b>가 팀 전체에 적용됩니다. 적도 똑같이 적용됩니다!</li>
+        <li>공격은 대상의 <b>회피율</b>만큼 빗나갈 수 있습니다. 회피율 = 병종 기본값 + 서 있는 지형 보정이며, 최대 15%입니다(기세 보너스 제외).</li>
       </ul>
     </div>
       </section>
@@ -438,17 +489,25 @@ body.ai-turn #enemy-banner{display:block}
   </div>
 </div>
 
-<div id="game-over-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-  <div class="panel border-2 border-amber-500 max-w-md w-full p-5 text-center" style="max-height:94dvh;overflow-y:auto">
+<div id="game-over-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex flex-col items-center justify-center p-4 gap-2">
+  <div id="res-hud" class="max-w-md w-full">
+    <div id="res-hud-in">
+      <div id="res-lv" class="lv-badge">Lv 1</div>
+      <div id="res-xp"><div class="xp-bar"><div class="xp-fill" id="res-xpfill"></div><span id="res-xptext">0 / 80</span></div></div>
+      <div id="res-gold">💰 0</div>
+      <div class="lvup-banner" id="res-banner">LEVEL UP!</div>
+    </div>
+  </div>
+  <div id="res-panel" class="panel border-2 border-amber-500 max-w-md w-full p-5 text-center" style="max-height:86dvh;overflow-y:auto">
     <div id="modal-icon" class="text-6xl mb-3">🏆</div>
     <h2 id="modal-title" class="title-font text-3xl text-amber-400 mb-2"></h2>
     <p id="modal-desc" class="text-slate-300 text-sm mb-3"></p>
     <div id="modal-rating" class="mb-4"></div>
-    <div class="flex flex-col gap-2">
-      <button id="modal-next" onclick="nextStage()" class="hidden w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl">다음 스테이지 ▶</button>
+    <div id="res-btns" class="flex flex-col gap-2 res-hidden">
+      <button id="modal-next" onclick="nextStage()" class="hidden w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl">🗺 월드맵으로 — 다음 스테이지 열림 ▶</button>
       <button onclick="initGame()" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl">↻ 다시 도전</button>
       <button onclick="openUpgrade()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl">🛠 병종 강화 <span id="modal-gold" class="text-yellow-300"></span></button>
-      <button onclick="openStageSelect()" class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-amber-200 font-bold rounded-xl border border-slate-500">🗺 스테이지 선택</button>
+      <button onclick="openStageSelect()" class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-amber-200 font-bold rounded-xl border border-slate-500">🗺 월드맵</button>
     </div>
   </div>
 </div>
@@ -462,16 +521,42 @@ body.ai-turn #enemy-banner{display:block}
     <div id="upg-list" class="flex flex-col gap-2.5"></div>
   </div>
 </div>
-<div id="stage-select" class="hidden fixed inset-0 z-[60] overflow-y-auto bg-slate-950/92 backdrop-blur-md">
-  <div class="max-w-5xl mx-auto p-4 sm:p-6">
-    <div class="flex items-center justify-between mb-4">
-      <div><h2 class="title-font text-2xl sm:text-3xl text-amber-300">스테이지 선택</h2><p class="text-xs text-slate-400 mt-1">지형과 기믹이 다른 20개의 전장 — 스테이지를 클리어하면 다음 전장이 열립니다.</p></div>
-      <div class="flex items-center gap-2"><span id="stage-gold" class="text-sm font-black text-yellow-300 bg-slate-800 border border-yellow-600/50 rounded-full px-3 py-1"></span>
-      <button onclick="openUpgrade()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-lg">🛠 강화</button>
-      <button id="stage-close" onclick="closeStageSelect()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-bold rounded-lg border border-slate-500">닫기 ✕</button></div>
+<div id="dbg-modal" class="hidden fixed inset-0 z-[95] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm">
+  <div class="panel border-2 border-rose-500 max-w-xs w-full p-4">
+    <div class="flex items-center justify-between mb-2"><h3 class="title-font text-lg text-rose-300">🐞 디버그</h3><button onclick="dbgClose()" class="px-2.5 py-1 bg-slate-700 text-slate-200 text-xs font-bold rounded-lg border border-slate-500">닫기 ✕</button></div>
+    <p id="dbg-info" class="text-[11px] text-slate-300 mb-2"></p>
+    <div class="grid grid-cols-2 gap-2 text-xs font-bold">
+      <button onclick="dbgDo('gold1')" class="menu-btn" style="min-height:40px">💰 +1,000</button>
+      <button onclick="dbgDo('gold2')" class="menu-btn" style="min-height:40px">💰 +100,000</button>
+      <button onclick="dbgDo('xp1')" class="menu-btn" style="min-height:40px">⭐ 경험치 +500</button>
+      <button onclick="dbgDo('lv1')" class="menu-btn" style="min-height:40px">⬆ 레벨 +1</button>
+      <button onclick="dbgDo('upg')" class="menu-btn" style="min-height:40px">🛠 강화 전부 MAX</button>
+      <button onclick="dbgDo('allclear')" class="menu-btn" style="min-height:40px">🏁 전 스테이지 클리어</button>
+      <button onclick="dbgDo('unclear')" class="menu-btn" style="min-height:40px">↩ 클리어 기록 삭제</button>
+      <button onclick="dbgDo('seen')" class="menu-btn" style="min-height:40px">❓ 팝업 다시 보기</button>
     </div>
-    <div id="stage-list" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"></div>
+    <button id="dbg-reset" onclick="dbgDo('reset')" class="mt-3 w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-xl text-sm">⚠ 모든 기록 초기화</button>
   </div>
+</div>
+<div id="obj-modal" class="hidden fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+  <div class="panel border-2 border-amber-500 max-w-xs w-full p-4 text-center">
+    <div id="obj-tag" class="text-[10px] font-black tracking-widest text-amber-300"></div>
+    <div id="obj-img"></div>
+    <h3 id="obj-title" class="title-font text-xl text-amber-300"></h3>
+    <p id="obj-desc" class="text-[13px] text-slate-200 mt-1.5 leading-snug"></p>
+    <button id="obj-ok" onclick="objNext()" class="mt-3 w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl">확인</button>
+  </div>
+</div>
+<div id="stage-select" class="hidden fixed inset-0 z-[60] flex flex-col">
+  <div id="wm-head">
+    <div class="min-w-0"><h2 id="wm-title" onclick="dbgTap()" class="title-font text-xl text-amber-300 leading-tight" style="user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent">🗺 월드맵</h2><p id="wm-region" class="text-[11px] text-slate-300 truncate"></p></div>
+    <div class="flex items-center gap-2 shrink-0"><span id="stage-gold" class="text-xs font-black text-yellow-300 bg-slate-800 border border-yellow-600/50 rounded-full px-2.5 py-1"></span>
+      <button onclick="openUpgrade()" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg">🛠 강화</button>
+      <button id="stage-close" onclick="closeStageSelect()" class="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold rounded-lg border border-slate-500">닫기 ✕</button></div>
+  </div>
+  <div id="wm-scroll"><div id="wm-wrap"><div id="wm-canvas"></div></div></div>
+  <div id="wm-toast"></div>
+  <div id="wm-info" class="hidden"></div>
 </div>
 
 <script>
@@ -724,88 +809,207 @@ function applyTheme(th) {
 }
 
 // 지형: . 평지  F 숲  H 언덕  S 늪(다음 이동 -1)  W 물(통행 불가)  B 다리
-const STAGES = [
-  { name: '초원의 입문', theme: 'grass', stars: 1, concept: '탁 트인 6×6 초원. 소수 정예로 배우는 기본 전투 — 지형 효과와 성 수비 구역(×2)을 익히세요.',
-    tip: '성 바로 옆(🛡×2) 칸에 서면 공격력이 2배! 작은 맵이라 적 궁수가 빨리 접근합니다.',
-    layout: ['..F...', '.H..F.', '..SH..', '..HS..', '.F..H.', '...F..'],
-    castles: { player: { r: 5, c: 0 }, ai: { r: 0, c: 5 } },
-    catapults: [[3, 1], [2, 4]], chests: [[3, 4]], obstacles: [[1, 2], [4, 3]], par: 8, turnLimit: 25,
-    player: [['SWORDSMAN', 4, 1], ['SPEARMAN', 5, 2], ['ARCHER', 5, 3], ['HEALER', 5, 5]],
-    ai: [['SWORDSMAN', 1, 4], ['SPEARMAN', 0, 3], ['ARCHER', 0, 2], ['HEALER', 0, 0]] },
-  { name: '속삭이는 깊은 숲', theme: 'forest', fog: true, stars: 2, concept: '🌫 안개 맵 · 빽빽한 숲과 독 늪, 중앙의 연못. 아군 주변 3칸 밖의 적은 보이지 않는 8×8 매복전.',
-    tip: '숲은 궁수의 회피가 +25%! 늪(독 늪)에 들어가면 다음 이동이 줄어드니 길목을 잘 고르세요.',
-    layout: ['..FF.F..', '.FF.H.F.', 'F.FSF...', '.HS.FW.F', 'F.WF.SH.', '...FSF.F', '.F.H.FF.', '..F.FF..'],
-    castles: { player: { r: 7, c: 0 }, ai: { r: 0, c: 7 } },
-    catapults: [[5, 2], [2, 5]], chests: [[3, 3], [4, 4]], obstacles: [[3, 0], [4, 7], [1, 3], [6, 4]], par: 12, turnLimit: 30,
-    player: [['SWORDSMAN', 7, 1], ['SPEARMAN', 7, 2], ['KNIGHT', 7, 3], ['ARCHER', 7, 4], ['MAGE', 7, 5], ['HEALER', 7, 7]],
-    ai: [['SWORDSMAN', 0, 6], ['SPEARMAN', 0, 5], ['KNIGHT', 0, 4], ['ARCHER', 0, 3], ['MAGE', 0, 2], ['HEALER', 0, 0]] },
-  { name: '신기루 오아시스', theme: 'desert', stars: 3, concept: '좌우로 긴 9×7 사막. 성이 양 끝 중앙에 있고, 가운데 오아시스가 길을 갈라놓습니다.',
-    tip: '모래 언덕은 나이트의 회피가 높고, 유사(늪)는 발이 묶입니다. 오아시스 위아래로 갈라지는 두 길을 모두 막으세요!',
-    layout: ['..H...F..', '.F..S..H.', 'H...WW...', '.FS.W.SF.', '...WW...H', '.H..S..F.', '..F...H..'],
-    castles: { player: { r: 3, c: 0 }, ai: { r: 3, c: 8 } },
-    catapults: [[1, 2], [5, 6]], chests: [[1, 3], [5, 5]], obstacles: [[2, 3], [4, 5], [3, 3], [3, 5]], par: 14, turnLimit: 30,
-    player: [['SWORDSMAN', 2, 1], ['SPEARMAN', 4, 1], ['SPEARMAN', 5, 1], ['KNIGHT', 3, 1], ['ARCHER', 2, 0], ['MAGE', 4, 0], ['HEALER', 6, 0]],
-    ai: [['SWORDSMAN', 4, 7], ['SPEARMAN', 2, 7], ['KNIGHT', 3, 7], ['KNIGHT', 1, 7], ['ARCHER', 4, 8], ['MAGE', 2, 8], ['HEALER', 0, 8]] },
-  { name: '얼어붙은 강', theme: 'snow', stars: 4, concept: '9×9 설원을 가르는 넓은 강. 건널 수 있는 곳은 폭 2칸짜리 다리 두 곳뿐(대각선 이동 유닛도 건널 수 있어요). 강 건너편으로는 궁수·마법사·투석기 사격이 오갑니다.',
-    tip: '다리가 두 곳뿐이라 길목 싸움이 핵심! 다리 앞 투석기(🪨)를 차지하면 건너오는 적을 3칸 밖에서 맞출 수 있고, 보물상자 📦는 팀 전체를 회복시켜 줍니다.',
-    layout: ['.F.H...F.', 'F..S.S..H', '.H.F...F.', 'WBBWWWBBW', 'WBBWWWBBW', 'WBBWWWBBW', '.F...F.H.', 'H..S.S..F', '.F...H.F.'],
-    castles: { player: { r: 8, c: 4 }, ai: { r: 0, c: 4 } },
-    catapults: [[2, 4], [6, 4]], chests: [[2, 2], [6, 6]], obstacles: [[2, 5], [6, 3], [2, 6], [6, 2]], par: 16, turnLimit: 32,
-    player: [['SWORDSMAN', 7, 2], ['SWORDSMAN', 7, 6], ['SPEARMAN', 7, 4], ['KNIGHT', 8, 2], ['ARCHER', 8, 3], ['MAGE', 8, 5], ['HEALER', 8, 6]],
-    ai: [['SWORDSMAN', 1, 6], ['SWORDSMAN', 1, 2], ['SPEARMAN', 1, 4], ['KNIGHT', 0, 6], ['ARCHER', 0, 5], ['MAGE', 0, 3], ['HEALER', 0, 2]] },
-  { name: '화염의 요새', theme: 'volcano', stars: 5, concept: '10×9 화산 지대. 적은 용암 해자로 둘러싸인 요새 안에 웅크리고 있고, 병력도 아군보다 많습니다. 최종 결전!',
-    tip: '요새로 들어가는 길은 서쪽 문(1,6)과 남쪽 문(3,8) 단 두 곳. 궁수·마법사는 용암 너머로 공격할 수 있습니다. 재 늪은 피하세요!',
-    layout: ['..F.H.W...', '.S..SF.H..', 'H..F..WH..', '..S..FWW.W', '.F.W.S....', '..H.WS.F..', 'S..F...W..', '.H.S.F....', '..F...H...'],
-    castles: { player: { r: 8, c: 0 }, ai: { r: 0, c: 9 } },
-    catapults: [[6, 2], [4, 6], [1, 8]], chests: [[6, 4], [4, 7]], obstacles: [[3, 8], [6, 5], [4, 2]], par: 20, turnLimit: 35,
-    player: [['SWORDSMAN', 7, 1], ['SPEARMAN', 7, 2], ['KNIGHT', 8, 2], ['ARCHER', 8, 3], ['ARCHER', 7, 4], ['MAGE', 8, 4], ['HEALER', 8, 5]],
-    ai: [['SWORDSMAN', 2, 7], ['SWORDSMAN', 4, 8], ['SPEARMAN', 2, 8], ['KNIGHT', 2, 9], ['KNIGHT', 4, 9], ['ARCHER', 0, 8], ['MAGE', 1, 9], ['HEALER', 0, 7]] },
-  { name: '국경의 평원 전투', theme: 'grass', stars: 3, concept: '10×10으로 커진 평원. 가운데 작은 호수를 끼고 8 대 8 정면 승부가 벌어집니다. 지도가 화면보다 크면 드래그로 이동할 수 있어요.',
-    tip: '맵이 넓어지기 시작합니다. 손가락으로 빈 곳을 끌어 지도를 옮기고, 호수 양쪽 길을 모두 지키세요.',
-    layout: ['..F.......','.S...F....','..F.....H.','HHF.F....S','....WW....','....WW....','S....F.FHH','.H.....F..','....F...S.','.......F..'],
-    castles: { player: { r: 9, c: 0 }, ai: { r: 0, c: 9 } },
-    catapults: [[4, 7], [5, 2]], chests: [[2, 3], [7, 6]], obstacles: [[7, 3], [6, 1], [3, 3], [2, 6], [3, 8], [6, 6]], par: 18, turnLimit: 40,
-    player: [['SWORDSMAN', 8, 1], ['SWORDSMAN', 7, 2], ['SPEARMAN', 9, 2], ['SPEARMAN', 8, 3], ['KNIGHT', 9, 3], ['ARCHER', 9, 4], ['MAGE', 8, 0], ['HEALER', 9, 1]],
-    ai: [['SWORDSMAN', 1, 8], ['SWORDSMAN', 2, 7], ['SPEARMAN', 0, 7], ['SPEARMAN', 1, 6], ['KNIGHT', 0, 6], ['ARCHER', 0, 5], ['MAGE', 1, 9], ['HEALER', 0, 8]] },
-  { name: '안개 낀 거대 숲', theme: 'forest', fog: true, stars: 3, concept: '🌫 안개 맵 · 11×11 거대 숲 한가운데 호수. 좌우 숲길과 독 늪 지대를 끼고 9 대 9 매복전이 벌어집니다.',
-    tip: '숲에서는 궁수가 강해요. 호수 양옆 숲길을 선점하고, 늪은 피해서 돌아가세요.',
-    layout: ['...........','S.F........','...HF.F.F.F','..HFH..FF..','...WWWWW..H','..FWWWWWF..','H..WWWWW...','..FF..HFH..','F.F.F.FH...','........F.S','...........'],
-    castles: { player: { r: 10, c: 5 }, ai: { r: 0, c: 5 } },
-    catapults: [[3, 9], [7, 1]], chests: [[9, 1], [1, 9]], obstacles: [[0, 8], [7, 4], [7, 10], [2, 2], [10, 2], [3, 6], [3, 0], [8, 8]], par: 20, turnLimit: 42,
-    player: [['SWORDSMAN', 9, 3], ['SWORDSMAN', 9, 7], ['SPEARMAN', 9, 4], ['SPEARMAN', 9, 6], ['KNIGHT', 9, 5], ['ARCHER', 10, 4], ['ARCHER', 10, 6], ['MAGE', 10, 3], ['HEALER', 10, 7]],
-    ai: [['SWORDSMAN', 1, 7], ['SWORDSMAN', 1, 3], ['SPEARMAN', 1, 6], ['SPEARMAN', 1, 4], ['KNIGHT', 1, 5], ['ARCHER', 0, 6], ['ARCHER', 0, 4], ['MAGE', 0, 7], ['HEALER', 0, 3]] },
-  { name: '붉은 모래 협곡', theme: 'desert', stars: 4, concept: '가로로 긴 13×9 사막을 폭 3칸 협곡 강이 가릅니다. 건너는 길은 폭 2칸 다리 두 곳뿐, 10 대 10 대규모 교전입니다.',
-    tip: '다리는 두 곳뿐! 다리를 먼저 점령하는 쪽이 유리하고, 건너편 사격에 주의하세요.',
-    layout: ['..F..WWW...H.','.....BBB.F...','.....BBBH..H.','....HWWW.....','....HWWWH....','.....WWWH....','.H..HBBB.....','...F.BBB.....','.H...WWW..F..'],
-    castles: { player: { r: 4, c: 0 }, ai: { r: 4, c: 12 } },
-    catapults: [[8, 4], [0, 8]], chests: [[6, 3], [2, 9]], obstacles: [[5, 3], [1, 11], [7, 2], [6, 2], [3, 9], [7, 1], [1, 10], [2, 10]], par: 22, turnLimit: 45,
-    player: [['SWORDSMAN', 3, 2], ['SWORDSMAN', 5, 2], ['SPEARMAN', 4, 2], ['SPEARMAN', 2, 1], ['KNIGHT', 3, 1], ['KNIGHT', 5, 1], ['ARCHER', 4, 1], ['ARCHER', 1, 0], ['MAGE', 6, 0], ['HEALER', 2, 0]],
-    ai: [['SWORDSMAN', 5, 10], ['SWORDSMAN', 3, 10], ['SPEARMAN', 4, 10], ['SPEARMAN', 6, 11], ['KNIGHT', 5, 11], ['KNIGHT', 3, 11], ['ARCHER', 4, 11], ['ARCHER', 7, 12], ['MAGE', 2, 12], ['HEALER', 6, 12]] },
-  { name: '이중 빙하 전선', theme: 'snow', stars: 4, concept: '12×13 설원에 빙하가 두 줄로 흐릅니다. 각 빙하마다 다리가 둘씩, 가운데 중립 지대에서 10 대 11 결전이 벌어집니다.',
-    tip: '두 번의 강을 건너야 해요. 가운데 땅을 차지해 보급선을 확보하고, 보물상자로 전열을 가다듬으세요.',
-    layout: ['.H..........','.F....F....F','H...........','WBBWWBBWWWWW','WBBWWBBWWWWW','...FS..SHFF.','.H........H.','.FFHS..SF...','WWWWWBBWWBBW','WWWWWBBWWBBW','...........H','F....F....F.','..........H.'],
-    castles: { player: { r: 12, c: 5 }, ai: { r: 0, c: 6 } },
-    catapults: [[0, 11], [12, 0]], chests: [[6, 6], [6, 5]], obstacles: [[12, 8], [0, 10], [1, 9], [10, 4], [0, 3], [12, 1], [11, 2], [2, 7]], par: 26, turnLimit: 50,
-    player: [['SWORDSMAN', 10, 3], ['SWORDSMAN', 10, 8], ['SPEARMAN', 10, 5], ['SPEARMAN', 10, 6], ['KNIGHT', 11, 3], ['KNIGHT', 11, 8], ['ARCHER', 11, 4], ['ARCHER', 11, 7], ['MAGE', 12, 4], ['HEALER', 12, 7]],
-    ai: [['SWORDSMAN', 2, 8], ['SWORDSMAN', 2, 3], ['SPEARMAN', 2, 6], ['SPEARMAN', 2, 5], ['KNIGHT', 1, 8], ['KNIGHT', 1, 3], ['ARCHER', 1, 7], ['ARCHER', 1, 4], ['MAGE', 0, 7], ['HEALER', 0, 4], ['SPEARMAN', 1, 5]] },
-  { name: '마왕성 최후 결전', theme: 'volcano', stars: 5, concept: '14×13 용암 지대. 두 줄기 용암 강이 요새를 가르고, 마왕의 정예 13기가 기다립니다. 최종 결전!',
-    tip: '용암 강 두 줄기에 다리가 네 곳. 투석기 4기를 잘 활용하고, 지도를 끌어 전장을 넓게 보세요.',
-    layout: ['....WW..WW....','..HHWWHSWW....','..HSBB..WW...H','.HFHBB..BBH..H','....WWH.BB..H.','....WWH.WWH...','....WW..WW....','...HWW.HWW....','.H..BB.HWW....','H..HBB..BBHFH.','H...WW..BBSH..','....WWSHWWHH..','....WW..WW....'],
-    castles: { player: { r: 12, c: 0 }, ai: { r: 0, c: 13 } },
-    catapults: [[8, 13], [11, 13], [4, 0], [1, 0]], chests: [[0, 1], [12, 12]], obstacles: [[6, 1], [2, 7], [0, 3], [0, 6], [10, 12], [6, 12], [10, 6], [12, 10], [12, 7], [2, 1]], par: 30, turnLimit: 55,
-    player: [['SWORDSMAN', 11, 2], ['SWORDSMAN', 10, 3], ['SPEARMAN', 11, 1], ['SPEARMAN', 10, 2], ['KNIGHT', 12, 2], ['KNIGHT', 9, 2], ['ARCHER', 12, 3], ['ARCHER', 11, 3], ['MAGE', 12, 1], ['MAGE', 9, 1], ['HEALER', 11, 0], ['HEALER', 10, 1]],
-    ai: [['SWORDSMAN', 1, 11], ['SWORDSMAN', 2, 10], ['SPEARMAN', 1, 12], ['SPEARMAN', 2, 11], ['KNIGHT', 0, 11], ['KNIGHT', 3, 11], ['ARCHER', 0, 10], ['ARCHER', 1, 10], ['MAGE', 0, 12], ['MAGE', 3, 12], ['HEALER', 1, 13], ['HEALER', 2, 12], ['KNIGHT', 4, 12]] },
-  {"name":"황금 들판의 함정","theme":"grass","stars":3,"concept":"🗡 가시 바닥 등장 · 12×12 들판에 가시 바닥이 숨어 있습니다. 위에 서서 턴을 마치면 피해를 입어요.","tip":"붉게 빛나는 가시 바닥에서는 멈추지 마세요! 지나가는 건 괜찮고, 턴을 마칠 때만 최대 체력의 20% 피해를 입습니다. 적을 가시 쪽으로 유인해 보세요.","par":22,"turnLimit":45,"layout":["............",".H..........","............",".F.S........","HH..SF.HHH..",".F..WWWWF...","...FWWWW..F.","..HHH.FS..HH","........S.F.","............","..........H.","............"],"castles":{"player":{"r":11,"c":0},"ai":{"r":0,"c":11}},"catapults":[[2,6],[9,5]],"chests":[[8,6],[3,5]],"obstacles":[[11,6],[3,0],[11,7],[2,8],[0,5],[8,11],[0,4],[9,3]],"spikes":[[11,9],[3,9],[4,10],[2,0],[0,2],[8,2],[7,1],[9,11]],"bombs":[],"belts":[],"warps":[],"player":[["HEALER",10,0],["MAGE",11,1],["ARCHER",9,0],["ARCHER",10,1],["KNIGHT",11,2],["SPEARMAN",8,0],["SPEARMAN",9,1],["SWORDSMAN",10,2],["SWORDSMAN",11,3]],"ai":[["HEALER",1,11],["MAGE",0,10],["ARCHER",2,11],["ARCHER",1,10],["KNIGHT",0,9],["SPEARMAN",3,11],["SPEARMAN",2,10],["SWORDSMAN",1,9],["SWORDSMAN",0,8]]},
-  {"name":"화약 사막의 협곡","theme":"desert","stars":4,"concept":"💣 화약통 등장 · 협곡을 가르는 다리 주변에 화약통이 설치돼 있습니다. 카운트가 0이 되면 주변 8칸이 폭발합니다.","tip":"화약통의 숫자는 폭발까지 남은 라운드입니다. 숫자가 1이면 곁에서 비키세요! 화약통을 공격하면 즉시 폭발하니 멀리서 터뜨려 적을 휩쓸 수도 있어요.","par":24,"turnLimit":48,"layout":[".....WWW..FF.","...H.WWW.....",".....BBBH....","...F.BBB.....","....HWWW.....","...H.WWW.H...",".....WWWH....",".....BBB.F...","....HBBB.....",".....WWW.H...",".FF..WWW....."],"castles":{"player":{"r":5,"c":0},"ai":{"r":5,"c":12}},"catapults":[[9,1],[1,11]],"chests":[[7,8],[3,4]],"obstacles":[[9,2],[2,10],[0,4],[4,8],[1,10],[8,2],[10,8],[6,4]],"spikes":[[10,3],[10,10],[0,9],[0,2]],"bombs":[[1,8,5],[10,12,4],[9,4,5],[0,0,4]],"belts":[],"warps":[],"player":[["HEALER",6,0],["MAGE",4,0],["ARCHER",5,1],["ARCHER",6,1],["KNIGHT",3,0],["KNIGHT",4,1],["SPEARMAN",5,2],["SPEARMAN",7,0],["SWORDSMAN",8,0],["SWORDSMAN",7,1]],"ai":[["HEALER",4,12],["MAGE",6,12],["ARCHER",5,11],["ARCHER",4,11],["KNIGHT",7,12],["KNIGHT",6,11],["SPEARMAN",5,10],["SPEARMAN",3,12],["SWORDSMAN",2,12],["SWORDSMAN",3,11]]},
-  {"name":"움직이는 안개 숲","theme":"forest","fog":true,"stars":4,"concept":"🌫 안개 맵 · ⏩ 컨베이어 등장 · 안개 낀 숲 속 컨베이어 벨트가 유닛을 한 칸씩 실어 나릅니다.","tip":"턴이 끝날 때 컨베이어 위에 있으면 화살표 방향으로 밀려납니다. 이를 이용해 빠르게 전진하거나, 적을 원치 않는 곳으로 보내버리세요.","par":26,"turnLimit":50,"layout":["..SF.......S.","..F.H....F..F","H.FFF...F...H","..F......FFF.","....FH.FFFFFF","....WWWWW..SS",".F..WWWWW..F.","SS..WWWWW....","FFFFFF.HF....",".FFF......F..","H...F...FFF.H","F..F....H.F..",".S.......FS.."],"castles":{"player":{"r":12,"c":6},"ai":{"r":0,"c":6}},"catapults":[[10,11],[2,1]],"chests":[[4,1],[8,11]],"obstacles":[[3,4],[9,4],[11,1],[3,7],[9,8],[3,8],[1,11],[9,5]],"spikes":[[3,0],[0,10],[9,12],[12,2]],"bombs":[],"belts":[[6,10,"D"],[7,10,"D"],[8,10,"D"],[7,3,"U"],[6,3,"U"],[5,3,"U"],[6,2,"U"],[5,2,"U"],[4,2,"U"],[5,9,"D"],[6,9,"D"],[7,9,"D"]],"warps":[],"player":[["HEALER",11,6],["MAGE",12,7],["ARCHER",12,5],["ARCHER",12,4],["KNIGHT",11,5],["KNIGHT",10,6],["SPEARMAN",11,7],["SPEARMAN",12,8],["SWORDSMAN",10,5],["SWORDSMAN",9,6]],"ai":[["HEALER",1,6],["MAGE",0,5],["ARCHER",0,7],["ARCHER",0,8],["KNIGHT",1,7],["KNIGHT",2,6],["SPEARMAN",1,5],["SPEARMAN",0,4],["SWORDSMAN",2,7],["SWORDSMAN",3,6],["SPEARMAN",0,9]]},
-  {"name":"차원의 설원","theme":"snow","stars":4,"concept":"🌀 워프 등장 · 두 줄기 얼음 강 사이에 차원 문이 열렸습니다. 같은 번호의 워프끼리 순간이동합니다.","tip":"턴을 워프 위에서 마치면 같은 번호의 짝 워프로 이동합니다. 강 건너편 기습이나 후퇴 경로로 활용하세요!","par":28,"turnLimit":52,"layout":["...........H","H......F....","H.H.......S.","............","WWBBWW.WBBWW","WWBBWWWWBBWW","............","............","WWBBWWWWBBWW","WWBBW.WWBBWW","............",".S.......H.H","....F......H","H..........."],"castles":{"player":{"r":13,"c":5},"ai":{"r":0,"c":6}},"catapults":[[3,0],[10,11]],"chests":[[6,1],[7,10]],"obstacles":[[6,0],[2,8],[3,10],[2,9],[7,11],[11,3],[10,1],[11,2]],"spikes":[[6,7],[1,1],[3,3],[7,4],[12,10],[10,8]],"bombs":[],"belts":[],"warps":[[12,8,10,2],[3,7,10,9],[1,3,3,9],[10,4,3,2]],"player":[["HEALER",12,5],["HEALER",13,6],["MAGE",11,5],["ARCHER",12,6],["ARCHER",13,7],["KNIGHT",10,5],["KNIGHT",11,6],["SPEARMAN",12,7],["SPEARMAN",13,8],["SWORDSMAN",9,5],["SWORDSMAN",10,6]],"ai":[["HEALER",1,6],["HEALER",0,5],["MAGE",2,6],["ARCHER",1,5],["ARCHER",0,4],["KNIGHT",3,6],["KNIGHT",2,5],["SPEARMAN",1,4],["SPEARMAN",0,3],["SWORDSMAN",4,6],["SWORDSMAN",3,5],["KNIGHT",0,9]]},
-  {"name":"폭열 용암 지대","theme":"volcano","stars":5,"concept":"💣 폭탄과 🗡 가시가 뒤섞인 용암 지대. 용암 강 두 줄기를 사이에 두고 화약통이 곳곳에 설치돼 있습니다.","tip":"다리 근처 화약통을 노려 적 선봉을 한 번에 쓸어버릴 수 있습니다. 반대로 내 부대가 걸리지 않게 주의하세요.","par":30,"turnLimit":55,"layout":["..H.WWH.WW....","S...WW.FWW....","....WW..WWH...","..S.BB.SBB....",".F..BB.FBB....","....WWHHWWF.H.","H...WW..WW....","....WW..WW...H",".H.FWWHHWW....","....BBF.BB..F.","....BBS.BB.S..","...HWW..WW....","....WWF.WW...S","....WW.HWW.H.."],"castles":{"player":{"r":13,"c":0},"ai":{"r":0,"c":13}},"catapults":[[7,0],[6,13]],"chests":[[1,2],[12,11]],"obstacles":[[7,11],[13,10],[13,13],[7,2],[8,2],[6,2],[0,3],[0,0],[6,11],[5,11]],"spikes":[[0,7],[2,7],[4,10],[13,6],[11,6],[9,3]],"bombs":[[1,6,5],[3,10,3],[10,13,5],[12,7,5],[10,3,3],[3,0,5]],"belts":[],"warps":[],"player":[["HEALER",12,0],["MAGE",13,1],["MAGE",11,0],["ARCHER",12,1],["ARCHER",13,2],["KNIGHT",10,0],["KNIGHT",11,1],["SPEARMAN",12,2],["SPEARMAN",13,3],["SWORDSMAN",9,0],["SWORDSMAN",10,1],["SWORDSMAN",11,2]],"ai":[["HEALER",1,13],["MAGE",0,12],["MAGE",2,13],["ARCHER",1,12],["ARCHER",0,11],["KNIGHT",3,13],["KNIGHT",2,12],["SPEARMAN",1,11],["SPEARMAN",0,10],["SWORDSMAN",4,13],["SWORDSMAN",3,12],["SWORDSMAN",2,11],["SWORDSMAN",1,10]]},
-  {"name":"순환하는 평원","theme":"grass","stars":4,"concept":"⏩ 컨베이어와 🌀 워프가 얽힌 평원. 넓은 호수를 돌아가는 길을 기믹이 바꿔놓습니다.","tip":"컨베이어와 워프를 조합하면 순식간에 전선이 바뀝니다. 적이 밀려나거나 순간이동할 위치를 예측해 보세요.","par":32,"turnLimit":58,"layout":["H.HF.HH.....FF.",".HF..HBBBF.H...","..HSH.BBBSH.H..",".........F..HH.","......WWWS.....","......WWW......","....F.WWW.F....","......WWW......",".....SWWW......",".HH..F.........","..H.HSBBB.HSH..","...H.FBBBH..FH.",".FF.....HH.FH.H"],"castles":{"player":{"r":6,"c":0},"ai":{"r":6,"c":14}},"catapults":[[9,11],[3,3]],"chests":[[0,4],[12,10]],"obstacles":[[3,5],[1,3],[8,2],[9,3],[1,10],[9,9],[11,11],[4,12],[3,11],[11,4]],"spikes":[[9,13],[2,5],[3,1],[10,9]],"bombs":[],"belts":[[7,11,"L"],[7,10,"L"],[7,9,"L"],[4,5,"L"],[4,4,"L"],[4,3,"L"],[2,14,"U"],[1,14,"U"],[0,14,"U"],[5,3,"R"],[5,4,"R"],[5,5,"R"],[8,9,"R"],[8,10,"R"],[8,11,"R"],[10,0,"D"],[11,0,"D"],[12,0,"D"]],"warps":[[0,8,5,10],[1,13,0,7],[12,6,7,4],[11,1,12,7]],"player":[["HEALER",5,0],["MAGE",6,1],["MAGE",7,0],["ARCHER",8,0],["ARCHER",7,1],["KNIGHT",4,0],["KNIGHT",5,1],["SPEARMAN",6,2],["SPEARMAN",7,2],["SWORDSMAN",3,0],["SWORDSMAN",4,1],["SWORDSMAN",5,2]],"ai":[["HEALER",7,14],["MAGE",6,13],["MAGE",5,14],["ARCHER",4,14],["ARCHER",5,13],["KNIGHT",8,14],["KNIGHT",7,13],["SPEARMAN",6,12],["SPEARMAN",5,12],["SWORDSMAN",9,14],["SWORDSMAN",8,13],["SWORDSMAN",7,12],["KNIGHT",3,14]]},
-  {"name":"혼돈의 사막 요새","theme":"desert","stars":5,"concept":"모든 기믹 총집합 · 세로 협곡 요새에 가시, 화약통, 컨베이어, 워프가 한꺼번에 등장합니다. 대규모 교전!","tip":"다리 두 곳이 핵심 길목입니다. 화약통과 가시로 적 진입로를 틀어막고, 투석기로 선제 타격하세요.","par":34,"turnLimit":60,"layout":["......WWW......","...H.HWWW......",".....HWWWFF....","...SHSBBBH..F..","......BBB......","....H.WWW..F...",".HH...WWW......","......WWW......","......WWW...HH.","...F..WWW.H....","......BBB......","..F..HBBBSHS...","....FFWWWH.....","......WWWH.H...","......WWW......"],"castles":{"player":{"r":14,"c":0},"ai":{"r":0,"c":14}},"catapults":[[1,0],[6,10],[13,14],[8,4]],"chests":[[4,5],[10,9]],"obstacles":[[6,14],[11,14],[1,10],[1,1],[12,3],[8,0],[3,0],[13,4],[13,13],[2,11]],"spikes":[[0,10],[4,0],[0,2],[14,4],[10,14],[14,12]],"bombs":[[4,10,3],[8,1,4],[10,4,3],[6,13,4]],"belts":[[7,11,"D"],[8,11,"D"],[9,11,"D"],[7,14,"D"],[8,14,"D"],[9,14,"D"],[7,3,"U"],[6,3,"U"],[5,3,"U"],[7,0,"U"],[6,0,"U"],[5,0,"U"]],"warps":[[8,5,14,5],[5,5,0,1],[6,9,0,9],[9,9,14,13]],"player":[["HEALER",13,0],["MAGE",14,1],["MAGE",12,0],["ARCHER",13,1],["ARCHER",14,2],["KNIGHT",11,0],["KNIGHT",12,1],["SPEARMAN",13,2],["SPEARMAN",14,3],["SPEARMAN",10,0],["SWORDSMAN",11,1],["SWORDSMAN",12,2],["SWORDSMAN",13,3]],"ai":[["HEALER",1,14],["MAGE",0,13],["MAGE",2,14],["ARCHER",1,13],["ARCHER",0,12],["KNIGHT",3,14],["KNIGHT",2,13],["SPEARMAN",1,12],["SPEARMAN",0,11],["SPEARMAN",4,14],["SWORDSMAN",3,13],["SWORDSMAN",2,12],["SWORDSMAN",1,11],["KNIGHT",4,13]]},
-  {"name":"미궁의 안개 숲","theme":"forest","fog":true,"stars":5,"concept":"🌫 안개 맵 · 모든 기믹 · 15×15 거대한 숲의 미궁. 시야 밖에서 컨베이어와 워프가 적을 실어 나릅니다.","tip":"안개 속에서는 적이 어디서 튀어나올지 모릅니다. 워프 출구 쪽을 경계하고, 화약통 폭발음에 주목하세요.","par":36,"turnLimit":62,"layout":["S..H....S......",".H.SS...FF.FS..","..FS.FFF..F....",".FF.SS.SHF..F.F","..FF.F..FFF.H..","..F..WWWWWF....","...FFWWWWWFH...",".....WWWWW.....","...HFWWWWWFF...","....FWWWWW..F..","..H.FFF..F.FF..","F.F..FHS.SS.FF.","....F..FFF.SF..","..SF.FF...SS.H.","......S....H..S"],"castles":{"player":{"r":7,"c":0},"ai":{"r":7,"c":14}},"catapults":[[11,4],[3,10]],"chests":[[14,2],[0,12]],"obstacles":[[9,11],[2,0],[4,11],[0,6],[7,11],[9,3],[5,3],[12,14],[10,3],[14,8],[7,3],[5,11]],"spikes":[[3,13],[12,1],[11,1],[2,13]],"bombs":[[11,3,5],[13,8,5],[3,11,5],[1,6,5]],"belts":[[12,0,"D"],[13,0,"D"],[14,0,"D"],[0,9,"R"],[0,10,"R"],[0,11,"R"],[2,14,"U"],[1,14,"U"],[0,14,"U"],[14,5,"L"],[14,4,"L"],[14,3,"L"]],"warps":[[10,13,14,13],[1,10,1,5],[4,1,0,1],[13,4,13,9]],"player":[["HEALER",8,0],["MAGE",6,0],["MAGE",7,1],["ARCHER",5,0],["ARCHER",6,1],["KNIGHT",7,2],["KNIGHT",9,0],["SPEARMAN",8,1],["SPEARMAN",10,0],["SPEARMAN",9,1],["SWORDSMAN",8,2],["SWORDSMAN",4,0],["SWORDSMAN",5,1]],"ai":[["HEALER",6,14],["MAGE",8,14],["MAGE",7,13],["ARCHER",9,14],["ARCHER",8,13],["KNIGHT",7,12],["KNIGHT",5,14],["SPEARMAN",6,13],["SPEARMAN",4,14],["SPEARMAN",5,13],["SWORDSMAN",6,12],["SWORDSMAN",10,14],["SWORDSMAN",9,13],["KNIGHT",8,12],["MAGE",4,13]]},
-  {"name":"서리 왕국의 관문","theme":"snow","stars":5,"concept":"폭이 4칸이나 되는 거대한 얼음 강과 세 곳의 다리. 가시·화약통·컨베이어·워프가 모두 깔린 관문입니다.","tip":"다리 위에서의 싸움은 불리합니다. 워프로 측면을 노리고, 화약통으로 다리를 막은 적을 날려버리세요.","par":38,"turnLimit":65,"layout":["..........F.FH..","H..........FHHF.","..S.........HH..","..........FS....",".F..F......H..FH","WWBBWWWBBWWWBBWW","WWBBWWWBBWWWBBWW","WWBBWWWBBWWWBBWW","WWBBWWWBBWWWBBWW","HF..H......F..F.","....SF..........","..HH.........S..",".FHHF..........H","..HF.F.........."],"castles":{"player":{"r":13,"c":7},"ai":{"r":0,"c":8}},"catapults":[[9,6],[4,9]],"chests":[[9,13],[4,2]],"obstacles":[[4,10],[2,1],[0,1],[11,1],[10,14],[9,5],[11,14],[13,14],[2,14],[3,1]],"spikes":[[1,2],[1,1],[10,0],[12,13],[12,14],[3,15]],"bombs":[[11,15,5],[10,12,3],[9,12,5],[2,0,5],[3,3,3],[4,3,5]],"belts":[[4,7,"L"],[4,6,"L"],[4,5,"L"],[10,9,"R"],[10,10,"R"],[10,11,"R"],[10,1,"R"],[10,2,"R"],[10,3,"R"],[9,8,"R"],[9,9,"R"],[9,10,"R"],[3,6,"L"],[3,5,"L"],[3,4,"L"],[3,14,"L"],[3,13,"L"],[3,12,"L"]],"warps":[[12,11,10,15],[12,0,11,4],[1,4,3,0],[1,15,2,11]],"player":[["HEALER",12,7],["MAGE",13,8],["MAGE",11,7],["ARCHER",12,8],["ARCHER",13,9],["KNIGHT",10,7],["KNIGHT",11,8],["KNIGHT",12,9],["SPEARMAN",13,10],["SPEARMAN",9,7],["SPEARMAN",10,8],["SWORDSMAN",11,9],["SWORDSMAN",12,10],["SWORDSMAN",13,11]],"ai":[["HEALER",1,8],["MAGE",0,7],["MAGE",2,8],["ARCHER",1,7],["ARCHER",0,6],["KNIGHT",3,8],["KNIGHT",2,7],["KNIGHT",1,6],["SPEARMAN",0,5],["SPEARMAN",4,8],["SPEARMAN",3,7],["SWORDSMAN",2,6],["SWORDSMAN",1,5],["SWORDSMAN",0,4],["KNIGHT",0,11],["SPEARMAN",1,10]]},
-  {"name":"마왕의 심장부","theme":"volcano","stars":5,"concept":"16×16 십자 용암 지대. 4개 구역을 가르는 용암과 모든 기믹, 마왕의 정예 18기가 기다리는 최종 결전입니다.","tip":"십자 용암으로 갈라진 구역들을 다리로 잇는 전투입니다. 모든 기믹을 활용해 마왕의 군세를 무너뜨리세요!","par":42,"turnLimit":70,"layout":["....H..WW.......","..H...FWW.H.....","H...H..BB.......","F.SH.F.BB.H.....",".H.....WW.......",".......WW.HH....","F.S....WW.......","WWWBBWWWWWWBBWWW","WWWBBWWWWWWBBWWW",".......WW....S.F","....HH.WW.......",".......WW.....H.",".....H.BB.F.HS.F",".......BB..H...H",".....H.WWF...H..",".......WW..H...."],"castles":{"player":{"r":15,"c":0},"ai":{"r":0,"c":15}},"catapults":[[0,1],[9,2],[15,14],[6,13]],"chests":[[9,6],[6,9]],"obstacles":[[14,10],[5,4],[2,1],[3,9],[6,4],[4,6],[1,5],[10,11],[13,14],[12,6],[9,11],[11,9]],"spikes":[[9,10],[14,11],[6,3],[15,9],[6,5],[1,4],[9,12],[0,6]],"bombs":[[2,11,3],[9,14,5],[10,2,4],[13,4,3],[6,1,5],[5,13,4]],"belts":[[2,9,"U"],[1,9,"U"],[0,9,"U"],[11,5,"L"],[11,4,"L"],[11,3,"L"],[10,12,"R"],[10,13,"R"],[10,14,"R"],[13,6,"D"],[14,6,"D"],[15,6,"D"],[4,10,"R"],[4,11,"R"],[4,12,"R"],[5,3,"L"],[5,2,"L"],[5,1,"L"]],"warps":[[15,12,10,15],[3,11,2,5],[11,10,13,5],[0,3,5,0],[12,4,13,10],[4,5,2,10]],"player":[["HEALER",14,0],["HEALER",15,1],["MAGE",13,0],["MAGE",14,1],["ARCHER",15,2],["ARCHER",12,0],["KNIGHT",13,1],["KNIGHT",14,2],["KNIGHT",15,3],["SPEARMAN",11,0],["SPEARMAN",12,1],["SPEARMAN",13,2],["SWORDSMAN",14,3],["SWORDSMAN",15,4],["SWORDSMAN",10,0]],"ai":[["HEALER",1,15],["HEALER",0,14],["MAGE",2,15],["MAGE",1,14],["ARCHER",0,13],["ARCHER",3,15],["KNIGHT",2,14],["KNIGHT",1,13],["KNIGHT",0,12],["SPEARMAN",4,15],["SPEARMAN",3,14],["SPEARMAN",2,13],["SWORDSMAN",1,12],["SWORDSMAN",0,11],["SWORDSMAN",5,15],["KNIGHT",0,10],["KNIGHT",1,11],["MAGE",2,12]]}
+// ---------- 월드맵 구역 & 스테이지 자동 생성 ----------
+// 6×6 ~ 16×16 정사각 맵을 크기별 10개씩 (총 110개). 월드맵의 구역(분위기)이 바뀌면 스테이지 테마도 같이 바뀐다.
+const SIZES = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], PER_SIZE = 10;
+const REGIONS = [
+  { theme: 'grass', name: '푸른 초원', icon: '🌾', adj: ['바람 부는', '황금빛', '푸른', '이슬 맺힌', '고요한', '꽃피는'], noun: ['들판', '언덕', '나루터', '초입', '평원', '오솔길', '풀밭', '방목지'] },
+  { theme: 'forest', name: '속삭이는 숲', icon: '🌲', adj: ['깊은', '이끼 낀', '안개 낀', '속삭이는', '어둑한', '고목의'], noun: ['숲길', '숲속', '샘터', '오두막', '늪지', '수풀', '바위숲', '숲 어귀'] },
+  { theme: 'desert', name: '붉은 사막', icon: '🏜️', adj: ['타오르는', '모래빛', '신기루의', '메마른', '붉은', '잊힌'], noun: ['오아시스', '협곡', '모래언덕', '유적', '대상로', '바위산', '폐허', '사구'] },
+  { theme: 'snow', name: '서리 설원', icon: '❄️', adj: ['얼어붙은', '하얀', '서리 맺힌', '눈보라의', '푸른 빙하의', '적막한'], noun: ['설원', '빙하', '고개', '강가', '산장', '얼음벽', '눈밭', '관문'] },
+  { theme: 'volcano', name: '불의 화산', icon: '🌋', adj: ['타오르는', '검붉은', '재의', '용암의', '불꽃의', '마왕의'], noun: ['화구', '용암길', '요새', '불길', '심장부', '재의 평원', '암흑 성채', '분화구'] }
 ];
+const TOTAL_STAGES = SIZES.length * PER_SIZE;
+const REGION_LEN = Math.ceil(TOTAL_STAGES / REGIONS.length);
+const regionOf = i => Math.min(REGIONS.length - 1, Math.floor(i / REGION_LEN));
+const mulberry32 = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const ARMY_ORDER = ['SWORDSMAN', 'SPEARMAN', 'ARCHER', 'HEALER', 'KNIGHT', 'MAGE', 'SWORDSMAN', 'SPEARMAN', 'KNIGHT', 'ARCHER', 'MAGE', 'SWORDSMAN', 'SPEARMAN', 'KNIGHT', 'HEALER', 'ARCHER', 'SWORDSMAN', 'MAGE', 'KNIGHT', 'SPEARMAN'];
+const UNIT_RANK = { HEALER: 0, MAGE: 1, ARCHER: 2, KNIGHT: 3, SPEARMAN: 4, SWORDSMAN: 5 };
+const GEN_TIPS = {
+  chest: '보물상자(📦)에 올라서면 팀 전체가 완전히 회복됩니다. 적도 열 수 있으니 먼저 차지하세요!',
+  obstacle: '바리케이드(🧱)는 HP 30을 깎으면 부술 수 있습니다. 길을 막았다면 공격으로 열어보세요.',
+  catapult: '투석기(🪨)를 차지하고 위에서 공격하면 사거리가 늘어납니다. 투석기마다 한 번뿐이에요.',
+  river: '강을 건널 수 있는 곳은 폭 2칸 다리뿐입니다. 다리 앞 길목을 먼저 차지하세요.',
+  spikes: '붉게 빛나는 가시 바닥에서는 턴을 마치지 마세요. 지나가는 건 괜찮아요.',
+  bombs: '화약통의 숫자는 폭발까지 남은 라운드입니다. 적 선봉 근처에서 터뜨리면 한 번에 쓸어버릴 수 있어요.',
+  belts: '컨베이어 위에서 턴을 끝내면 화살표 방향으로 밀려납니다. 이를 이용해 전진하거나 적을 밀어내세요.',
+  warps: '같은 번호의 워프끼리 순간이동합니다. 측면 기습과 후퇴 경로로 쓰세요.',
+  fog: '안개 속에서는 적이 어디서 튀어나올지 모릅니다. 시야를 넓히며 전진하세요.',
+  lake: '호수는 건널 수 없지만 궁수·마법사의 공격은 호수 너머로 닿습니다.',
+  generic: ['성 바로 옆(🛡×2) 칸에 서면 공격력이 2배! 먼저 길목을 지키세요.', '투석기(🪨)를 차지하면 멀리 있는 적을 먼저 때릴 수 있습니다.', '보물상자(📦)는 팀 전체를 완전 회복시켜 줍니다. 적도 열 수 있으니 서두르세요.', '상성(검사›창병›나이트›궁수)을 활용하면 피해가 크게 달라집니다.', '힐러는 뒤에서 아군을 지키세요. 마법사와 힐러는 항상 공격에 취약합니다.']
+};
+const aiBoost = i => -0.15 + 0.70 * Math.pow(i / (TOTAL_STAGES - 1), 0.75);       // 적 체력·공격력 보정
+const stageGold = i => 110 + i * 22;                                              // 스테이지 기본 보상
+
+// ----- 오브젝트 단계별 해금: 스테이지 번호(0부터)에 처음 등장하는 오브젝트 -----
+const UNLOCK = { chest: 1, obstacle: 2, catapult: 3, lake: 4, river: 5, spikes: 6, bombs: 7, belts: 8, warps: 9 };
+const UNLOCK_PERIOD = { lake: 2, river: 3, spikes: 3, bombs: 4, belts: 4, warps: 5 };   // 해금 뒤 몇 스테이지마다 다시 등장하는지
+const UNLOCK_LABEL = { chest: '📦 보물상자', obstacle: '🧱 바리케이드', catapult: '🪨 투석기', lake: '🌊 호수', river: '🌉 강과 다리', spikes: '⚠️ 가시 바닥', bombs: '💣 화약통', belts: '⏩ 컨베이어', warps: '🌀 워프' };
+const hasObj = (x, i) => i >= UNLOCK[x] && (!UNLOCK_PERIOD[x] || (i - UNLOCK[x]) % UNLOCK_PERIOD[x] === 0);
+const newObjsAt = i => Object.keys(UNLOCK).filter(x => UNLOCK[x] === i);
+
+function genStage(i) {
+  for (let att = 0; att < 60; att++) { const s = tryGenStage(i, att, att >= 45); if (s) return s; }
+  return tryGenStage(i, 999, true);
+}
+function tryGenStage(i, att, simple) {
+  const N = SIZES[Math.floor(i / PER_SIZE)], k = i % PER_SIZE, reg = regionOf(i), R = REGIONS[reg], theme = R.theme;
+  const rng = mulberry32(7919 * (i + 1) + att * 104729);
+  const rnd = n => Math.floor(rng() * n), pick = a => a[rnd(a.length)];
+  const mid = Math.floor(N / 2);
+  const variant = k === 0 ? 0 : rnd(3);     // 0: 좌하↔우상, 1: 하단 중앙↔상단 중앙, 2: 우하↔좌상
+  const P = variant === 0 ? { r: N - 1, c: 0 } : variant === 1 ? { r: N - 1, c: mid } : { r: N - 1, c: N - 1 };
+  const A = variant === 0 ? { r: 0, c: N - 1 } : variant === 1 ? { r: 0, c: mid } : { r: 0, c: 0 };
+  const mir = (r, c) => variant === 1 ? [N - 1 - r, c] : [N - 1 - r, N - 1 - c];
+  const flipDir = d => variant === 1 ? ({ U: 'D', D: 'U', L: 'L', R: 'R' })[d] : ({ U: 'D', D: 'U', L: 'R', R: 'L' })[d];
+  const cheb = (a, b, c, d) => Math.max(Math.abs(a - c), Math.abs(b - d));
+  const key = (r, c) => r + ',' + c;
+  const inB = (r, c) => r >= 0 && c >= 0 && r < N && c < N;
+
+  // ----- 지형 -----
+  const W = { grass: [.10, .08, .025], forest: [.22, .07, .04], desert: [.08, .12, .04], snow: [.10, .09, .03], volcano: [.08, .10, .04] }[theme];
+  const g = Array.from({ length: N }, () => Array(N).fill('.'));
+  for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
+    const x = rng(); let ch = '.';
+    if (x < W[0]) ch = 'F'; else if (x < W[0] + W[1]) ch = 'H'; else if (x < W[0] + W[1] + W[2]) ch = 'S';
+    else if (rng() < 0.3) { const nb = [c > 0 ? g[r][c - 1] : '.', r > 0 ? g[r - 1][c] : '.'].filter(t => t === 'F' || t === 'H'); if (nb.length) ch = pick(nb); }
+    g[r][c] = ch;
+  }
+  const flags = {
+    river: !simple && hasObj('river', i),
+    lake: !simple && hasObj('lake', i) && !hasObj('river', i),
+    spikes: !simple && hasObj('spikes', i),
+    bombs: !simple && hasObj('bombs', i),
+    belts: !simple && hasObj('belts', i),
+    warps: !simple && hasObj('warps', i),
+    fog: theme === 'forest' && i % 3 === 1
+  };
+  if (flags.river) {
+    const horiz = variant === 1 || rng() < 0.5;
+    const w = N < 9 ? 1 : N < 13 ? 2 : 3, a = Math.floor((N - w) / 2), nPairs = N < 12 ? 1 : 2;
+    for (let t = a; t < a + w; t++) for (let u = 0; u < N; u++) { if (horiz) g[t][u] = 'W'; else g[u][t] = 'W'; }
+    const starts = []; let guard = 0;
+    while (starts.length < nPairs && guard++ < 40) {
+      const s = rnd(Math.max(1, Math.floor(N / 2) - 1));            // 한쪽 절반에만 다리 시작점을 정하면 대칭 복사로 짝이 생긴다
+      if (starts.every(x => Math.abs(x - s) >= 3)) starts.push(s);
+    }
+    starts.forEach(s => { for (let t = a; t < a + w; t++) for (let d = 0; d < 2; d++) { if (horiz) g[t][s + d] = 'B'; else g[s + d][t] = 'B'; } });
+  }
+  if (flags.lake) {
+    const nLake = N >= 12 ? 2 : 1;
+    for (let q = 0; q < nLake; q++) {
+      const cr = 2 + rnd(Math.max(1, N - 4)), cc = 2 + rnd(Math.max(1, N - 4));
+      if (cheb(cr, cc, P.r, P.c) < 3 || cheb(cr, cc, A.r, A.c) < 3) continue;
+      g[cr][cc] = 'W';
+      const extra = rnd(3) + (N >= 10 ? 1 : 0);
+      for (let e = 0; e < extra; e++) { const dr = pick([-1, 0, 1]), dc = pick([-1, 0, 1]); const rr = cr + dr, c2 = cc + dc; if (inB(rr, c2) && cheb(rr, c2, P.r, P.c) > 2 && cheb(rr, c2, A.r, A.c) > 2) g[rr][c2] = 'W'; }
+    }
+  }
+  // 대칭 복사 (공정한 맵)
+  for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) { const [mr, mc] = mir(r, c); if (r * N + c < mr * N + mc) g[mr][mc] = g[r][c]; }
+  // 성 주변은 평지
+  for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (cheb(r, c, P.r, P.c) <= 1 || cheb(r, c, A.r, A.c) <= 1) g[r][c] = '.';
+
+  // ----- 오브젝트 배치 (대칭 쌍) -----
+  const used = new Set(), okTile = (r, c) => inB(r, c) && g[r][c] !== 'W' && g[r][c] !== 'B' && !used.has(key(r, c)) && cheb(r, c, P.r, P.c) > 1 && cheb(r, c, A.r, A.c) > 1;
+  const symPairs = (cnt, make) => {
+    const out = []; let guard = 0;
+    while (out.length < cnt * 2 && guard++ < 200) {
+      const r = rnd(N), c = rnd(N), [mr, mc] = mir(r, c);
+      if (r === mr && c === mc) continue;
+      if (!okTile(r, c) || !okTile(mr, mc)) continue;
+      used.add(key(r, c)); used.add(key(mr, mc));
+      out.push(make(r, c, false), make(mr, mc, true));
+    }
+    return out;
+  };
+  const catapults = hasObj('catapult', i) ? symPairs(N < 12 ? 1 : 2, (r, c) => [r, c]) : [];
+  const chests = hasObj('chest', i) ? symPairs(1, (r, c) => [r, c]) : [];
+  const obstacles = (simple || !hasObj('obstacle', i)) ? [] : symPairs(Math.max(1, Math.round(N * 0.3)), (r, c) => [r, c]);
+  const spikes = flags.spikes ? symPairs(Math.max(1, Math.round(N * 0.25)), (r, c) => [r, c]) : [];
+  const fuseOf = {};
+  const bombs = [];
+  if (flags.bombs) {
+    const n = Math.max(1, Math.round(N * 0.18)); let qi = 0;
+    symPairs(n, (r, c, second) => { if (!second) fuseOf.cur = 3 + rnd(3); bombs.push([r, c, fuseOf.cur]); qi++; return [r, c]; });
+  }
+  const belts = [];
+  if (flags.belts) {
+    const nPairs = N < 12 ? 1 : N < 15 ? 2 : 3; let made = 0, guard = 0;
+    while (made < nPairs && guard++ < 200) {
+      const d = pick(['U', 'D', 'L', 'R']), dv = { U: [-1, 0], D: [1, 0], L: [0, -1], R: [0, 1] }[d], r0 = rnd(N), c0 = rnd(N);
+      const t1 = [0, 1, 2].map(j => [r0 + dv[0] * j, c0 + dv[1] * j]);
+      const t2 = t1.map(([r, c]) => mir(r, c));
+      const all = [...t1, ...t2];
+      if (!all.every(([r, c]) => okTile(r, c)) || new Set(all.map(([r, c]) => key(r, c))).size !== 6) continue;
+      all.forEach(([r, c]) => used.add(key(r, c)));
+      t1.forEach(([r, c]) => belts.push([r, c, d])); t2.forEach(([r, c]) => belts.push([r, c, flipDir(d)]));
+      made++;
+    }
+  }
+  const warps = [];
+  if (flags.warps) {
+    const nW = N < 14 ? 1 : 2; let made = 0, guard = 0;
+    while (made < nW && guard++ < 300) {
+      const r1 = rnd(N), c1 = rnd(N), r2 = rnd(N), c2 = rnd(N);
+      if (cheb(r1, c1, r2, c2) < Math.floor(N / 2)) continue;
+      const [m1r, m1c] = mir(r1, c1), [m2r, m2c] = mir(r2, c2);
+      const all = [[r1, c1], [r2, c2], [m1r, m1c], [m2r, m2c]];
+      if (!all.every(([r, c]) => okTile(r, c)) || new Set(all.map(([r, c]) => key(r, c))).size !== 4) continue;
+      all.forEach(([r, c]) => used.add(key(r, c)));
+      warps.push([r1, c1, r2, c2], [m1r, m1c, m2r, m2c]); made++;
+    }
+  }
+  // ----- 연결성 검사: 성 ↔ 성 길이 있어야 한다 (물·장애물·화약통은 막힘) -----
+  const blocked = new Set([...obstacles, ...bombs].map(([r, c]) => key(r, c)));
+  const seen = new Set([key(P.r, P.c)]), q = [[P.r, P.c]];
+  while (q.length) { const [r, c] = q.shift(); for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nr = r + dr, nc = c + dc; if (!inB(nr, nc) || g[nr][nc] === 'W' || blocked.has(key(nr, nc)) || seen.has(key(nr, nc))) continue; seen.add(key(nr, nc)); q.push([nr, nc]); } }
+  if (!seen.has(key(A.r, A.c))) return null;
+  // 두 성 모두 점령 칸(상하좌우)에 접근 가능해야 한다 (위 검사로 충분하지만 성 옆이 막혔는지도 확인)
+  // ----- 병력 배치 -----
+  const T = Math.max(4, Math.min(18, Math.round(4 + (N - 6) * 1.4)));
+  const extraAi = k >= 9 ? 2 : k >= 5 ? 1 : 0;
+  const objTiles = new Set([...used, ...blocked]);
+  const place = (own, foe, count, owner) => {
+    const cands = [];
+    for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
+      if (g[r][c] === 'W' || g[r][c] === 'B' || objTiles.has(key(r, c)) || (r === own.r && c === own.c) || (r === foe.r && c === foe.c)) continue;
+      if (cheb(r, c, own.r, own.c) >= cheb(r, c, foe.r, foe.c)) continue;
+      cands.push({ r, c, d: cheb(r, c, own.r, own.c) + rng() * 0.9 });
+    }
+    cands.sort((x, y) => x.d - y.d);
+    if (cands.length < count) return null;
+    const army = ARMY_ORDER.slice(0, count).sort((x, y) => UNIT_RANK[x] - UNIT_RANK[y]);
+    return army.map((t, j) => [t, cands[j].r, cands[j].c]);
+  };
+  const player = place(P, A, T, 'player'), ai = place(A, P, T + extraAi, 'ai');
+  if (!player || !ai) return null;
+  const featTags = [];
+  if (flags.river) featTags.push('강'); if (flags.lake) featTags.push('호수'); if (spikes.length) featTags.push('가시'); if (bombs.length) featTags.push('화약통'); if (belts.length) featTags.push('컨베이어'); if (warps.length) featTags.push('워프'); if (flags.fog) featTags.push('안개');
+  const j = i - reg * REGION_LEN;
+  const name = `${R.adj[j % R.adj.length]} ${R.noun[(j * 3 + Math.floor(j / R.adj.length)) % R.noun.length]}`;
+  const base = N < 8 ? '좁은 전장에서 벌어지는 소규모 전투.' : N < 11 ? '중간 규모의 전장.' : N < 14 ? '대규모 교전이 벌어지는 전장.' : '거대한 전장에서 펼쳐지는 총력전.';
+  const feat = [];
+  if (flags.river) feat.push('강과 다리가 길을 가릅니다.'); if (flags.lake) feat.push('호수가 길을 돌려놓습니다.');
+  if (spikes.length) feat.push('⚠ 가시 바닥이 곳곳에 있습니다.'); if (bombs.length) feat.push('💣 화약통이 설치돼 있습니다.');
+  if (belts.length) feat.push('⏩ 컨베이어가 유닛을 실어 나릅니다.'); if (warps.length) feat.push('🌀 워프 문이 열려 있습니다.');
+  if (flags.fog) feat.unshift('🌫 안개 맵 · 아군 주변 3칸 밖의 적은 보이지 않습니다.');
+  const fresh = newObjsAt(i);
+  if (fresh.length) feat.unshift('✨ 새 오브젝트: ' + fresh.map(x => UNLOCK_LABEL[x]).join(', '));
+  const freshMain = fresh.length ? ({ spikes: 'spikes', bombs: 'bombs', belts: 'belts', warps: 'warps', river: 'river', lake: 'lake', chest: 'chest', obstacle: 'obstacle', catapult: 'catapult' })[fresh[0]] : null;
+  const main = freshMain ? freshMain : flags.fog ? 'fog' : bombs.length ? 'bombs' : warps.length ? 'warps' : belts.length ? 'belts' : spikes.length ? 'spikes' : flags.river ? 'river' : flags.lake ? 'lake' : null;
+  const tip = main ? GEN_TIPS[main] : GEN_TIPS.generic[(i + k) % GEN_TIPS.generic.length];
+  const par = Math.round(3 * N - 10 + k / 3);
+  const layout = g.map((row, r) => row.map((ch, c) => ch).join(''));
+  return {
+    name, theme, newObj: fresh, fog: flags.fog || undefined, stars: reg + 1, size: N, region: reg, features: featTags,
+    concept: `${R.icon} ${N}×${N} ${R.name}. ${base} ${feat.join(' ')}`.trim(), tip,
+    layout, castles: { player: P, ai: A },
+    catapults, chests, obstacles, spikes, bombs, belts, warps,
+    par, turnLimit: Math.round(par * 1.3 + 14), player, ai
+  };
+}
+const STAGES = Array.from({ length: TOTAL_STAGES }, (_, i) => genStage(i));
 
 
 // ---------- 부술 수 있는 장애물 ----------
@@ -973,12 +1177,12 @@ const captureOf = (r, c) => Object.keys(CASTLES).find(k => Math.abs(CASTLES[k].r
 const TYPE_ADVANTAGE = { SWORDSMAN: 'SPEARMAN', SPEARMAN: 'KNIGHT', KNIGHT: 'ARCHER' }; // 마법사는 상성 순환에서 제외 (항상 열세 대상)
 const DAMAGE_SCALE = 2; // 전체 공격력 배율
 const UNIT_TYPES = {
-  SWORDSMAN: { name: '검사', maxHp: 28, atk: 9, def: 3, healPower: 0, evade: 6, tag: '상하좌우 1칸', color: 'text-blue-400', desc: '창병에 우세 / 공격: 상하좌우 1칸 / 이동: 직선 3칸' },
-  SPEARMAN: { name: '창병', maxHp: 32, atk: 8, def: 4, healPower: 0, evade: 3, tag: '대각선 1칸', color: 'text-green-400', desc: '나이트에 우세, 검사에 열세 / 공격: 대각선 1칸 / 이동: 상하좌우 2칸' },
-  KNIGHT: { name: '나이트', maxHp: 26, atk: 10, def: 2, healPower: 0, evade: 13, tag: '인접 8방향', color: 'text-amber-400', desc: '궁수에 우세, 창병에 열세 / 공격: 인접 8방향 / 이동: L자 점프' },
-  ARCHER: { name: '궁수', maxHp: 22, atk: 9, def: 1, healPower: 0, evade: 10, tag: '사거리 2칸', color: 'text-purple-400', desc: '나이트에 열세 / 공격: 사거리 2칸 / 이동: 대각선 2칸' },
-  MAGE: { name: '마법사', maxHp: 20, atk: 8, def: 1, healPower: 0, evade: 6, tag: '사거리 1~2칸', color: 'text-pink-400', desc: '공격할 땐 모두에게 우세, 공격받을 땐 항상 열세 / 공격: 사거리 1~2칸 / 이동: 2칸' },
-  HEALER: { name: '힐러', maxHp: 20, atk: 0, def: 2, healPower: 15, evade: 10, tag: '8방향 회복', color: 'text-emerald-400', desc: '상하좌우·대각선 1칸 아군 HP 15 회복 (자신 제외) / 이동: 대각선 2칸' }
+  SWORDSMAN: { name: '검사', maxHp: 28, atk: 9, def: 3, healPower: 0, evade: 3, tag: '상하좌우 1칸', color: 'text-blue-400', desc: '창병에 우세 / 공격: 상하좌우 1칸 / 이동: 직선 3칸' },
+  SPEARMAN: { name: '창병', maxHp: 32, atk: 8, def: 4, healPower: 0, evade: 2, tag: '대각선 1칸', color: 'text-green-400', desc: '나이트에 우세, 검사에 열세 / 공격: 대각선 1칸 / 이동: 상하좌우 2칸' },
+  KNIGHT: { name: '나이트', maxHp: 26, atk: 10, def: 2, healPower: 0, evade: 7, tag: '인접 8방향', color: 'text-amber-400', desc: '궁수에 우세, 창병에 열세 / 공격: 인접 8방향 / 이동: L자 점프' },
+  ARCHER: { name: '궁수', maxHp: 22, atk: 9, def: 1, healPower: 0, evade: 5, tag: '사거리 2칸', color: 'text-purple-400', desc: '나이트에 열세 / 공격: 사거리 2칸 / 이동: 대각선 2칸' },
+  MAGE: { name: '마법사', maxHp: 20, atk: 8, def: 1, healPower: 0, evade: 3, tag: '사거리 1~2칸', color: 'text-pink-400', desc: '공격할 땐 모두에게 우세, 공격받을 땐 항상 열세 / 공격: 사거리 1~2칸 / 이동: 2칸' },
+  HEALER: { name: '힐러', maxHp: 20, atk: 0, def: 2, healPower: 15, evade: 5, tag: '2칸 회복', color: 'text-emerald-400', desc: '반경 2칸(대각선 포함) 아군 HP 15 회복 (자신 제외) / 이동: 대각선 2칸' }
 };
 const DIRS_ORTHO = [[-1, 0], [1, 0], [0, -1], [0, 1]];
 const DIRS_DIAG = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
@@ -986,9 +1190,9 @@ const DIRS_DIAG = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
 // ---------- Terrain & Evade ----------
 const BASE_TERRAINS = {
   PLAIN:  { name: '평지', icon: '🌾', bonus: 0,   by: {},                         note: '보정 없음' },
-  FOREST: { name: '숲',   icon: '🌲', bonus: 10,  by: { KNIGHT: 3, ARCHER: 12 },   note: '회피 +10% (나이트 +3%, 궁수 +12%)' },
-  HILL:   { name: '언덕', icon: '⛰️', bonus: 5,  by: { KNIGHT: 8 },              note: '회피 +5% (나이트 +8%)' },
-  SWAMP:  { name: '늪',   icon: '🌫️', bonus: -8, by: { KNIGHT: -12, MAGE: -5 },  note: '회피 -8% (나이트 -12%, 마법사 -5%) · 서 있으면 다음 이동 -1칸 (나이트는 대각선 1칸만)' },
+  FOREST: { name: '숲',   icon: '🌲', bonus: 5,  by: { KNIGHT: 2, ARCHER: 6 },   note: '회피 +5% (나이트 +2%, 궁수 +6%)' },
+  HILL:   { name: '언덕', icon: '⛰️', bonus: 3,  by: { KNIGHT: 4 },              note: '회피 +3% (나이트 +4%)' },
+  SWAMP:  { name: '늪',   icon: '🌫️', bonus: -4, by: { KNIGHT: -6, MAGE: -3 },  note: '회피 -4% (나이트 -6%, 마법사 -3%) · 서 있으면 다음 이동 -1칸 (나이트는 대각선 1칸만)' },
   WATER:  { name: '물',   icon: '🌊', bonus: 0,   by: {},                         note: '진입/통과 불가 (공격은 가능)' },
   BRIDGE: { name: '다리', icon: '🌉', bonus: 0,   by: {},                         note: '보정 없음 · 물을 건너는 길목' }
 };
@@ -998,19 +1202,20 @@ let TERRAIN_LAYOUT = [];
 const TERRAIN_KEY = { '.': 'PLAIN', F: 'FOREST', H: 'HILL', S: 'SWAMP', W: 'WATER', B: 'BRIDGE' };
 const terrainAt = (r, c) => TERRAIN_KEY[TERRAIN_LAYOUT[r][c]];
 const terrainBonus = (typeKey, tk) => { const t = TERRAINS[tk]; return t.by[typeKey] !== undefined ? t.by[typeKey] : t.bonus; };
-const clampEv = v => Math.max(0, Math.min(30, v));   // 지형 포함 회피율 최대 30% (기세 보너스는 그 위에 더해짐)
+const clampEv = v => Math.max(0, Math.min(15, v));   // 지형 포함 회피율 최대 15% (기세 보너스는 그 위에 더해짐)
 // ---------- 기세(돌격/소극) ----------
-// 적 성 쪽으로 전진하거나 공격하면 기세가 오르고(공격력 +8%/단계, 회피 +3%p/단계), 둘 다 안 하면 내려간다 (-3 ~ +3)
+// 적 성 쪽으로 전진하거나 공격하면 기세가 오르고(공격력 +8%/단계, 회피 +1.5%p/단계), 둘 다 안 하면 내려간다 (-3 ~ +3)
 const MO_MAX = 3, MO_MIN = -3;
 let momentum = { player: 0, ai: 0 }, lastActed = { attack: false, heal: false };
 const moAtk = o => 1 + 0.08 * (momentum[o] || 0);
-const moEv = o => 3 * (momentum[o] || 0);
+const MO_EV = 1.5;   // 기세 1단계당 회피 보정(%p)
+const moEv = o => MO_EV * (momentum[o] || 0);
 const manh = (r1, c1, r2, c2) => Math.abs(r1 - r2) + Math.abs(c1 - c2);
 function renderMo() {
   ['player', 'ai'].forEach(o => {
     const el = $('mo-' + o); if (!el) return;
     const v = momentum[o], mine = o === 'player';
-    const atk = Math.round(v * 8), ev = v * 3, sg = x => (x > 0 ? '+' : '') + x;
+    const atk = Math.round(v * 8), ev = v * MO_EV, sg = x => (x > 0 ? '+' : '') + x;
     const pips = []; for (let i = MO_MIN; i <= MO_MAX; i++) pips.push(`<i class="${i === 0 ? 'mid' : ''} ${v > 0 && i > 0 && i <= v ? 'on-up' : v < 0 && i < 0 && i >= v ? 'on-down' : ''}"></i>`);
     const label = v > 0 ? `🔥 돌격 ${sg(v)}` : v < 0 ? `🧊 소극 ${v}` : '⚖ 기세 0';
     el.className = 'mo-pill' + (mine ? '' : ' foe') + (v >= 2 ? ' hot' : v <= -2 ? ' cold' : '');
@@ -1035,17 +1240,17 @@ function applyMomentum(u, from, attacked, healed) {
   lastActed = { attack: false, heal: false };
   if (momentum[o] !== old && units.includes(u)) {
     showFloatingText(u.r, u.c, momentum[o] > old ? `🔥기세 ${momentum[o] > 0 ? '+' : ''}${momentum[o]}` : `🧊기세 ${momentum[o]}`, momentum[o] > old ? 'heal' : 'miss', '', 120);
-    addLog(o === 'player' ? '아군' : '적군', `${o === 'player' ? '아군' : '적군'} 기세 <b>${momentum[o] > 0 ? '+' : ''}${momentum[o]}</b> (${adv && attacked ? '전진 + 공격' : adv ? '적 성 방향으로 전진' : attacked ? '공격' : '소극적 행동'}) — 공격력 ${momentum[o] >= 0 ? '+' : ''}${momentum[o] * 8}% · 회피 ${momentum[o] >= 0 ? '+' : ''}${momentum[o] * 3}%p`, momentum[o] > old ? 'text-amber-300' : 'text-sky-300');
+    addLog(o === 'player' ? '아군' : '적군', `${o === 'player' ? '아군' : '적군'} 기세 <b>${momentum[o] > 0 ? '+' : ''}${momentum[o]}</b> (${adv && attacked ? '전진 + 공격' : adv ? '적 성 방향으로 전진' : attacked ? '공격' : '소극적 행동'}) — 공격력 ${momentum[o] >= 0 ? '+' : ''}${momentum[o] * 8}% · 회피 ${momentum[o] >= 0 ? '+' : ''}${momentum[o] * MO_EV}%p`, momentum[o] > old ? 'text-amber-300' : 'text-sky-300');
   }
   renderMo();
   const el = $('mo-' + o); if (el) { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
 }
-const evadeAt = (typeKey, r, c, owner) => Math.max(0, Math.min(39, clampEv(UNIT_TYPES[typeKey].evade + terrainBonus(typeKey, terrainAt(r, c))) + (owner ? moEv(owner) : 0)));
+const evadeAt = (typeKey, r, c, owner) => Math.max(0, Math.min(20, Math.round(clampEv(UNIT_TYPES[typeKey].evade + terrainBonus(typeKey, terrainAt(r, c))) + (owner ? moEv(owner) : 0))));
 function evadeParts(u) {
   if (u.typeKey === 'OBSTACLE') return { base: 0, bonus: 0, tk: terrainAt(u.r, u.c), total: 0 };
   const base = UNIT_TYPES[u.typeKey].evade, tk = terrainAt(u.r, u.c), bonus = terrainBonus(u.typeKey, tk);
   const mo = moEv(u.owner);
-  return { base, bonus, mo, tk, total: Math.max(0, Math.min(39, clampEv(base + bonus) + mo)) };
+  return { base, bonus, mo, tk, total: Math.max(0, Math.min(20, Math.round(clampEv(base + bonus) + mo))) };
 }
 
 function getCompatibility(a, d) {
@@ -1128,7 +1333,7 @@ function loadStage(i) {
   chests = (st.chests || []).map(([r, c]) => ({ r, c, opened: false }));
   $('game-over-modal').classList.add('hidden');
   $('post-move-actions').classList.add('hidden');
-  $('stage-name').innerText = `STAGE ${i + 1} · ${st.name}`;
+  stageTitle = `STAGE ${i + 1} · ${st.name}`;
   // 보드 크기에 맞춰 격자/폭 조정
   const grid = $('chessboard');
   grid.style.gridTemplateColumns = `repeat(${COLS},minmax(0,1fr))`;
@@ -1152,17 +1357,22 @@ function loadStage(i) {
 
 // 화면(아이폰 등)에 맞춰 타일 크기를 계산해 보드를 최대한 크게 맞춘다
 const MIN_TILE = 38;
+(function () {   // 대기/이동 취소 버튼이 보일 때만 하단 패널을 보여 준다 (그 외에는 보드를 더 크게)
+  const pm = document.getElementById('post-move-actions'), pp = document.getElementById('phase-panel');
+  const sync = () => { pp.style.display = pm.classList.contains('hidden') ? 'none' : ''; setTimeout(resizeBoard, 0); };
+  new MutationObserver(sync).observe(pm, { attributes: true, attributeFilter: ['class'] }); sync();
+})();
 function resizeBoard() {
   const area = $('board-area'), f = $('board-frame'), g = $('chessboard');
   if (!area || !area.clientWidth || !f) return;
-  const pad = 12 + 4;                                   // 프레임 패딩 + 여유
-  const fit = Math.floor(Math.min((area.clientWidth - 12 - pad) / COLS, (area.clientHeight - 4 - pad) / ROWS));
+  const pad = 8 + 2;                                    // 프레임 패딩 + 여유
+  const fit = Math.floor(Math.min((area.clientWidth - 4 - pad) / COLS, (area.clientHeight - pad) / ROWS));
   if (fit < 10) return;
   const tile = Math.max(MIN_TILE, fit);                  // 맵이 너무 크면 최소 칸 크기를 유지하고 스크롤한다
   g.style.width = tile * COLS + 'px'; g.style.height = tile * ROWS + 'px';
   g.style.aspectRatio = 'auto';
   document.documentElement.style.setProperty('--tile', tile + 'px');
-  const big = tile * COLS + 28 > area.clientWidth + 2 || tile * ROWS + 28 > area.clientHeight + 2;
+  const big = tile * COLS + 12 > area.clientWidth + 2 || tile * ROWS + 12 > area.clientHeight + 2;
   let h = document.getElementById('scroll-hint');
   if (big && !h) { h = document.createElement('div'); h.id = 'scroll-hint'; h.textContent = '↔ 빈 곳을 끌어서 지도를 움직이세요'; area.appendChild(h); }
   else if (!big && h) h.remove();
@@ -1183,25 +1393,23 @@ window.addEventListener('orientationchange', () => setTimeout(resizeBoard, 200))
 
 // ---------- 하단 메뉴 탭 ----------
 const TAB_TITLES = { menu: '⚙️ 메뉴', unit: '🧑‍✈️ 유닛 정보', terrain: '🌍 지형 · 특수 구역', log: '📜 전투 기록', rules: '📖 전투 규칙' };
-let openTab = null;
+let openTab = null, stageTitle = '';
 function toggleTab(name) {
   openTab = (name === null || name === openTab) ? null : name;
   $('sheet').classList.toggle('hidden', !openTab);
   document.querySelectorAll('#sheet-body section').forEach(sec => sec.classList.toggle('hidden', sec.dataset.tab !== openTab));
   document.querySelectorAll('#tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === openTab));
-  if (openTab) { $('sheet-title').innerText = TAB_TITLES[openTab]; $('sheet-body').scrollTop = 0; if (openTab === 'log') { const lb = $('game-log'); lb.scrollTop = lb.scrollHeight; } }
+  if (openTab) { $('sheet-title').innerText = openTab === 'menu' && stageTitle ? '⚙️ ' + stageTitle : TAB_TITLES[openTab]; $('sheet-body').scrollTop = 0; if (openTab === 'log') { const lb = $('game-log'); lb.scrollTop = lb.scrollHeight; } }
   setTimeout(resizeBoard, 0);
 }
 
-function nextStage() { if (currentStage + 1 < STAGES.length) { if (SAVE.newUnlock === currentStage + 1) { SAVE.newUnlock = null; persist(); } loadStage(currentStage + 1); } }
+function nextStage() { openStageSelect(); }   // 월드맵으로: 새 스테이지가 열리고 캐릭터가 그곳으로 이동
 
 // ---------- 스테이지 선택 ----------
 // ---------- 저장 / 골드 / 병종 강화 ----------
 const GRADE_ORDER = ['C', 'B', 'A', 'S'];
-const STAGE_GOLD = [120, 180, 250, 340, 480, 560, 650, 750, 860, 1000, 1100, 1200, 1300, 1400, 1520, 1640, 1760, 1880, 2000, 2200];            // 스테이지 기본 보상
 const UPG_COST = [100, 180, 280, 400, 560, 760, 1000, 1300];              // 레벨 0→1, 1→2 ...
 const UPG_MAX = 8;
-const AI_BOOST = [-0.15, -0.06, 0.04, 0.17, 0.12, 0.26, 0.28, 0.30, 0.26, 0.40, 0.40, 0.45, 0.42, 0.45, 0.54, 0.50, 0.52, 0.52, 0.40, 0.42];   // 적 체력·공격력 보정 (시뮬레이션으로 보정)                 // 후반 스테이지 적 강화율
 let SAVE = { gold: 150, upg: {}, cleared: [], best: {}, xp: 0, lv: 1 };
 const xpNeed = lv => 80 + 40 * (lv - 1);
 let clearedStages = SAVE.cleared;
@@ -1211,14 +1419,40 @@ try {
   else SAVE.cleared = JSON.parse(localStorage.getItem('te_cleared') || '[]');
 } catch (e) {}
 SAVE.xp = SAVE.xp || 0; SAVE.lv = SAVE.lv || 1; SAVE.upg = SAVE.upg || {}; SAVE.best = SAVE.best || {}; SAVE.cleared = SAVE.cleared || [];
+if (SAVE.ver !== 2) { SAVE.ver = 2; SAVE.cleared = []; SAVE.best = {}; SAVE.newUnlock = null; SAVE.pos = 0; }   // 월드맵 개편: 스테이지 구성이 바뀌어 진행도만 초기화 (골드·강화·레벨은 유지)
 clearedStages = SAVE.cleared;
 function persist() { try { localStorage.setItem('te_save', JSON.stringify(SAVE)); } catch (e) {} }
+
+// ---------- 디버그 (월드맵 제목을 7번 연속 탭하면 열림) ----------
+let dbgCnt = 0, dbgTimer = 0, dbgResetArm = 0;
+function dbgTap() { dbgCnt++; clearTimeout(dbgTimer); dbgTimer = setTimeout(() => { dbgCnt = 0; }, 1200); if (dbgCnt >= 7) { dbgCnt = 0; dbgOpen(); } }
+function dbgInfo() { $('dbg-info').textContent = `Lv ${SAVE.lv} · XP ${SAVE.xp}/${xpNeed(SAVE.lv)} · 💰 ${SAVE.gold} · 클리어 ${SAVE.cleared.length}/${TOTAL_STAGES}`; }
+function dbgOpen() { dbgResetArm = 0; $('dbg-reset').textContent = '⚠ 모든 기록 초기화'; dbgInfo(); $('dbg-modal').classList.remove('hidden'); }
+function dbgClose() { $('dbg-modal').classList.add('hidden'); }
+function dbgAddXp(n) { SAVE.xp += n; while (SAVE.xp >= xpNeed(SAVE.lv)) { SAVE.xp -= xpNeed(SAVE.lv); SAVE.lv++; } }
+function dbgDo(a) {
+  if (a === 'reset') {
+    if (!dbgResetArm) { dbgResetArm = 1; $('dbg-reset').textContent = '정말 초기화? 한 번 더 누르세요'; setTimeout(() => { dbgResetArm = 0; const b = $('dbg-reset'); if (b) b.textContent = '⚠ 모든 기록 초기화'; }, 3000); return; }
+    try { localStorage.removeItem('te_save'); localStorage.removeItem('te_cleared'); } catch (e) {}
+    location.reload(); return;
+  }
+  if (a === 'gold1') SAVE.gold += 1000;
+  else if (a === 'gold2') SAVE.gold += 100000;
+  else if (a === 'xp1') dbgAddXp(500);
+  else if (a === 'lv1') dbgAddXp(xpNeed(SAVE.lv) - SAVE.xp);
+  else if (a === 'upg') Object.keys(UNIT_TYPES).forEach(k => { SAVE.upg[k] = UPG_MAX; });
+  else if (a === 'allclear') { SAVE.cleared = Array.from({ length: TOTAL_STAGES }, (_, i) => i); SAVE.newUnlock = null; }
+  else if (a === 'unclear') { SAVE.cleared = []; SAVE.best = {}; SAVE.newUnlock = null; SAVE.pos = 0; }
+  else if (a === 'seen') SAVE.seenObj = {};
+  clearedStages = SAVE.cleared; persist(); refreshGold(); dbgInfo();
+  if (a === 'allclear' || a === 'unclear') { try { wmInit(); } catch (e) {} }
+}
 function markCleared(i) { if (!SAVE.cleared.includes(i)) SAVE.cleared.push(i); persist(); }
 const upgLv = k => SAVE.upg[k] || 0;
 const isUnlocked = i => i === 0 || SAVE.cleared.includes(i - 1) || SAVE.cleared.includes(i);
 // 병종 레벨에 따른 능력치
 function statsAt(k, lv) {
-  const t = UNIT_TYPES[k], m = 1 + 0.08 * lv + 0.01 * (SAVE.lv - 1);
+  const t = UNIT_TYPES[k], m = 1 + 0.08 * lv + 0.01 * Math.min(40, SAVE.lv - 1);
   return { maxHp: Math.round(t.maxHp * m), atk: Math.round(t.atk * m), def: t.def + (lv >= 2 ? 1 : 0) + (lv >= 4 ? 1 : 0) + (lv >= 6 ? 1 : 0), healPower: Math.round(t.healPower * m) };
 }
 function refreshGold() {
@@ -1287,29 +1521,281 @@ function miniMap(st) {
   }
   return h + '</div>';
 }
-function renderStageSelect() {
-  refreshGold();
-  $('stage-list').innerHTML = STAGES.map((st, i) => {
-    const th = THEMES[st.theme], done = clearedStages.includes(i), cur = i === currentStage;
-    if (!isUnlocked(i)) return `<div class="panel text-left p-3 stage-card-locked"><div class="flex items-center justify-between mb-1.5"><span class="title-font text-slate-400 text-lg">STAGE ${i + 1}</span><span class="text-[11px] text-slate-500">🔒 잠김</span></div><div class="rounded-md bg-slate-900 border border-slate-700 flex items-center justify-center text-4xl" style="aspect-ratio:2/1">🔒</div><div class="mt-2 font-bold text-slate-400">???</div><div class="text-[11px] text-slate-500 mt-0.5">STAGE ${i} 을(를) 클리어하면 열립니다.</div></div>`;
-    const isNew = SAVE.newUnlock === i;
-    return `<button onclick="selectStage(${i})" class="panel text-left p-3 hover:border-amber-400 transition ${isNew ? 'stage-card-new unlock-pop' : ''} ${cur ? 'border-amber-400' : ''}" style="${cur ? 'border-color:#fbbf24' : ''}">
-      <div class="flex items-center justify-between mb-1.5"><span class="title-font text-amber-300 text-lg">STAGE ${i + 1}${isNew ? '<span class="new-tag">NEW 해금!</span>' : ''}</span>
-        <span class="text-[11px] ${done ? 'text-emerald-300' : 'text-slate-500'}">${done ? '✔ 클리어' : '미클리어'}${SAVE.best[i] ? ` · <b class="text-yellow-300">${SAVE.best[i]}</b>` : ''}</span></div>
-      ${miniMap(st)}
-      <div class="mt-2 font-bold text-slate-100">${th.icon} ${st.name}</div>
-      <div class="text-[11px] text-slate-400 leading-snug mt-0.5">${st.concept}</div>
-      <div class="flex flex-wrap gap-1.5 mt-2 text-[10px]">
-        <span class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-600 text-slate-300">${st.layout[0].length}×${st.layout.length}</span>
-        <span class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-600 text-sky-300">아군 ${st.player.length} / 적 ${st.ai.length}</span>
-        <span class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-600 text-amber-300">난이도 ${'★'.repeat(st.stars)}${'☆'.repeat(5 - st.stars)}</span>
-        <span class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-600 text-orange-300">🪨 ${st.catapults.length}</span>${st.fog ? '<span class="px-1.5 py-0.5 rounded bg-slate-200 text-slate-700 font-bold">🌫 안개</span>' : ''}${(st.spikes || []).length ? '<span class="px-1.5 py-0.5 rounded bg-slate-800 border border-red-800 text-red-300">⚠ 가시</span>' : ''}${(st.bombs || []).length ? '<span class="px-1.5 py-0.5 rounded bg-slate-800 border border-orange-800 text-orange-300">💣 화약통</span>' : ''}${(st.belts || []).length ? '<span class="px-1.5 py-0.5 rounded bg-slate-800 border border-yellow-800 text-yellow-300">⏩ 컨베이어</span>' : ''}${(st.warps || []).length ? '<span class="px-1.5 py-0.5 rounded bg-slate-800 border border-violet-800 text-violet-300">🌀 워프</span>' : ''}
-      </div></button>`;
-  }).join('');
+// ---------- 월드맵 ----------
+// 구역(초원 → 숲 → 사막 → 설원 → 화산)이 길을 따라 점점 바뀌고, 각 노드의 스테이지 테마는 그 자리의 구역과 같다.
+const WM = { W: 400, DY: 78, TOP: 120, BOT: 130, built: false, pts: [], nodes: [], avatar: 0, walking: false, busy: false, pending: null, scale: 1, toastT: 0, labelRaf: 0 };
+WM.H = WM.TOP + (STAGES.length - 1) * WM.DY + WM.BOT;
+const WM_PAL = ['#7fbf62', '#3f7a4c', '#dcc07e', '#dce9f5', '#4b3732'];
+const wmXY = i => ({ x: 200 + 108 * Math.sin(i * 0.62), y: WM.H - WM.BOT - i * WM.DY });
+const wmIdxAtY = y => Math.max(0, Math.min(STAGES.length - 1, Math.round((WM.H - WM.BOT - y) / WM.DY)));
+const wmFrontier = () => { let i = 0; while (i < STAGES.length && SAVE.cleared.includes(i)) i++; return Math.min(i, STAGES.length - 1); };
+
+function wmPiece(reg, x, y, rng) {
+  const th = THEMES[REGIONS[reg].theme], s = 0.55 + rng() * 0.55, t = rng(), X = x.toFixed(1), Y = y.toFixed(1);
+  const rock = (c1, c2) => `<g transform="translate(${X} ${Y}) scale(${s})"><ellipse cx="0" cy="8" rx="15" ry="4" fill="rgba(0,0,0,.25)"/><path d="M-14 8 L-9 -6 L2 -11 L13 -4 L15 8Z" fill="${c1}" stroke="${c2}" stroke-width="1.6" stroke-linejoin="round"/></g>`;
+  switch (th.plain) {
+    case 'grass':
+      if (t < 0.5) return pine(x, y, s * 0.9, th.pine);
+      if (t < 0.78) return `<g transform="translate(${X} ${Y}) scale(${s})"><ellipse cx="0" cy="8" rx="16" ry="4" fill="rgba(0,0,0,.2)"/><ellipse cx="-6" cy="0" rx="11" ry="9" fill="#4f8f3f"/><ellipse cx="7" cy="2" rx="10" ry="8" fill="#5fa24a"/></g>`;
+      return `<g transform="translate(${X} ${Y}) scale(${s})"><circle cx="0" cy="0" r="3.4" fill="#fde68a"/><circle cx="0" cy="0" r="1.3" fill="#f59e0b"/><circle cx="9" cy="5" r="2.6" fill="#fbcfe8"/><circle cx="-8" cy="6" r="2.4" fill="#fff"/></g>`;
+    case 'forest':
+      if (t < 0.82) return pine(x, y, s * 1.15, th.pine);
+      return rock('#7d8a66', '#3f4a33');
+    case 'desert':
+      if (t < 0.5) return cactus(x, y, s);
+      if (t < 0.8) return `<g transform="translate(${X} ${Y}) scale(${s})"><path d="M-26 6 Q-10 -14 6 -2 Q16 -10 28 6Z" fill="#cfae6a" opacity=".85"/><path d="M-20 6 Q-8 -6 4 0" stroke="#e7cd90" stroke-width="2" fill="none"/></g>`;
+      return rock('#b99a63', '#7a5a2a');
+    case 'snow':
+      if (t < 0.55) return pine(x, y, s, th.pine);
+      if (t < 0.85) return `<g transform="translate(${X} ${Y}) scale(${s})"><ellipse cx="0" cy="7" rx="20" ry="6" fill="#fff" opacity=".9"/><ellipse cx="-4" cy="2" rx="13" ry="7" fill="#f8fbff"/></g>`;
+      return `<g transform="translate(${X} ${Y}) scale(${s})"><path d="M-12 8 L-6 -10 L2 -2 L8 -14 L15 8Z" fill="#cfe6f6" stroke="#8fb6d4" stroke-width="1.5" stroke-linejoin="round"/></g>`;
+    default:
+      if (t < 0.4) return deadTree(x, y, s);
+      if (t < 0.75) return `<g transform="translate(${X} ${Y}) scale(${s})"><ellipse cx="0" cy="4" rx="22" ry="9" fill="#7c1d06"/><ellipse cx="0" cy="3" rx="17" ry="6.5" fill="#f97316"/><ellipse cx="-3" cy="2" rx="9" ry="3.4" fill="#fde047" opacity=".85"/></g>`;
+      return rock('#4a3c38', '#140e0c');
+  }
 }
-function openStageSelect() { renderStageSelect(); $('stage-select').classList.remove('hidden'); $('game-over-modal').classList.add('hidden'); }
-function closeStageSelect() { $('stage-select').classList.add('hidden'); if (!gameActive) $('game-over-modal').classList.remove('hidden'); }
-function selectStage(i) { if (!isUnlocked(i)) return; if (SAVE.newUnlock === i) { SAVE.newUnlock = null; persist(); } $('stage-select').classList.add('hidden'); loadStage(i); }
+
+function wmBuild() {
+  const cv = $('wm-canvas'), W = WM.W, H = WM.H;
+  cv.style.aspectRatio = `${W} / ${H}`;
+  // 길(곡선) 좌표: 노드 사이를 10등분한 Catmull-Rom 곡선
+  const P = STAGES.map((_, i) => wmXY(i)), pts = [];
+  for (let i = 0; i < P.length - 1; i++) {
+    const p0 = P[Math.max(0, i - 1)], p1 = P[i], p2 = P[i + 1], p3 = P[Math.min(P.length - 1, i + 2)];
+    for (let s = 0; s < 10; s++) {
+      const t = s / 10, t2 = t * t, t3 = t2 * t, f = (a, b, c, d) => 0.5 * ((2 * b) + (-a + c) * t + (2 * a - 5 * b + 4 * c - d) * t2 + (-a + 3 * b - 3 * c + d) * t3);
+      pts.push({ x: f(p0.x, p1.x, p2.x, p3.x), y: f(p0.y, p1.y, p2.y, p3.y) });
+    }
+  }
+  pts.push(P[P.length - 1]); WM.pts = pts;
+  // 배경: 구역 색이 위로 갈수록 부드럽게 바뀐다
+  const yb = k => (wmXY(k * REGION_LEN - 1).y + wmXY(k * REGION_LEN).y) / 2;
+  let stops = '';
+  for (let r = REGIONS.length - 1; r >= 0; r--) {
+    const top = r === REGIONS.length - 1 ? 0 : yb(r + 1), bot = r === 0 ? H : yb(r), o0 = top / H, o1 = bot / H, L = o1 - o0;
+    if (r === REGIONS.length - 1) stops += `<stop offset="0" stop-color="${WM_PAL[r]}"/>`;
+    stops += `<stop offset="${(o0 + L * 0.3).toFixed(4)}" stop-color="${WM_PAL[r]}"/><stop offset="${(o1 - L * 0.3).toFixed(4)}" stop-color="${WM_PAL[r]}"/>`;
+    if (r === 0) stops += `<stop offset="1" stop-color="${WM_PAL[r]}"/>`;
+  }
+  let svg = `<svg viewBox="0 0 ${W} ${H}" style="position:absolute;inset:0;width:100%;height:100%"><defs><linearGradient id="wmg" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${H}">${stops}</linearGradient>` +
+    `<linearGradient id="wmglow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff5a14" stop-opacity=".45"/><stop offset="1" stop-color="#ff5a14" stop-opacity="0"/></linearGradient></defs>` +
+    `<rect width="${W}" height="${H}" fill="url(#wmg)"/><rect width="${W}" height="${H * 0.16}" fill="url(#wmglow)"/>`;
+  // 풍경 (위 → 아래 순서로 그려 앞쪽이 위에 오게 한다). 구역 경계에서는 이웃 구역 풍경이 섞여 분위기가 점점 바뀐다.
+  const rng = mulberry32(4242), pathX = y => { const f = Math.max(0, Math.min(pts.length - 1, Math.round((H - WM.BOT - y) / WM.DY * 10))); return pts[f].x; };
+  for (let y = 12; y < H - 20; y += 34) for (let n = 0; n < 3; n++) {
+    const x = n === 0 ? 8 + rng() * 56 : n === 1 ? 336 + rng() * 56 : 30 + rng() * 340, yy = y + (rng() - 0.5) * 26;
+    if (n === 2 && Math.abs(x - pathX(yy)) < 58) continue;
+    const reg = regionOf(wmIdxAtY(yy + (rng() - 0.5) * 150));
+    svg += wmPiece(reg, x, yy, rng);
+  }
+  // 길
+  const ps = pts.map(p => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+  svg += `<polyline points="${ps}" fill="none" stroke="rgba(50,32,16,.5)" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>` +
+    `<polyline points="${ps}" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round"/>` +
+    `<polyline id="wm-done" points="" fill="none" stroke="#fbbf24" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 4px #f59e0b)"/></svg>`;
+  cv.innerHTML = svg;
+  const pc = (x, y) => `left:${(x / W * 100).toFixed(3)}%;top:${(y / H * 100).toFixed(3)}%`;
+  let h = '';
+  // 시작/도착 성, 구역 표지, 크기 표지
+  const p0 = wmXY(0), pL = wmXY(STAGES.length - 1);
+  h += `<div class="wm-castle" style="${pc(p0.x, p0.y + 62)};width:96px;height:96px">${castleSvg('player')}</div><div class="wm-banner" style="${pc(200, H - 22)}">🚩 출발</div>`;
+  h += `<div class="wm-castle" style="${pc(pL.x, pL.y - 72)};width:120px;height:120px">${castleSvg('ai')}</div><div class="wm-banner" style="${pc(200, 22)}">👑 마왕의 성</div>`;
+  for (let r = 1; r < REGIONS.length; r++) h += `<div class="wm-banner" style="${pc(200, yb(r))}">${REGIONS[r].icon} ${REGIONS[r].name}</div>`;
+  for (let i = 0; i < STAGES.length; i += PER_SIZE) { const p = wmXY(i), n = SIZES[i / PER_SIZE]; h += `<div class="wm-size" style="${pc(p.x < 200 ? p.x + 70 : p.x - 70, p.y + 4)}">${n}×${n} 구역</div>`; }
+  WM.nodes = STAGES.map((_, i) => { const p = wmXY(i); return `<button class="wm-node locked" data-i="${i}" style="${pc(p.x, p.y)}" onclick="wmTap(${i})"></button>`; });
+  h += WM.nodes.join('');
+  h += `<div id="wm-avatar"><div class="wm-av-in">${portrait('SWORDSMAN', 'player')}</div></div>`;
+  cv.insertAdjacentHTML('beforeend', h);
+  WM.nodes = Array.from(cv.querySelectorAll('.wm-node'));
+  $('wm-scroll').addEventListener('scroll', () => { if (WM.labelRaf) return; WM.labelRaf = requestAnimationFrame(() => { WM.labelRaf = 0; wmLabel(); }); }, { passive: true });
+  WM.built = true;
+}
+function wmLabel() {
+  const sc = $('wm-scroll'); if (!sc || !WM.built) return;
+  const i = wmIdxAtY((sc.scrollTop + sc.clientHeight * 0.5) / WM.scale), R = REGIONS[regionOf(i)], n = SIZES[Math.floor(i / PER_SIZE)];
+  $('wm-region').textContent = `${R.icon} ${R.name} · ${n}×${n} 구역 · ${SAVE.cleared.length}/${STAGES.length} 클리어`;
+}
+function wmPlace(x, y, dx) {
+  const av = $('wm-avatar'); if (!av) return;
+  av.style.left = (x / WM.W * 100) + '%'; av.style.top = (y / WM.H * 100) + '%';
+  if (dx > 0.15) av.dataset.flip = '0'; else if (dx < -0.15) av.dataset.flip = '1';
+}
+function wmScrollTo(y, smooth) {
+  const sc = $('wm-scroll'); if (!sc) return;
+  const top = Math.max(0, y * WM.scale - sc.clientHeight * 0.55);
+  if (smooth && sc.scrollTo) sc.scrollTo({ top, behavior: 'smooth' }); else sc.scrollTop = top;
+}
+function wmRender() {
+  refreshGold();
+  const f = wmFrontier();
+  WM.nodes.forEach((n, i) => {
+    if (WM.pending === i) { n.className = 'wm-node locked pend'; n.innerHTML = '<span>🔒</span>'; return; }
+    const done = SAVE.cleared.includes(i), unl = isUnlocked(i);
+    if (done) { n.className = 'wm-node cleared'; n.innerHTML = `<span>${i + 1}</span><small>${SAVE.best[i] || '✔'}</small>`; }
+    else if (unl) { n.className = 'wm-node open'; n.innerHTML = `<span>${i + 1}</span>`; }
+    else { n.className = 'wm-node locked' + (i > f + 3 ? ' far' : ''); n.innerHTML = i > f + 3 ? '' : '<span>🔒</span>'; }
+  });
+  const upto = (WM.pending != null ? Math.max(0, f - 1) : f) * 10, dn = $('wm-done');
+  if (dn) dn.setAttribute('points', WM.pts.slice(0, upto + 1).map(p => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' '));
+  wmLabel();
+}
+function wmToast(msg) {
+  const t = $('wm-toast'); if (!t) return; t.textContent = msg; t.classList.add('show'); clearTimeout(WM.toastT); WM.toastT = setTimeout(() => t.classList.remove('show'), 1600);
+}
+function wmTags(st) {
+  const tag = (c, t) => `<span class="px-1.5 py-0.5 rounded bg-slate-800 border ${c}">${t}</span>`;
+  return `<div class="flex flex-wrap gap-1 mt-1.5 text-[10px]">` +
+    tag('border-slate-600 text-slate-300', `${st.layout[0].length}×${st.layout.length}`) + tag('border-slate-600 text-sky-300', `아군 ${st.player.length} / 적 ${st.ai.length}`) +
+    tag('border-slate-600 text-amber-300', `난이도 ${'★'.repeat(st.stars)}${'☆'.repeat(5 - st.stars)}`) + tag('border-slate-600 text-orange-300', `🪨 ${st.catapults.length}`) +
+    (st.fog ? '<span class="px-1.5 py-0.5 rounded bg-slate-200 text-slate-700 font-bold">🌫 안개</span>' : '') +
+    ((st.features || []).includes('강') ? tag('border-sky-800 text-sky-300', '🌉 강') : '') + ((st.features || []).includes('호수') ? tag('border-sky-800 text-sky-300', '🌊 호수') : '') +
+    ((st.spikes || []).length ? tag('border-red-800 text-red-300', '⚠ 가시') : '') + ((st.bombs || []).length ? tag('border-orange-800 text-orange-300', '💣 화약통') : '') +
+    ((st.belts || []).length ? tag('border-yellow-800 text-yellow-300', '⏩ 컨베이어') : '') + ((st.warps || []).length ? tag('border-violet-800 text-violet-300', '🌀 워프') : '') + `</div>`;
+}
+function wmShowInfo(i) {
+  const st = STAGES[i], th = THEMES[st.theme], done = SAVE.cleared.includes(i), box = $('wm-info');
+  box.innerHTML = `<div class="flex gap-3"><div style="width:92px;flex:none">${miniMap(st)}</div><div class="flex-1 min-w-0">
+      <div class="flex items-center justify-between gap-2"><span class="title-font text-amber-300 text-base">STAGE ${i + 1}</span><span class="text-[11px] ${done ? 'text-emerald-300' : 'text-slate-400'}">${done ? '✔ 클리어' : '미클리어'}${SAVE.best[i] ? ` · <b class="text-yellow-300">${SAVE.best[i]}</b>` : ''}</span></div>
+      <div class="font-bold text-slate-100 text-sm truncate">${th.icon} ${st.name}</div>
+      <div class="text-[11px] text-slate-400 leading-snug mt-0.5" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${st.concept}</div>${wmTags(st)}</div></div>
+    <div class="text-[11px] text-emerald-300 mt-1.5 leading-snug">💡 ${st.tip}</div>
+    <div class="flex gap-2 mt-2"><button onclick="wmStart(${i})" class="flex-1 py-2.5 rounded-xl font-black text-slate-950 bg-amber-500 hover:bg-amber-400">⚔ ${done ? '다시 도전' : '출정!'}</button><button onclick="wmHideInfo()" class="px-4 py-2.5 rounded-xl font-bold text-slate-200 bg-slate-700 border border-slate-500">닫기</button></div>`;
+  box.classList.remove('hidden'); setTimeout(() => wmLabel(), 0);
+}
+function wmHideInfo() { $('wm-info').classList.add('hidden'); }
+function wmStart(i) { selectStage(i); }
+function wmTap(i) {
+  if (WM.walking || WM.busy) return;
+  if (!isUnlocked(i)) { wmToast(`🔒 STAGE ${wmFrontier() + 1} 을(를) 클리어하면 열립니다.`); sound.tone('square', 200, 150, 0.1, 0.1); return; }
+  if (i === WM.avatar) { wmShowInfo(i); sound.playMove(); return; }
+  wmWalk(i, () => wmShowInfo(i));
+}
+// 캐릭터가 길을 따라 걸어간다
+function wmWalk(to, done) {
+  if (WM.walking) return;
+  const from = WM.avatar * 10, dest = to * 10, n = Math.abs(to - WM.avatar), av = $('wm-avatar'), pts = WM.pts;
+  if (!n) { if (done) done(); return; }
+  wmHideInfo(); WM.walking = true; av.classList.add('walking');
+  const dur = Math.min(4200, 380 + n * 340), t0 = performance.now(); let lastX = pts[from].x, lastSnd = 0;
+  const step = now => {
+    const k = Math.min(1, (now - t0) / dur), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2, f = from + (dest - from) * e;
+    const i0 = Math.min(pts.length - 1, Math.floor(f)), i1 = Math.min(pts.length - 1, i0 + 1), u = f - i0;
+    const x = pts[i0].x + (pts[i1].x - pts[i0].x) * u, y = pts[i0].y + (pts[i1].y - pts[i0].y) * u;
+    wmPlace(x, y, x - lastX); lastX = x;
+    const sc = $('wm-scroll'); if (sc) sc.scrollTop = Math.max(0, y * WM.scale - sc.clientHeight * 0.55);
+    if (now - lastSnd > 190) { lastSnd = now; sound.tone('sine', 260 + (Math.random() * 40), 150, 0.05, 0.07); }
+    if (k < 1) { requestAnimationFrame(step); return; }
+    WM.avatar = to; WM.walking = false; av.classList.remove('walking'); SAVE.pos = to; persist(); wmRender(); if (done) done();
+  };
+  requestAnimationFrame(step);
+}
+// 월드맵 열기: 방금 클리어해서 새로 열린 스테이지가 있으면 잠금이 풀리고 캐릭터가 그곳으로 걸어간다
+function wmInit() {
+  const cv = $('wm-canvas'); WM.scale = (cv.clientWidth || 360) / WM.W;
+  const f = wmFrontier(); let a = SAVE.pos == null ? 0 : SAVE.pos; if (a > f || a < 0) a = f;
+  WM.avatar = a; WM.walking = false; WM.busy = false; WM.pending = null; wmHideInfo();
+  const p = WM.pts[a * 10]; wmPlace(p.x, p.y, 0); wmScrollTo(p.y, false);
+  const nu = SAVE.newUnlock;
+  if (nu != null && nu <= f && nu !== a && !SAVE.cleared.includes(nu)) {
+    WM.busy = true; WM.pending = nu; wmRender(); wmScrollTo(wmXY(nu).y, true);
+    const node = WM.nodes[nu];
+    setTimeout(() => { node.classList.add('unlock-anim'); sound.tone('square', 220, 90, 0.25, 0.2); }, 900);
+    setTimeout(() => {
+      WM.pending = null; SAVE.newUnlock = null; persist(); wmRender(); node.classList.add('pop');
+      [523, 659, 784, 1047].forEach((fr, k) => sound.tone('triangle', fr, fr, 0.2, 0.22, k * 0.09));
+      WM.busy = false;
+      setTimeout(() => wmWalk(nu, () => wmShowInfo(nu)), 700);
+    }, 1900);
+  } else {
+    if (nu != null) { SAVE.newUnlock = null; persist(); }
+    wmRender(); wmShowInfo(a);
+  }
+  try { MUSIC.play(REGIONS[regionOf(a)].theme); } catch (e) {}
+}
+function openStageSelect() {
+  $('game-over-modal').classList.add('hidden'); $('stage-select').classList.remove('hidden');
+  if (!WM.built) wmBuild();
+  wmInit();
+}
+function closeStageSelect() { if (WM.walking) return; $('stage-select').classList.add('hidden'); if (!gameActive) $('game-over-modal').classList.remove('hidden'); else try { MUSIC.play(STAGES[currentStage].theme); } catch (e) {} }
+// ---------- 오브젝트 소개 팝업 (처음 한 번만 자동 표시, 규칙 탭에서 다시 볼 수 있음) ----------
+const OBJ_INFO = {
+  turret:   { icon: '🛡', title: '성 수비 구역', desc: '자기 성의 상하좌우 칸에 서면 공격력이 ×2가 되고, 턴 시작 때 체력이 10% 회복됩니다. 적의 성 칸에 먼저 도달하면 승리!' },
+  catapult: { icon: '🪨', title: '투석기', desc: '위에서 공격하면 사거리가 3~5칸(맵이 클수록 길어짐)으로 늘어납니다. 위력은 60%이고, 투석기마다 한 번만 쓸 수 있어요.' },
+  chest:    { icon: '📦', title: '보물상자', desc: '유닛이 올라서면 열리고 그 팀 전원의 체력이 완전히 회복됩니다. 상자마다 1회뿐이고, 적도 열 수 있어요!' },
+  obstacle: { icon: '🧱', title: '바리케이드', desc: '이동이나 점프로 지나갈 수 없는 장애물입니다. 공격해서 HP 30을 깎으면 부서져 길이 열려요. 적 AI는 공격하지 않습니다.' },
+  lake:     { icon: '🌊', title: '호수', desc: '물은 들어가거나 지나갈 수 없어 길을 돌아가야 합니다. 하지만 궁수·마법사의 공격은 호수 너머로 닿아요.' },
+  river:    { icon: '🌉', title: '강과 다리', desc: '물은 들어가거나 지나갈 수 없지만 공격은 물 너머로 닿습니다. 건너려면 폭 2칸의 다리를 이용하세요.' },
+  spike:    { icon: '⚠️', title: '가시 바닥', desc: '위에서 턴을 마치면 최대 체력의 20% 피해를 입습니다. 지나가는 것만으로는 안전해요.' },
+  bomb:     { icon: '💣', title: '화약통', desc: '숫자만큼의 라운드가 지나면 폭발해 주변 8칸의 모든 유닛(아군 포함)에 최대 체력 40% 피해를 줍니다. 공격하면 즉시 폭발해요.' },
+  belt:     { icon: '⏩', title: '컨베이어', desc: '턴이 끝날 때 위에 있으면 화살표 방향으로 1칸 밀려납니다. 전진에 쓰거나 적을 밀어내 보세요.' },
+  warp:     { icon: '🌀', title: '워프', desc: '턴이 끝날 때 위에 있으면 같은 번호의 짝 워프로 순간이동합니다. 측면 기습이나 후퇴에 쓰세요.' },
+  fog:      { icon: '🌫', title: '전장의 안개', desc: '아군 주변 3칸 밖의 적은 보이지 않습니다. 시야를 넓히며 전진하세요. 메뉴에서 끌 수 있어요.' }
+};
+const OBJ_ORDER = Object.keys(OBJ_INFO);
+function objKeysOf(st) {
+  const k = ['turret'];
+  if ((st.catapults || []).length) k.push('catapult');
+  if ((st.chests || []).length) k.push('chest');
+  if ((st.obstacles || []).length) k.push('obstacle');
+  if (st.layout.some(r => /B/.test(r))) k.push('river'); else if (st.layout.some(r => /W/.test(r))) k.push('lake');
+  if ((st.spikes || []).length) k.push('spike');
+  if ((st.bombs || []).length) k.push('bomb');
+  if ((st.belts || []).length) k.push('belt');
+  if ((st.warps || []).length) k.push('warp');
+  if (st.fog) k.push('fog');
+  return k;
+}
+function objImgHtml(key, themeKey) {
+  const th = THEMES[themeKey || 'grass'];
+  const hz = kind => { const old = HZ; HZ = { spike: new Set(), belt: new Map(), warp: new Map(), warpId: new Map(), endFx: false };
+    if (kind === 'spike') HZ.spike.add('0,0'); if (kind === 'belt') HZ.belt.set('0,0', 'R'); if (kind === 'warp') { HZ.warp.set('0,0', [1, 1]); HZ.warpId.set('0,0', 0); }
+    const h = hazardHtml(0, 0).html; HZ = old; return h; };
+  let inner = '';
+  switch (key) {
+    case 'turret': inner = castleSvg('player').replace('class="deco"', 'class="deco" style="opacity:.55"') + turretSvg('player'); break;
+    case 'catapult': inner = catapultSvg(false); break;
+    case 'chest': inner = chestSvg(false); break;
+    case 'obstacle': inner = `<div style="position:absolute;inset:0">${obstacleSvg(th, 1)}</div>`; break;
+    case 'river': { const w = th.water; inner = `<svg class="deco" viewBox="0 0 100 100"><rect width="100" height="100" fill="${w.bg}"/><path d="M0 22 Q12 14 25 22 T50 22 T75 22 T100 22" stroke="${w.w1}" stroke-width="3" fill="none" opacity=".7"/><path d="M0 84 Q12 76 25 84 T50 84 T75 84 T100 84" stroke="${w.w1}" stroke-width="3" fill="none" opacity=".7"/><rect x="-2" y="34" width="104" height="32" fill="#a67c52"/>${[40, 50, 60].map(y => `<path d="M0 ${y} H100" stroke="#6b4a2b" stroke-width="2.2"/>`).join('')}<rect x="-2" y="32" width="104" height="5" fill="#7a5532"/><rect x="-2" y="63" width="104" height="5" fill="#7a5532"/></svg>`; break; }
+    case 'lake': { const w = th.water; inner = `<svg class="deco" viewBox="0 0 100 100"><rect width="100" height="100" fill="${w.bg}"/>${[26,50,74].map(y => `<path d="M4 ${y} Q16 ${y-8} 28 ${y} T52 ${y} T76 ${y} T100 ${y}" stroke="${w.w1}" stroke-width="3" fill="none" opacity=".75"/>`).join('')}</svg>`; break; }
+    case 'bomb': inner = `<div style="position:absolute;inset:6% 6% 10%">${bombSvg(3)}</div>`; break;
+    case 'spike': case 'belt': case 'warp': inner = hz(key); break;
+    case 'fog': inner = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:44px">🧑‍✈️</div><div class="fog fog2" style="animation:none;clip-path:polygon(0 0,100% 0,100% 100%,52% 100%,52% 0,0 0)"></div><div style="position:absolute;right:6px;top:6px;font-size:26px">❓</div>`; break;
+  }
+  return inner;
+}
+let objQueue = [];
+function renderObjPopup(key, isNew, total, idx) {
+  const o = OBJ_INFO[key], st = STAGES[currentStage], th = THEMES[(st && st.theme) || 'grass'];
+  const img = $('obj-img'); img.style.cssText = `position:relative;width:104px;height:104px;margin:8px auto;border-radius:14px;overflow:hidden;--tile:100px;background:${th.colors.PLAIN[0]};box-shadow:0 0 0 3px #e7c36a,0 6px 14px rgba(0,0,0,.5)`;
+  img.innerHTML = objImgHtml(key, st && st.theme);
+  $('obj-tag').textContent = isNew ? `NEW 오브젝트${total > 1 ? ` · ${idx}/${total}` : ''}` : '오브젝트 도감';
+  $('obj-title').textContent = `${o.icon} ${o.title}`; $('obj-desc').textContent = o.desc;
+  $('obj-ok').textContent = objQueue.length ? '다음 ▶' : '확인';
+  $('obj-modal').classList.remove('hidden');
+}
+let objTotal = 0, objShown = 0;
+function objNext() {
+  if (!objQueue.length) { $('obj-modal').classList.add('hidden'); return; }
+  const k = objQueue.shift(); objShown++;
+  SAVE.seenObj = SAVE.seenObj || {}; SAVE.seenObj[k] = 1; persist();
+  renderObjPopup(k, true, objTotal, objShown);
+}
+function showObjIntro(i) {            // 스테이지에 처음 등장하는 오브젝트만 소개
+  const st = STAGES[i]; if (!st) return;
+  SAVE.seenObj = SAVE.seenObj || {};
+  const q = objKeysOf(st).filter(k => !SAVE.seenObj[k]);
+  if (!q.length) return;
+  objQueue = q; objTotal = q.length; objShown = 0; objNext();
+}
+function openObjInfo(key) { objQueue = []; renderObjPopup(key, false, 1, 1); }   // 규칙 탭에서 다시 보기
+function renderObjCodex() {
+  const box = $('obj-codex'); if (!box) return;
+  box.innerHTML = OBJ_ORDER.map(k => `<button onclick="openObjInfo('${k}')" class="menu-btn" style="min-height:40px;font-size:12px;padding:0 6px">${OBJ_INFO[k].icon} ${OBJ_INFO[k].title}</button>`).join('');
+}
+function selectStage(i) { if (!isUnlocked(i) || WM.walking) return; if (SAVE.newUnlock === i) SAVE.newUnlock = null; SAVE.pos = i; persist(); $('stage-select').classList.add('hidden'); loadStage(i); setTimeout(() => showObjIntro(i), 450); }
 
 // ---------- 배경음악 (WebAudio 절차 생성) ----------
 const MUSIC_THEMES = {
@@ -1395,7 +1881,7 @@ function createUnit(owner, typeKey, r, c) {
   const n = unitSeq[owner + typeKey] = (unitSeq[owner + typeKey] || 0) + 1;
   let st8 = { maxHp: t.maxHp, atk: t.atk, def: t.def, healPower: t.healPower };
   if (owner === 'player') st8 = statsAt(typeKey, upgLv(typeKey));                                   // 병종 강화 적용
-  else { const bst = 1 + (AI_BOOST[currentStage] || 0); st8 = { maxHp: Math.round(t.maxHp * bst), atk: Math.round(t.atk * bst), def: t.def, healPower: t.healPower }; } // 후반 스테이지 적 강화
+  else { const bst = 1 + aiBoost(currentStage); st8 = { maxHp: Math.round(t.maxHp * bst), atk: Math.round(t.atk * bst), def: t.def, healPower: t.healPower }; } // 후반 스테이지 적 강화
   const u = { id: owner + typeKey + n, owner, typeKey, name: t.name, hp: st8.maxHp, maxHp: st8.maxHp, atk: st8.atk, def: st8.def, healPower: st8.healPower, r, c };
   board[r][c] = u; units.push(u);
 }
@@ -1460,7 +1946,7 @@ function renderBoard() {
     const chs = chestAt(r, c);               // 보물상자
     if (chs) { html += chestSvg(chs.opened); tile.title += chs.opened ? ' — 📦 보물상자 (열림)' : ' — 📦 보물상자: 올라서면 우리 팀 전원 체력 완전 회복 (1회)'; }
     const kt = catapultAt(r, c);             // 투석기 포탑
-    if (kt) { html += catapultSvg(kt.used); tile.title += kt.used ? ' — 🪨 투석기 (사용됨)' : ' — 🪨 투석기: 위에서 공격하면 사거리 3칸 (1회용, 위력 60%)'; }
+    if (kt) { html += catapultSvg(kt.used); tile.title += kt.used ? ' — 🪨 투석기 (사용됨)' : ` — 🪨 투석기: 위에서 공격하면 사거리 ${catapultRange()}칸 (1회용, 위력 60%)`; }
 
     { const hzh = hazardHtml(r, c); html += hzh.html; tile.title += hzh.title; }
     const hl = []; let mark = '';
@@ -1496,7 +1982,7 @@ function renderBoard() {
       if (selectedUnit && selectedUnit.typeKey !== 'HEALER' && unit.owner === 'ai') {
         // 선택한 아군 기준 상성을 모든 적 위에 표시 (이동 위치를 고르는 단계부터)
         const k = getCompatibility(selectedUnit.typeKey, unit.typeKey).key;
-        const mark = k === 'ADVANTAGE' ? ['match-up', '▲우세<span class="mb-x"> ×1.5</span>'] : k === 'DISADVANTAGE' ? ['match-down', '▼열세<span class="mb-x"> ×0.35</span>'] : ['match-even', '● 보통'];
+        const mark = k === 'ADVANTAGE' ? ['match-up', '▲×1.5'] : k === 'DISADVANTAGE' ? ['match-down', '▼×0.35'] : ['match-even', '●×1'];
         badge += `<div class="match-badge ${mark[0]}">${mark[1]}</div>`;
         // 지금 공격 가능한 적에게는 회피율/투석 정보도 함께 표시
         const inReach = pendingMovePos ? validActionTiles.some(t => t.r === r && t.c === c)
@@ -1518,7 +2004,7 @@ function renderBoard() {
     }
     if (unit && unit.typeKey !== 'OBSTACLE' && HZ.spike.has(hzKey(r, c))) tile.insertAdjacentHTML('beforeend', '<div class="tile-chip" style="color:#fca5a5">⚠턴종료 피해</div>');
     else if (unit && tk === 'SWAMP') tile.insertAdjacentHTML('beforeend', '<div class="tile-chip" style="color:#bae6fd">🌫이동-1</div>');
-    else if (unit && kt && !kt.used) tile.insertAdjacentHTML('beforeend', '<div class="tile-chip">🪨3칸</div>');
+    else if (unit && kt && !kt.used) tile.insertAdjacentHTML('beforeend', `<div class="tile-chip">🪨${catapultRange()}칸</div>`);
     else if (unit && cb === unit.owner) tile.insertAdjacentHTML('beforeend', '<div class="tile-chip">🛡×2</div>');
     const tkey = r + ',' + c;
     const tfx = (tileFx[tkey] || []).filter(f => nowMs() < f.start + f.dur);
@@ -1556,11 +2042,11 @@ function renderBoard() {
       if (actPhase) {
         const vt = validActionTiles.find(p => p.r === r && p.c === c);
         if (vt && realTgt(vt)) t.classList.add(heal ? 'act-target-heal' : 'act-target');
-        else if (!vt && !(pendingMovePos.r === r && pendingMovePos.c === c)) t.classList.add('act-dim');
+        else if (!vt && !(pendingMovePos.r === r && pendingMovePos.c === c) && !(myRange && myRange.has(key))) t.classList.add('act-dim');
       } else {
         const own = originalUnitPos.r === r && originalUnitPos.c === c;
         if (tgtKeys.has(key)) t.classList.add(heal ? 'act-target-heal' : 'act-target');
-        else if (!own && !validMoveTiles.some(m => m.r === r && m.c === c)) t.classList.add('act-dim');
+        else if (!own && !validMoveTiles.some(m => m.r === r && m.c === c) && !(myRange && myRange.has(key))) t.classList.add('act-dim');   // 이동 칸·공격 범위는 어둡게 하지 않는다
       }
     });
   }
@@ -1594,6 +2080,8 @@ function handleTileClick(r, c) {
     setInstruction('이 자리에서 행동할 대상이 없습니다. 다른 캐릭터를 선택하세요.');
     return;
   }
+  // 힐러 선택 중에 회복 가능한 아군을 누르면 이동 후 바로 회복 (드래그와 동일)
+  if (selectedUnit && selectedUnit.typeKey === 'HEALER' && clicked && clicked !== selectedUnit && clicked.owner === 'player' && attackTargetPositions(selectedUnit, clicked).length) { dropUnitOn(r, c); return; }
   if (clicked && clicked.owner === 'player') { selectUnitForMove(r, c); sound.playMove(); return; }
   if (selectedUnit && validMoveTiles.some(t => t.r === r && t.c === c)) { executeMoveTo(r, c); return; }
   if (selectedUnit && clicked && clicked.owner !== 'player' && attackTargetPositions(selectedUnit, clicked).length) { dropUnitOn(r, c); return; } // 공격 가능하면 바로 이동+공격
@@ -1673,9 +2161,14 @@ function initPointerDrag() {
   const droppable = t => { if (!t || !selectedUnit) return false; const r = +t.dataset.r, c = +t.dataset.c, tg = seenAt(r, c);
     if (!tg) return validMoveTiles.some(m => m.r === r && m.c === c);
     return tg !== selectedUnit && attackTargetPositions(selectedUnit, tg).length > 0; };
-  const tileAt = (x, y) => { const e = document.elementFromPoint(x, y); return e && e.closest ? e.closest('.tile') : null; };
-  let undo = [];
   const tileEl = (r, c) => grid.querySelector(`.tile[data-r="${r}"][data-c="${c}"]`);
+  // 좌표로 타일을 찾는다. (터치 기기에서는 타일 내부 요소가 pointer-events:none 이라 elementFromPoint 를 쓸 수 없다)
+  const tileAt = (x, y) => {
+    const b = grid.getBoundingClientRect(); if (!b.width || !b.height) return null;
+    const c = Math.floor((x - b.left) / (b.width / COLS)), r = Math.floor((y - b.top) / (b.height / ROWS));
+    return (r < 0 || c < 0 || r >= ROWS || c >= COLS) ? null : tileEl(r, c);
+  };
+  let undo = [];
   const clearOver = () => {
     if (over) { over.classList.remove('drag-over', 'drag-attack'); over = null; }
     undo.forEach(f => f()); undo = [];
@@ -1725,8 +2218,7 @@ function initPointerDrag() {
   grid.addEventListener('pointerdown', e => {
     if (cand) end();                                   // 이전 드래그가 비정상 종료됐다면 먼저 정리
     if (currentTurn !== 'player' || !gameActive || pendingMovePos || !e.isPrimary) return;
-    const card = e.target.closest && e.target.closest('.unit-card'); if (!card) return;
-    const t = card.closest('.tile'); if (!t) return;
+    const t = tileAt(e.clientX, e.clientY); if (!t) return;
     const u = board[+t.dataset.r][+t.dataset.c];
     if (!u || u.owner !== 'player') return;
     cand = { unit: u, x: e.clientX, y: e.clientY, started: false, id: e.pointerId, r: u.r, c: u.c };
@@ -1822,6 +2314,14 @@ function initPointerDrag() {
   window.addEventListener('pointercancel', e => { if (cand) finish(e, false); });
   window.addEventListener('blur', end);
   document.addEventListener('visibilitychange', () => { if (document.hidden) end(); });
+  // 터치 기기: 타일 내부 요소는 pointer-events:none 이라 클릭이 보드(grid)로 들어온다 → 좌표로 타일을 찾아 처리
+  grid.addEventListener('click', e => {
+    if (e.target !== grid) return;
+    const t = tileAt(e.clientX, e.clientY);
+    if (t) handleTileClick(+t.dataset.r, +t.dataset.c);
+  });
+  // iOS 사파리 안전망: 손가락을 뗐는데 pointerup 이 오지 않아 드래그 잔상이 남는 경우를 정리
+  ['touchend', 'touchcancel'].forEach(n => window.addEventListener(n, () => { setTimeout(() => { if (cand) end(); }, 350); }, { passive: true }));
 }
 
 function selectUnitForMove(r, c) {
@@ -1833,7 +2333,7 @@ function selectUnitForMove(r, c) {
   stayAction = getActionTargets(unit, r, c).length > 0;
   updateDetailPanel(unit);
   setInstruction(stayAction
-    ? '파란 타일로 이동하거나, 현재 위치(노란 칸)를 눌러 이동 없이 바로 행동하세요.'
+    ? (unit.typeKey === 'HEALER' ? '다친 아군(초록 표시)을 누르거나 끌어다 놓으면 이동해서 바로 회복합니다. 파란 타일 = 이동, 현재 위치(노란 칸) = 제자리 행동.' : '파란 타일로 이동하거나, 현재 위치(노란 칸)를 눌러 이동 없이 바로 행동하세요.')
     : (validMoveTiles.length ? '파란 타일로 이동하세요. 파란 칸으로 옮기거나 사거리 안 적 위에 놓으면 이동 후 바로 공격/회복합니다. (제자리 터치 = 선택 취소)' : '이동할 수 있는 칸이 없습니다. 다른 캐릭터를 선택하세요.'));
   renderBoard();
 }
@@ -1879,13 +2379,13 @@ function finishPlayerAction() {
   if (gameActive) applyMomentum(mu, mfrom, ma, mh);
   clearSelection();
   currentTurn = 'ai';
-  updateTurnBadge();
+  updateTurnBadge(true);   // 화면 어두워짐은 전투 효과가 끝난 뒤에
   setInstruction('상대방(AI)의 턴입니다...');
   renderBoard();
   const fw = lastFlight; lastFlight = 0;
   if (mu) setTimeout(() => { if (gameActive && units.includes(mu)) { openChestIfAny(mu); renderBoard(); } }, fw + 200);   // 상자는 대기/공격이 끝난 뒤에 연다
   if (HZ.endFx) setTimeout(() => { if (gameActive) endTurnHazards('player'); }, fw + 450);
-  setTimeout(processAiTurn, 800 + fw + (HZ.endFx ? 1000 : 0));
+  setTimeout(processAiTurn, 1300 + fw + (HZ.endFx ? 1000 : 0));   // 피격/데미지 표시·보상 연출이 끝날 시간까지 기다린다
 }
 
 function clearSelection() {
@@ -1957,19 +2457,21 @@ function normalRange(unit, r, c) {
       case 'KNIGHT': ok = Math.max(adr, adc) === 1; break;
       case 'ARCHER': ok = Math.max(adr, adc) === 2 || man === 2; break;
       case 'MAGE': ok = man <= 2; break;
-      case 'HEALER': ok = Math.max(adr, adc) === 1; break; // 주변 8방향 1칸
+      case 'HEALER': ok = Math.max(adr, adc) <= 2; break; // 반경 2칸 (대각선 포함)
     }
     if (ok) tiles.push({ r: tr, c: tc });
   }
   return tiles;
 }
 
-// 투석기 위에서는 맨해튼 거리 3칸까지 사거리가 늘어난다 (힐러 제외)
+// 투석기 사거리: 맵이 클수록 길어진다 (긴 변 기준 약 1/3, 최소 3칸 → 6~10칸 맵 3, 12~13칸 4, 14~16칸 5)
+const catapultRange = () => Math.max(3, Math.round(Math.max(ROWS, COLS) / 3));
+// 투석기 위에서는 사거리가 catapultRange()칸(대각선 포함)까지 늘어난다 (힐러 제외)
 function getActionRange(unit, r, c) {
   const tiles = normalRange(unit, r, c);
   if (unit.typeKey !== 'HEALER' && catapultActive(r, c)) {
     for (let tr = 0; tr < ROWS; tr++) for (let tc = 0; tc < COLS; tc++) {
-      if (tr !== r || tc !== c) if (Math.max(Math.abs(tr - r), Math.abs(tc - c)) <= 3 && !tiles.some(p => p.r === tr && p.c === tc)) tiles.push({ r: tr, c: tc });
+      if (tr !== r || tc !== c) if (Math.max(Math.abs(tr - r), Math.abs(tc - c)) <= catapultRange() && !tiles.some(p => p.r === tr && p.c === tc)) tiles.push({ r: tr, c: tc });
     }
   }
   return tiles;
@@ -2018,17 +2520,18 @@ function hudArrive(kind, amt) {
 }
 const COIN_SVG = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fbbf24" stroke="#b45309" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="none" stroke="#fde68a" stroke-width="1.6"/><path d="M12 7v10M9.5 10h4a1.5 1.5 0 010 3h-3a1.5 1.5 0 000 3h4" stroke="#b45309" stroke-width="1.3" fill="none"/></svg>';
 const XP_SVG = '<svg viewBox="0 0 24 24"><path d="M12 1l3 7 8 1-6 5 2 8-7-4-7 4 2-8-6-5 8-1z" fill="#7dd3fc" stroke="#0369a1" stroke-width="1.5"/><path d="M12 6l1.6 4 4 .5-3 2.6 1 4-3.6-2-3.6 2 1-4-3-2.6 4-.5z" fill="#e0f2fe"/></svg>';
-function launchOrb(kind, from, to, amt, ep) {
+function launchOrb(kind, from, to, amt, ep, cb) {
   const o = document.createElement('div'); o.className = 'reward-orb' + (kind === 'xp' ? ' xp' : ''); o.innerHTML = kind === 'gold' ? COIN_SVG : XP_SVG;
   document.body.appendChild(o);
   const jx = (Math.random() - 0.5) * 90, cx = (from.x + to.x) / 2 + jx, cy = Math.min(from.y, to.y) - 40 - Math.random() * 60;
+  if (!o.animate) { o.remove(); if (cb) cb(); return; }
   const kf = [], n = 16;
   for (let i = 0; i <= n; i++) { const k = i / n, u = 1 - k; kf.push({ transform: `translate(${u * u * from.x + 2 * u * k * cx + k * k * to.x}px,${u * u * from.y + 2 * u * k * cy + k * k * to.y}px) rotate(${k * 540}deg) scale(${1.25 - 0.45 * k})`, opacity: k > 0.92 ? 0.6 : 1, offset: k }); }
-  o.animate(kf, { duration: 750 + Math.random() * 250, easing: 'cubic-bezier(.4,0,.8,.6)', fill: 'forwards' }).onfinish = () => { o.remove(); hudFlying = Math.max(0, hudFlying - 1); if (ep === hudEpoch) hudArrive(kind, amt); };
+  o.animate(kf, { duration: 750 + Math.random() * 250, easing: 'cubic-bezier(.4,0,.8,.6)', fill: 'forwards' }).onfinish = () => { o.remove(); if (cb) { cb(); return; } hudFlying = Math.max(0, hudFlying - 1); if (ep === hudEpoch) hudArrive(kind, amt); };
 }
 // 적을 처치하면 그 자리에서 골드/경험치가 헤더로 날아간다
 function rewardKill(def) {
-  const g = 10 + Math.round(def.maxHp * 0.4) + currentStage * 3, x = 6 + currentStage * 2;
+  const g = 8 + Math.round(def.maxHp * 0.3) + Math.floor(currentStage * 0.8), x = 4 + Math.floor(currentStage * 0.15);
   grant(SAVE, g, x); persist(); stats.kills = (stats.kills || 0) + 1;
   try {
     const t = document.querySelector(`#chessboard .tile[data-r="${def.r}"][data-c="${def.c}"]`), hg = $('hud-gold'), hx = $('hud-xp');
@@ -2251,6 +2754,7 @@ function countCastleThreats(owner) {
 
 function processAiTurn() {
   if (!gameActive) return;
+  updateTurnBadge();       // 이제 적 턴 암전 시작
   castleRegen('ai');
   const aiUnits = units.filter(u => u.owner === 'ai');
   const playerUnits = units.filter(u => u.owner === 'player');
@@ -2471,39 +2975,6 @@ function confettiBurst(box, n = 28) {
     box.appendChild(c); setTimeout(() => c.remove(), 1600);
   }
 }
-async function animateXp(gain) {
-  const fill = $('xp-fill'), txt = $('xp-text'), lvEl = $('xp-lv'), box = $('xp-box'), ban = $('lvup-banner'), bonus = $('xp-bonus');
-  if (!fill) return;
-  let left = gain, ups = 0, goldBonus = 0;
-  fill.classList.add('shine');
-  sound.tone('sine', 400, 900, 0.5, 0.12);
-  while (left > 0) {
-    const need = xpNeed(SAVE.lv), room = need - SAVE.xp, add = Math.min(left, room);
-    SAVE.xp += add; left -= add;
-    persist();
-    fill.style.width = (SAVE.xp / need * 100) + '%';
-    // 숫자도 함께 올라가는 연출
-    const from = SAVE.xp - add, t0 = performance.now();
-    await new Promise(res => { const step = now => { const k = Math.min(1, (now - t0) / 900); txt.textContent = `${Math.round(from + add * k)} / ${need}`; k < 1 ? requestAnimationFrame(step) : res(); }; requestAnimationFrame(step); });
-    if (SAVE.xp >= need) {                                  // 레벨 업!
-      SAVE.xp = 0; SAVE.lv++; ups++; const g = 50 * SAVE.lv; goldBonus += g; SAVE.gold += g;
-      sound.tone('triangle', 523, 523, 0.18, 0.22); sound.tone('triangle', 659, 659, 0.18, 0.22, 0.12); sound.tone('triangle', 784, 784, 0.18, 0.22, 0.24); sound.tone('triangle', 1046, 1046, 0.5, 0.25, 0.36);
-      lvEl.textContent = 'Lv ' + SAVE.lv; lvEl.classList.remove('pop'); void lvEl.offsetWidth; lvEl.classList.add('pop');
-      box.classList.remove('xp-flash'); void box.offsetWidth; box.classList.add('xp-flash');
-      ban.textContent = `LEVEL UP!  Lv ${SAVE.lv}`; ban.classList.remove('show'); void ban.offsetWidth; ban.classList.add('show');
-      confettiBurst(box); setTimeout(() => confettiBurst(box, 18), 180);
-      bonus.textContent = `레벨업 보너스 💰+${goldBonus}${ups > 1 ? ` (${ups}회)` : ''}`;
-      await wait(500);
-      fill.classList.remove('shine'); fill.style.transition = 'none'; fill.style.width = '0%'; void fill.offsetWidth; fill.style.transition = ''; fill.classList.add('shine');
-      txt.textContent = `0 / ${xpNeed(SAVE.lv)}`;
-      await wait(250);
-    }
-  }
-  fill.classList.remove('shine');
-  persist(); syncHud(); refreshGold();
-  if (ups) { const note = document.createElement('div'); note.className = 'text-[11px] text-yellow-200 mt-1 text-center'; note.textContent = `플레이어 레벨 ${SAVE.lv}: 전 병종 체력·공격력 +${SAVE.lv - 1}% 적용 중`; box.appendChild(note); }
-}
-
 // 종료 연출: 이동·공격·보상 연출이 끝난 뒤 VICTORY / DEFEAT 배너를 보여주고 결과창을 연다
 function endGame(win, reason) {
   if (resultGiven) return;
@@ -2518,69 +2989,164 @@ function endGame(win, reason) {
     setTimeout(() => { try { b.remove(); } catch (e) {} showResult(win, reason); }, 2000);
   }, 1000 + fw);
 }
+// ---------- 결과 화면: 보상 집계 → 헤더로 날아가는 연출 → 랭크 / 언락 순서로 공개 ----------
+const rs = { lv: 1, xp: 0, gold: 0 };            // 결과 헤더에 표시 중인 값 (저장값보다 늦게 따라간다)
+let resSkip = false, resBusy = false;
+function renderResHud() {
+  const need = xpNeed(rs.lv);
+  $('res-lv').textContent = 'Lv ' + rs.lv; $('res-xpfill').style.width = Math.min(100, rs.xp / need * 100) + '%';
+  $('res-xptext').textContent = `${rs.xp} / ${need}`; $('res-gold').textContent = '💰 ' + rs.gold.toLocaleString();
+}
+function resArrive(kind, amt) {
+  if (kind === 'gold') { rs.gold += amt; pulse('res-gold'); sound.tone('sine', 1200, 1500, 0.07, 0.1); }
+  else {
+    const ups = grant(rs, 0, amt); pulse('res-xp'); sound.tone('sine', 700, 900, 0.07, 0.08);
+    if (ups) {
+      sound.tone('triangle', 523, 523, 0.15, 0.2); sound.tone('triangle', 659, 659, 0.15, 0.2, 0.1); sound.tone('triangle', 784, 784, 0.15, 0.2, 0.2); sound.tone('triangle', 1046, 1046, 0.4, 0.22, 0.3);
+      const b = $('res-banner'), h = $('res-hud-in'), lv = $('res-lv');
+      b.textContent = 'LEVEL UP!  Lv ' + rs.lv; b.classList.remove('show'); void b.offsetWidth; b.classList.add('show');
+      lv.classList.remove('pop'); void lv.offsetWidth; lv.classList.add('pop');
+      h.classList.remove('xp-flash'); void h.offsetWidth; h.classList.add('xp-flash'); confettiBurst(h, 30);
+    }
+  }
+  renderResHud();
+}
+const resWait = ms => new Promise(res => { const t0 = Date.now(), iv = setInterval(() => { if (resSkip || Date.now() - t0 >= ms) { clearInterval(iv); res(); } }, 30); });
+function resCount(el, to, dur, fmt) {
+  fmt = fmt || (n => n.toLocaleString());
+  return new Promise(res => {
+    const t0 = performance.now(); let lastTick = 0;
+    const step = now => {
+      const k = resSkip ? 1 : Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 2);
+      el.textContent = fmt(Math.round(to * e));
+      if (k < 1 && now - lastTick > 55) { lastTick = now; sound.tone('square', 600 + 500 * k, 600 + 500 * k, 0.03, 0.04); }
+      k < 1 ? requestAnimationFrame(step) : res();
+    };
+    requestAnimationFrame(step);
+  });
+}
+const elCenter = el => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
+async function playResultSeq(o) {
+  resSkip = false; resBusy = true;
+  const panel = $('res-panel'), onTap = () => { resSkip = true; };
+  panel.addEventListener('pointerdown', onTap);
+  try {
+    await resWait(600);
+    for (const x of o.rows) {
+      const d = document.createElement('div'); d.className = 'res-row';
+      d.innerHTML = `<span class="text-slate-300">${x[0]} <span class="text-slate-500 text-[10px]">${x[2]}</span></span><b class="text-yellow-300">+<span>0</span></b>`;
+      $('res-rows').appendChild(d);
+      await resCount(d.querySelector('b span'), x[1], 420); await resWait(140);
+    }
+    $('res-total').style.display = 'flex'; $('res-total').classList.add('res-pop');
+    await resCount($('res-total-n'), o.gold, 1000); await resWait(250);
+    $('res-xpline').style.display = 'flex'; $('res-xpline').classList.add('res-pop');
+    await resCount($('res-xp-n'), o.xp, 800);
+    $('res-hint').textContent = '';
+    await resWait(1000);
+    // 헤더로 날아가기
+    resSkip = false;
+    const N = 8, fg = elCenter($('res-total-n')), fx = elCenter($('res-xp-n')), tg = elCenter($('res-gold')), tx = elCenter($('res-xp'));
+    $('res-total').classList.add('res-src'); $('res-xpline').classList.add('res-src');
+    sound.tone('sine', 500, 1400, 0.4, 0.1);
+    await Promise.race([new Promise(done => {
+      let left = N * 2; const fin = (kind, amt) => () => { resArrive(kind, amt); if (--left === 0) done(); };
+      for (let i = 0; i < N; i++) {
+        const ga = Math.floor(o.gold / N) + (i < o.gold % N ? 1 : 0), xa = Math.floor(o.xp / N) + (i < o.xp % N ? 1 : 0);
+        setTimeout(() => launchOrb('gold', fg, tg, ga, 0, fin('gold', ga)), i * 90);
+        setTimeout(() => launchOrb('xp', fx, tx, xa, 0, fin('xp', xa)), 50 + i * 90);
+      }
+      setTimeout(() => { $('res-total').style.opacity = .35; $('res-xpline').style.opacity = .35; }, 500);
+    }), wait(5000)]);
+    await wait(o.ups ? 1500 : 500);
+    if (o.ups) { const n = document.createElement('div'); n.className = 'text-[11px] text-yellow-200 mt-1 text-center'; n.textContent = `플레이어 레벨 ${SAVE.lv}: 전 병종 체력·공격력 +${SAVE.lv - 1}% 적용 중`; $('res-rewards').appendChild(n); }
+    // 랭크 공개 → 언락 공개
+    resSkip = false;
+    if (o.rankHtml) {
+      const rk = $('res-rank'); rk.style.display = 'block'; rk.classList.add('res-pop');
+      [392, 523, 659].forEach((f, i) => sound.tone('triangle', f, f, 0.18, 0.2, i * 0.1));
+      if (o.grade === 'S' || o.grade === 'A') confettiBurst(rk, 34);
+      await wait(1000);
+    }
+    if (o.unlockHtml) {
+      $('res-unlock').innerHTML = o.unlockHtml;
+      setTimeout(() => { try { const b = $('unlock-banner'); if (b) { confettiBurst(b, 26); [523, 659, 784, 1047].forEach((f, i) => sound.tone('triangle', f, f, 0.2, 0.22, i * 0.09)); } } catch (e) {} }, 1500);
+      await wait(700);
+    }
+  } catch (e) { /* 연출 실패 시에도 결과는 끝까지 보여준다 */ }
+  finally {
+    panel.removeEventListener('pointerdown', onTap);
+    try {
+      if (o.rankHtml) $('res-rank').style.display = 'block';
+      if (o.unlockHtml && !$('res-unlock').innerHTML) $('res-unlock').innerHTML = o.unlockHtml;
+      rs.lv = SAVE.lv; rs.xp = SAVE.xp; rs.gold = SAVE.gold; renderResHud();
+      $('res-btns').classList.remove('res-hidden'); syncHud(); refreshGold();
+    } catch (e) {}
+    resBusy = false;
+  }
+}
 function showResult(win, reason) {
   const st = STAGES[currentStage], last = currentStage + 1 >= STAGES.length;
   $('modal-icon').innerText = win ? '👑' : '💀';
   $('modal-title').innerText = win ? '승리하였습니다!' : '패배하였습니다...';
   $('modal-title').className = `title-font text-3xl mb-2 ${win ? 'text-amber-400' : 'text-red-400'}`;
   $('modal-desc').innerText = reason ? reason : win ? (!last ? '모든 적군을 물리쳤습니다. 다음 전장이 기다립니다!' : '모든 스테이지를 정복했습니다! 당신이 진정한 지휘관입니다.') : '아군 부대가 전멸했습니다. 병종을 강화하거나 난이도를 조절해 다시 도전해보세요.';
-  const base = STAGE_GOLD[currentStage] || 100;
-  let html = '', rateGrade = 'C', firstClear = false;
+  const base = stageGold(currentStage);
+  const g0 = SAVE.gold, lv0 = SAVE.lv, xp0 = SAVE.xp;
+  let rankHtml = '', unlockHtml = '', rows = [], gold = 0, rateGrade = 'C', firstClear = false;
   if (win) {
     const r = rateBattle(), first = !SAVE.cleared.includes(currentStage);
     if (first && !last) SAVE.newUnlock = currentStage + 1;
     rateGrade = r.grade; firstClear = first;
     const mult = { S: 1.6, A: 1.3, B: 1.0, C: 0.8 }[r.grade];
-    const rows = [['기본 보상', Math.round(base * mult) , `스테이지 ${base} × 등급 ${mult}`], ['생존 보너스', r.alive * 15, `${r.alive}/${r.total}명 생존`], ['보물상자', r.chests * 25, `${r.chests}개 개봉`]];
+    rows = [['기본 보상', Math.round(base * mult), `스테이지 ${base} × 등급 ${mult}`], ['생존 보너스', r.alive * 15, `${r.alive}/${r.total}명 생존`], ['보물상자', r.chests * 25, `${r.chests}개 개봉`]];
     if (first) rows.push(['첫 클리어', Math.round(base * 0.5), '최초 달성 보너스']);
-    const gold = rows.reduce((a, x) => a + x[1], 0);
-    SAVE.gold += gold;
+    gold = rows.reduce((a, x) => a + x[1], 0);
     const prev = SAVE.best[currentStage];
     if (!prev || GRADE_ORDER.indexOf(r.grade) > GRADE_ORDER.indexOf(prev)) SAVE.best[currentStage] = r.grade;
-    markCleared(currentStage); persist();
+    markCleared(currentStage);
     const col = { S: '#fde047', A: '#4ade80', B: '#60a5fa', C: '#cbd5e1' }[r.grade];
-    html = `<div class="flex items-center justify-center gap-4 mb-3">
+    rankHtml = `<div class="flex items-center justify-center gap-4 mt-3 mb-3">
         <div style="font-size:64px;line-height:1;font-weight:900;color:${col};text-shadow:0 0 18px ${col}88" class="title-font">${r.grade}</div>
         <div class="text-left"><div style="font-size:26px;letter-spacing:2px;color:#fbbf24">${'★'.repeat(r.stars)}<span style="color:#475569">${'★'.repeat(3 - r.stars)}</span></div><div class="text-xs text-slate-400">점수 ${r.score}점${prev && GRADE_ORDER.indexOf(r.grade) > GRADE_ORDER.indexOf(prev) ? ' · <b class="text-yellow-300">최고 기록 갱신!</b>' : ''}</div></div>
       </div>
-      <div class="grid grid-cols-3 gap-1.5 text-center text-[11px] mb-3">
+      <div class="grid grid-cols-3 gap-1.5 text-center text-[11px]">
         <div class="bg-slate-950/50 border border-slate-700 rounded-lg p-1.5"><div class="text-slate-400">턴 수</div><div class="font-black text-sky-300">${r.turns}<span class="text-slate-500 font-normal"> / 목표 ${r.par}</span></div></div>
         <div class="bg-slate-950/50 border border-slate-700 rounded-lg p-1.5"><div class="text-slate-400">생존</div><div class="font-black text-green-300">${r.alive}/${r.total}</div></div>
         <div class="bg-slate-950/50 border border-slate-700 rounded-lg p-1.5"><div class="text-slate-400">남은 체력</div><div class="font-black text-emerald-300">${Math.round(r.hpRatio * 100)}%</div></div>
-      </div>
-      <div class="bg-slate-950/50 border border-yellow-700/40 rounded-xl p-2.5 text-left text-xs">
-        ${rows.map(x => `<div class="flex justify-between py-0.5"><span class="text-slate-300">${x[0]} <span class="text-slate-500 text-[10px]">${x[2]}</span></span><b class="text-yellow-300">+${x[1]}</b></div>`).join('')}
-        <div class="flex justify-between border-t border-slate-700 mt-1 pt-1.5 text-sm"><span class="font-bold text-slate-200">획득 골드</span><b class="text-yellow-300">💰 +${gold}</b></div>
       </div>`;
   } else {
-    const gold = Math.round(base * 0.15); SAVE.gold += gold; persist();
-    html = `<div class="bg-slate-950/50 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-300">위로 보상 <b class="text-yellow-300">💰 +${gold}</b> — 병종 강화로 다음 도전을 준비하세요!</div>`;
+    gold = Math.round(base * 0.15); rows = [['위로 보상', gold, '병종 강화로 다음 도전을 준비하세요']];
   }
-  // 플레이어 경험치
-  const xpGain = win ? Math.round((60 + currentStage * 15) * { S: 1.5, A: 1.25, B: 1, C: 0.8 }[rateGrade] + (firstClear ? 40 : 0)) : 20;
-  const lv0 = SAVE.lv, xp0 = SAVE.xp;
-  html += `<div id="xp-box" class="mt-3">
-      <div class="lvup-banner" id="lvup-banner">LEVEL UP!</div>
-      <div class="flex items-center justify-between mb-1.5"><div class="flex items-center gap-2"><span class="lv-badge" id="xp-lv">Lv ${lv0}</span><span class="text-xs text-slate-300">플레이어 경험치</span></div><b class="text-yellow-300 text-sm">+${xpGain} XP</b></div>
-      <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:${xp0 / xpNeed(lv0) * 100}%"></div></div>
-      <div class="flex justify-between text-[10px] text-slate-400 mt-1"><span id="xp-text">${xp0} / ${xpNeed(lv0)}</span><span id="xp-bonus" class="text-yellow-300"></span></div>
-    </div>`;
+  const xpGain = win ? Math.round((50 + currentStage * 4) * { S: 1.5, A: 1.25, B: 1, C: 0.8 }[rateGrade] + (firstClear ? 40 : 0)) : 20;
   if (win && firstClear && !last) {
     const nx = STAGES[currentStage + 1];
-    html += `<div class="unlock-banner" id="unlock-banner"><div class="ub-lock"><span class="l1">🔒</span><span class="l2">🔓</span></div><div class="flex-1 min-w-0"><div class="text-[10px] text-amber-300 font-black tracking-widest">NEW STAGE UNLOCKED</div><div class="font-black text-amber-100 leading-tight">STAGE ${currentStage + 2} · ${nx.name}</div><div class="text-[10px] text-slate-300">${nx.layout[0].length}×${nx.layout.length} · ${THEMES[nx.theme].icon} 새로운 전장이 열렸습니다!</div></div></div>`;
-    setTimeout(() => { try { const b = $('unlock-banner'); if (b) { confettiBurst(b, 26); [523, 659, 784, 1047].forEach((f, i) => sound.tone('triangle', f, f, 0.2, 0.22, i * 0.09)); } } catch (e) {} }, 1500);
+    unlockHtml = `<div class="unlock-banner" id="unlock-banner"><div class="ub-lock"><span class="l1">🔒</span><span class="l2">🔓</span></div><div class="flex-1 min-w-0"><div class="text-[10px] text-amber-300 font-black tracking-widest">NEW STAGE UNLOCKED</div><div class="font-black text-amber-100 leading-tight">STAGE ${currentStage + 2} · ${nx.name}</div><div class="text-[10px] text-slate-300">${nx.layout[0].length}×${nx.layout.length} · ${THEMES[nx.theme].icon} 새로운 전장이 열렸습니다!${(nx.newObj || []).length ? ' · ✨ 새 오브젝트: ' + nx.newObj.map(x => UNLOCK_LABEL[x]).join(', ') : ''}</div></div></div>`;
   }
-  $('modal-rating').innerHTML = html;
-  syncHud(); refreshGold();
-  setTimeout(() => animateXp(xpGain), 700);
+  // 저장은 즉시 (연출 도중 닫혀도 보상은 반영), 화면의 헤더 값은 연출에 맞춰 천천히 따라간다
+  SAVE.gold += gold; const ups = grant(SAVE, 0, xpGain); persist();
+  rs.lv = lv0; rs.xp = xp0; rs.gold = g0; renderResHud();
+  $('modal-rating').innerHTML = `<div id="res-rewards">
+      <div class="bg-slate-950/50 border border-yellow-700/40 rounded-xl p-2.5 text-left text-xs">
+        <div id="res-rows"></div>
+        <div id="res-total" class="justify-between items-center border-t border-slate-700 mt-1 pt-1.5 text-sm" style="display:none"><span class="font-bold text-slate-200">획득 골드</span><b class="text-yellow-300 text-base">💰 +<span id="res-total-n">0</span></b></div>
+        <div id="res-xpline" class="justify-between items-center pt-1 text-sm" style="display:none"><span class="font-bold text-slate-200">플레이어 경험치</span><b class="text-sky-300 text-base">⭐ +<span id="res-xp-n">0</span> XP</b></div>
+      </div>
+      <div id="res-hint" class="text-[10px] text-slate-500 mt-1.5">터치하면 건너뜁니다</div>
+    </div>
+    <div id="res-rank" style="display:none">${rankHtml}</div>
+    <div id="res-unlock"></div>`;
+  $('res-btns').classList.add('res-hidden');
   $('modal-next').classList.toggle('hidden', !(win && !last));
   $('game-over-modal').classList.remove('hidden');
+  playResultSeq({ rows, gold, xp: xpGain, ups, rankHtml, unlockHtml, grade: rateGrade });
 }
 
-function updateTurnBadge() {
+function updateTurnBadge(deferDim) {
   const p = currentTurn === 'player';
-  if (document.body) document.body.classList.toggle('ai-turn', !p && gameActive);
-  $('turn-badge').className = `px-3 py-1 rounded-full font-bold text-white shadow ${p ? 'bg-blue-600' : 'bg-red-600'}`;
+  // 적 턴 암전은 내 전투·전투 효과가 모두 끝난 뒤(processAiTurn 시작 시점)에 켠다
+  if (document.body && !(deferDim && !p)) document.body.classList.toggle('ai-turn', !p && gameActive);
+  $('turn-badge').className = `px-2.5 py-1 rounded-full font-bold text-white shadow text-[11px] ${p ? 'bg-blue-600' : 'bg-red-600'}`;
   $('turn-text').innerText = (p ? '플레이어 턴' : '적군 턴') + ` · ${Math.min(turnNo, turnLimit)}/${turnLimit}`;
 }
 function setInstruction(msg) { $('phase-instruction').innerText = msg; }
@@ -2620,9 +3186,9 @@ function updateDetailPanel(unit) {
       <div class="bg-slate-950/50 p-2 rounded-lg border border-slate-700"><div class="text-slate-400 text-[10px]">회피율</div><div class="font-extrabold text-cyan-300 text-sm">${ev.total}%</div></div>
     </div>
     <div class="w-full mt-2 text-[11px] text-slate-400 text-center">📍 ${T.icon} ${T.name} · 기본 ${ev.base}% ${ev.bonus ? `<span class="${ev.bonus > 0 ? 'text-green-400' : 'text-red-400'}">${sign(ev.bonus)}%</span>` : '<span class="text-slate-500">±0%</span>'} = <b class="text-cyan-300">${ev.total}%</b></div>
-    ${momentum[unit.owner] ? `<div class="w-full mt-1 text-[11px] ${momentum[unit.owner] > 0 ? 'text-amber-300' : 'text-sky-300'} text-center">${momentum[unit.owner] > 0 ? '🔥 돌격 기세' : '🧊 소극 기세'} ${momentum[unit.owner] > 0 ? '+' : ''}${momentum[unit.owner]}: 공격력 ${momentum[unit.owner] > 0 ? '+' : ''}${momentum[unit.owner] * 8}% · 회피 ${momentum[unit.owner] > 0 ? '+' : ''}${momentum[unit.owner] * 3}%p 적용 중</div>` : ''}
+    ${momentum[unit.owner] ? `<div class="w-full mt-1 text-[11px] ${momentum[unit.owner] > 0 ? 'text-amber-300' : 'text-sky-300'} text-center">${momentum[unit.owner] > 0 ? '🔥 돌격 기세' : '🧊 소극 기세'} ${momentum[unit.owner] > 0 ? '+' : ''}${momentum[unit.owner]}: 공격력 ${momentum[unit.owner] > 0 ? '+' : ''}${momentum[unit.owner] * 8}% · 회피 ${momentum[unit.owner] > 0 ? '+' : ''}${momentum[unit.owner] * MO_EV}%p 적용 중</div>` : ''}
     ${castleBonus(unit, unit.r, unit.c) > 1 ? '<div class="w-full mt-1 text-[11px] text-amber-300 text-center">🛡 성 수비 구역: 공격력 ×2 적용 중</div>' : ''}
-    ${!heal && catapultActive(unit.r, unit.c) ? '<div class="w-full mt-1 text-[11px] text-orange-300 text-center">🪨 투석기 위: 사거리 3칸 (1회용, 위력 60%)</div>' : ''}`;
+    ${!heal && catapultActive(unit.r, unit.c) ? `<div class="w-full mt-1 text-[11px] text-orange-300 text-center">🪨 투석기 위: 사거리 ${catapultRange()}칸 (1회용, 위력 60%)</div>` : ''}`;
 }
 
 function addLog(speaker, text, cls = 'text-slate-300') {
@@ -2635,7 +3201,7 @@ function addLog(speaker, text, cls = 'text-slate-300') {
 function clearLogs() { $('game-log').innerHTML = ''; }
 
 window.onload = () => {
-  loadSettings(); syncAudioUi(); syncHud(); refreshGold(); renderMo();
+  loadSettings(); syncAudioUi(); syncHud(); refreshGold(); renderMo(); renderObjCodex();
   initGame(); initPointerDrag(); resizeBoard(); openStageSelect();
   // 브라우저 정책상 소리는 첫 터치 이후에 시작한다
   const unlock = () => { MUSIC.unlock(); window.removeEventListener('pointerdown', unlock); };
