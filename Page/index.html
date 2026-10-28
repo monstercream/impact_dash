@@ -260,6 +260,38 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none;-webkit-tap-highl
 #res-xptext{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
 #res-gold{flex:none;font-weight:900;font-size:14px;color:#fde047;background:rgba(2,6,23,.6);border:1px solid rgba(250,204,21,.5);border-radius:999px;padding:3px 10px;min-width:84px;text-align:center}
 #res-hud .lvup-banner{font-size:24px;z-index:10}
+#ach-hud-in{position:relative;display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:12px;background:linear-gradient(180deg,rgba(30,41,59,.97),rgba(15,23,42,.97));border:1px solid rgba(250,204,21,.5);box-shadow:0 4px 14px rgba(0,0,0,.5)}
+#ach-hud .lv-badge{min-width:42px;height:26px;font-size:13px;flex:none}
+#ach-xp{flex:1;min-width:0}
+#ach-hud .xp-bar{height:18px;position:relative}
+#ach-hud .xp-fill{transition:width .3s ease-out}
+#ach-xptext{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
+#ach-gold{flex:none;font-weight:900;font-size:14px;color:#fde047;background:rgba(2,6,23,.6);border:1px solid rgba(250,204,21,.5);border-radius:999px;padding:3px 10px;min-width:84px;text-align:center}
+#ach-hud .lvup-banner{font-size:24px;z-index:10}
+#upg-hud-in{position:relative;display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:12px;background:linear-gradient(180deg,rgba(30,41,59,.97),rgba(15,23,42,.97));border:1px solid rgba(250,204,21,.5);box-shadow:0 4px 14px rgba(0,0,0,.5)}
+#upg-hud .lv-badge{min-width:42px;height:26px;font-size:13px;flex:none}
+#upg-xp{flex:1;min-width:0}
+#upg-hud .xp-bar{height:18px;position:relative}
+#upg-hud .xp-fill{transition:width .3s ease-out}
+#upg-xptext{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
+#upg-gold{flex:none;font-weight:900;font-size:14px;color:#fde047;background:rgba(2,6,23,.6);border:1px solid rgba(250,204,21,.5);border-radius:999px;padding:3px 10px;min-width:84px;text-align:center}
+#upg-hud .lvup-banner{font-size:24px;z-index:10}
+#ach-hud-in{position:relative;display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:12px;background:linear-gradient(180deg,rgba(30,41,59,.97),rgba(15,23,42,.97));border:1px solid rgba(250,204,21,.5);box-shadow:0 4px 14px rgba(0,0,0,.5)}
+#ach-hud .lv-badge{min-width:42px;height:26px;font-size:13px;flex:none}
+#ach-xp{flex:1;min-width:0}
+#ach-hud .xp-bar{height:18px;position:relative}
+#ach-hud .xp-fill{transition:width .3s ease-out}
+#ach-xptext{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
+#ach-gold{flex:none;font-weight:900;font-size:14px;color:#fde047;background:rgba(2,6,23,.6);border:1px solid rgba(250,204,21,.5);border-radius:999px;padding:3px 10px;min-width:84px;text-align:center}
+#ach-hud .lvup-banner{font-size:24px;z-index:10}
+.promo-art{filter:drop-shadow(0 0 3px #fde047) drop-shadow(0 0 7px rgba(251,191,36,.7))}
+.promo-card{border-color:#fbbf24 !important;background:linear-gradient(90deg,rgba(120,53,15,.5),rgba(15,23,42,.9)) !important;box-shadow:0 0 14px rgba(251,191,36,.35)}
+.promo-btn{background:linear-gradient(#fde047,#f59e0b);color:#451a03;border:1px solid #fff7ae;animation:promoGlow 1.4s ease-in-out infinite}
+@keyframes promoGlow{50%{box-shadow:0 0 16px rgba(253,224,71,.95)}}
+.res-out{animation:resOut .28s ease-in forwards}
+@keyframes resOut{to{opacity:0;transform:translateX(-40px)}}
+.res-in{animation:resIn .4s cubic-bezier(.2,1,.3,1) both}
+@keyframes resIn{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:none}}
 .res-hidden{opacity:0;pointer-events:none}
 #res-btns{transition:opacity .5s}
 .res-row{display:flex;justify-content:space-between;padding:2px 0;animation:resRowIn .3s ease-out both}
@@ -315,9 +347,14 @@ body.ai-turn #enemy-banner{display:block}
 #tabbar button{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 0 6px;font-size:11px;font-weight:700;color:#94a3b8;min-height:52px}
 #tabbar button span{font-size:19px;line-height:1.1}
 #tabbar button.on{color:#fcd34d;background:rgba(245,158,11,.12)}
-#sheet{position:absolute;left:0;right:0;bottom:calc(52px + env(safe-area-inset-bottom));max-height:68%;display:flex;flex-direction:column;z-index:30;
+#sheet{position:absolute;left:0;right:0;bottom:0;padding-bottom:env(safe-area-inset-bottom);max-height:72%;display:flex;flex-direction:column;z-index:30;
   background:linear-gradient(180deg,#1e293b,#0f172a);border:1px solid rgba(148,163,184,.3);border-bottom:none;border-radius:18px 18px 0 0;box-shadow:0 -12px 30px rgba(0,0,0,.55)}
 #sheet.hidden{display:none}
+#btn-menu{flex:none;width:34px;height:28px;border-radius:9px;background:rgba(30,41,59,.95);color:#fcd34d;border:1px solid #64748b;font-size:17px;font-weight:900;line-height:1}
+#btn-menu.on{background:#f59e0b;color:#451a03;border-color:#fde68a}
+#sheet-tabs{flex:none;display:flex;gap:5px;padding:0 12px 8px;overflow-x:auto}
+#sheet-tabs button{flex:1;white-space:nowrap;padding:7px 8px;border-radius:10px;font-size:12px;font-weight:800;color:#94a3b8;background:rgba(51,65,85,.55);border:1px solid rgba(148,163,184,.25)}
+#sheet-tabs button.on{color:#451a03;background:linear-gradient(#fde047,#f59e0b);border-color:#fff7ae}
 #sheet-head{flex:none;display:flex;align-items:center;justify-content:space-between;padding:10px 14px 6px;font-weight:800;color:#fcd34d;font-size:15px}
 .sheet-x{font-size:12px;font-weight:700;color:#cbd5e1;background:#334155;border-radius:8px;padding:5px 10px}
 #sheet-body{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:8px}
@@ -327,6 +364,33 @@ body.ai-turn #enemy-banner{display:block}
 @media (max-width:600px){.match-badge{top:-1px}.tile-chip{display:none}.match-badge{font-size:7px;padding:0 2px}.evade-badge,.shot-badge{font-size:8px;padding:0 3px}}
 @media (max-height:700px){#unit-chip{display:none}}
 @media (min-width:700px){body{background-attachment:fixed}}
+
+/* ---------- 달성 과제 ---------- */
+#ach-toast{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top));transform:translate(-50%,-140%);z-index:950;width:min(92vw,420px);pointer-events:none;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:linear-gradient(90deg,#78350f,#b45309 45%,#78350f);border:2px solid #fcd34d;box-shadow:0 10px 28px rgba(0,0,0,.6),0 0 22px rgba(251,191,36,.55);color:#fff7ed;transition:transform .45s cubic-bezier(.2,1.3,.4,1),opacity .35s;opacity:0}
+#ach-toast.show{transform:translate(-50%,0);opacity:1}
+#ach-toast .at-ic{font-size:30px;line-height:1;flex:none;animation:atSpin .9s ease-out}
+@keyframes atSpin{from{transform:scale(0) rotate(-200deg)}to{transform:none}}
+#ach-toast .at-t{font-size:10px;font-weight:900;letter-spacing:2px;color:#fde68a}
+#ach-toast .at-n{font-weight:900;font-size:14px;line-height:1.2}
+#ach-toast .at-r{font-size:11px;color:#fde68a}
+.ach-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;background:rgba(15,23,42,.8);border:1px solid rgba(148,163,184,.3)}
+.ach-card.ready{border-color:#fbbf24;background:linear-gradient(90deg,rgba(120,53,15,.55),rgba(15,23,42,.85));box-shadow:0 0 14px rgba(251,191,36,.35)}
+.ach-card.done{opacity:.55}
+.ach-ic{flex:none;width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;background:rgba(30,41,59,.9);border:1px solid #475569}
+.ach-card.ready .ach-ic{background:linear-gradient(#fde047,#f59e0b);border-color:#fff7ae}
+.ach-bar{height:9px;border-radius:99px;background:#1e293b;border:1px solid #334155;overflow:hidden;margin-top:4px}
+.ach-bar i{display:block;height:100%;background:linear-gradient(90deg,#38bdf8,#818cf8);border-radius:99px;transition:width .4s}
+.ach-card.ready .ach-bar i{background:linear-gradient(90deg,#f59e0b,#fde047)}
+.ach-btn{flex:none;min-width:78px;padding:8px 6px;border-radius:10px;font-weight:900;font-size:12px;background:#f59e0b;color:#451a03;border:1px solid #fde68a}
+.ach-btn:disabled{background:#334155;color:#94a3b8;border-color:#475569}
+.ach-pop{animation:achPop .6s ease-out}
+@keyframes achPop{0%{transform:scale(1)}30%{transform:scale(1.04);box-shadow:0 0 26px rgba(253,224,71,.9)}100%{transform:scale(1)}}
+
+/* ---------- 화면 전환(아이리스 페이드) ---------- */
+#fade{position:fixed;inset:0;z-index:900;background:#05070d;pointer-events:none}
+#fade:after{content:'';position:absolute;left:50%;top:50%;width:90px;height:90px;margin:-45px 0 0 -45px;border-radius:50%;border:3px solid rgba(251,191,36,.0);opacity:0}
+#fade.logo:after{animation:fadeRing .7s ease-out}
+@keyframes fadeRing{0%{opacity:.9;transform:scale(.3);border-color:rgba(251,191,36,.9)}100%{opacity:0;transform:scale(2.4);border-color:rgba(251,191,36,0)}}
 
 /* ---------- 월드맵 ---------- */
 #stage-select{background:#0b1220}
@@ -355,19 +419,24 @@ body.ai-turn #enemy-banner{display:block}
 #wm-avatar[data-flip="1"] .wm-av-in .portrait{transform:scaleX(-1)}
 #wm-avatar.walking .wm-av-in{animation:wmBob .26s ease-in-out infinite}
 @keyframes wmBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-#wm-info{flex:none;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(30,41,59,.98),rgba(15,23,42,.99));border-top:1px solid rgba(250,204,21,.45);animation:wmUp .25s ease-out;z-index:6}
+#wm-info{position:absolute;left:0;right:0;bottom:0;transition:transform .32s cubic-bezier(.3,.9,.3,1);padding:0 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(30,41,59,.98),rgba(15,23,42,.99));border-top:1px solid rgba(250,204,21,.45);animation:wmUp .25s ease-out;z-index:6}
 #wm-info > *{max-width:560px;margin-left:auto;margin-right:auto}
+#wm-info.tuck{transform:translateY(calc(100% - 26px - env(safe-area-inset-bottom)))}
+.wm-handle{height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.wm-handle i{display:block;width:44px;height:5px;border-radius:3px;background:rgba(250,204,21,.6)}
 @keyframes wmUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
 #wm-toast{position:absolute;left:50%;bottom:18%;transform:translate(-50%,10px);z-index:20;padding:8px 14px;border-radius:999px;background:rgba(15,23,42,.92);color:#fde68a;font-weight:800;font-size:12px;border:1px solid rgba(250,204,21,.5);opacity:0;pointer-events:none;transition:.25s;white-space:nowrap}
 #wm-toast.show{opacity:1;transform:translate(-50%,0)}
 </style>
 </head>
 <body>
+<div id="fade" style="display:none"></div>
 <div id="app">
   <div id="hud">
     <div id="hud-lv" class="lv-badge">Lv 1</div>
     <div id="hud-xp"><div class="xp-bar"><div class="xp-fill" id="hud-xpfill"></div><span id="hud-xptext">0 / 80</span></div></div>
     <div id="hud-gold">💰 0</div>
+    <button id="btn-menu" onclick="menuBtn()" aria-label="메뉴">☰</button>
     <div class="lvup-banner" id="hud-banner">LEVEL UP!</div>
   </div>
   <div id="enemy-banner">⚔️ 적군 턴 · 상대가 움직이는 중...</div>
@@ -390,15 +459,9 @@ body.ai-turn #enemy-banner{display:block}
       <button onclick="cancelMovePhase()" class="act-btn act-cancel">이동 취소</button>
     </div>
   </div>
-  <nav id="tabbar">
-    <button data-tab="menu" onclick="toggleTab('menu')"><span>⚙️</span>메뉴</button>
-    <button data-tab="unit" onclick="toggleTab('unit')"><span>🧑‍✈️</span>유닛</button>
-    <button data-tab="terrain" onclick="toggleTab('terrain')"><span>🌍</span>지형</button>
-    <button data-tab="log" onclick="toggleTab('log')"><span>📜</span>기록</button>
-    <button data-tab="rules" onclick="toggleTab('rules')"><span>📖</span>규칙</button>
-  </nav>
   <div id="sheet" class="hidden">
     <div id="sheet-head"><span id="sheet-title"></span><button onclick="toggleTab(null)" class="sheet-x">닫기 ✕</button></div>
+    <div id="sheet-tabs"><button data-tab="menu" onclick="setTab('menu')">⚙️ 메뉴</button><button data-tab="unit" onclick="setTab('unit')">🧑‍✈️ 유닛</button><button data-tab="terrain" onclick="setTab('terrain')">🌍 지형</button><button data-tab="log" onclick="setTab('log')">📜 기록</button><button data-tab="rules" onclick="setTab('rules')">📖 규칙</button></div>
     <div id="sheet-body">
       <section data-tab="menu" class="hidden">
         <div class="p-3 flex flex-col gap-3">
@@ -411,6 +474,7 @@ body.ai-turn #enemy-banner{display:block}
           <div class="flex items-center justify-between gap-3 mb-2"><span class="font-bold text-amber-200 text-sm">전장의 안개 (안개 맵 한정)</span><button id="fog-toggle" onclick="toggleFog()" class="menu-btn" style="min-height:38px;padding:0 16px;font-size:13px">🌫 켜짐</button></div>
           <div class="flex items-center justify-between gap-3"><span class="font-bold text-amber-200 text-sm">효과음</span><button id="sfx-toggle" onclick="toggleSfx()" class="menu-btn" style="min-height:38px;padding:0 16px;font-size:13px">🔊 켜짐</button></div>
           <button onclick="toggleTab(null);openUpgrade()" class="menu-btn" style="background:#4f46e5;border-color:#6366f1;color:#fff">🛠 병종 강화 <span id="menu-gold" class="text-yellow-300"></span></button>
+          <button onclick="toggleTab(null);openAch()" class="menu-btn" style="background:#b45309;border-color:#f59e0b;color:#fff">🏆 달성 과제</button>
           <button onclick="toggleTab(null);openStageSelect()" class="menu-btn">🗺 월드맵</button>
           <button onclick="toggleTab(null);initGame()" class="menu-btn amber">↻ 현재 스테이지 다시 시작</button>
           <p class="text-[11px] text-slate-400 leading-relaxed">조작: 아군 캐릭터를 <b>터치</b>해 선택 → 파란 칸을 터치해 이동 → 빨간 칸의 적을 터치해 공격. 제자리 타일을 터치하면 이동 없이 공격할 수 있고, <b>유닛을 끌어서 적 위에 놓으면 알아서 이동해 공격</b>하며, 적을 터치하면 이동 가능 범위를 볼 수 있습니다.</p>
@@ -423,19 +487,9 @@ body.ai-turn #enemy-banner{display:block}
     </div>
     <div class="p-3 pt-1">
       <h2 class="text-xs font-bold text-amber-200/80 mb-2">병종 상성 관계</h2>
-      <div class="bg-slate-950/50 p-2 rounded-lg border border-slate-700 text-[11px] font-bold flex items-center justify-between gap-1 text-center">
-        <span class="text-blue-400">검사</span><span class="text-slate-500">›</span>
-        <span class="text-green-400">창병</span><span class="text-slate-500">›</span>
-        <span class="text-amber-400">나이트</span><span class="text-slate-500">›</span>
-        <span class="text-purple-400">궁수</span>
-      </div>
-      <div class="mt-1.5 flex justify-between text-[10px] pt-1.5">
-        <span class="text-green-400 font-semibold">▲ 우세: +50%</span>
-        <span class="text-emerald-400 font-semibold">♥ 마법사: 공격 시 항상 우세 · 피격 시 항상 열세 / 힐러: 피격 시 항상 열세</span>
-        <span class="text-red-400 font-semibold">▼ 열세: -65%</span>
-      </div>
+      <div id="matchup-box"></div>
     </div>
-        <div class="p-3 pt-0"><h2 class="text-xs font-bold text-amber-200/80 mb-2">병종 한눈에 보기</h2><div class="grid grid-cols-3 gap-1.5 text-center text-xs" id="legend"></div></div>
+    <div class="p-3 pt-0"><h2 class="text-xs font-bold text-amber-200/80 mb-2">병종 한눈에 보기 <span class="font-normal text-slate-500">(만난 병종만 · 눌러서 다시 보기)</span></h2><div class="grid grid-cols-3 gap-1.5 text-center text-xs" id="legend"></div></div>
       </section>
       <section data-tab="terrain" class="hidden">
     <div class="p-3">
@@ -443,13 +497,8 @@ body.ai-turn #enemy-banner{display:block}
       <div id="terrain-legend" class="grid grid-cols-2 gap-1.5 text-[11px]"></div>
     </div>
     <div class="p-3 pt-0">
-      <h2 class="text-xs font-bold text-amber-200/80 mb-2">특수 구역</h2>
-      <div class="grid grid-cols-1 gap-1.5 text-[11px]">
-        <div class="flex items-start gap-2 bg-slate-950/40 border border-slate-700 rounded-lg p-1.5"><span class="text-base">🛡</span><div><div class="font-bold text-slate-200">성 수비 구역 (포탑)</div><div class="text-[10px] text-slate-400 leading-tight">자기 성 상하좌우 칸에 서 있으면 <b class="text-amber-300">공격력 ×2</b>, 턴 시작 때 <b class="text-emerald-300">체력 10% 회복</b></div></div></div>
-        <div class="flex items-start gap-2 bg-slate-950/40 border border-slate-700 rounded-lg p-1.5"><span class="text-base">🧱</span><div><div class="font-bold text-slate-200">부술 수 있는 장애물</div><div class="text-[10px] text-slate-400 leading-tight">이동·점프로 통과 불가. 공격해서 <b class="text-amber-300">HP 30</b>를 깎으면 부서져 길이 열립니다. (회피 없음, 방어 2)</div></div></div>
-        <div class="flex items-start gap-2 bg-slate-950/40 border border-slate-700 rounded-lg p-1.5"><span class="text-base">📦</span><div><div class="font-bold text-slate-200">보물상자</div><div class="text-[10px] text-slate-400 leading-tight">유닛이 올라서면 열리고 <b class="text-emerald-300">그 팀 전원의 체력이 완전 회복</b>됩니다. 상자마다 <b>1회</b> (적도 열 수 있어요!)</div></div></div>
-        <div class="flex items-start gap-2 bg-slate-950/40 border border-slate-700 rounded-lg p-1.5"><span class="text-base">🪨</span><div><div class="font-bold text-slate-200">투석기 포탑 (맵 곳곳)</div><div class="text-[10px] text-slate-400 leading-tight">그 위에서 공격하면 <b class="text-amber-300">사거리 3~5칸(맵이 클수록 길어짐, 대각선 포함)</b>까지 가능. 대신 <b>위력 60%</b>, 투석기마다 <b>1회만</b> 사용 가능 (사용 후 파괴)</div></div></div>
-      </div>
+      <h2 class="text-xs font-bold text-amber-200/80 mb-2">🧩 오브젝트 도감 <span class="font-normal text-slate-500">(새 오브젝트를 처음 만나면 추가돼요 · 눌러서 다시 보기)</span></h2>
+      <div id="obj-codex" class="grid grid-cols-2 gap-1.5"></div>
     </div>
       </section>
       <section data-tab="log" class="hidden">
@@ -463,23 +512,21 @@ body.ai-turn #enemy-banner{display:block}
       </section>
       <section data-tab="rules" class="hidden">
     <div class="p-3 text-xs text-slate-400">
-      <div class="font-bold text-slate-200 mb-1">📚 오브젝트 도감 <span class="font-normal text-slate-500">(눌러서 다시 보기)</span></div>
-      <div id="obj-codex" class="grid grid-cols-2 gap-1.5 mb-3"></div>
       <div class="font-bold text-slate-200 mb-1">💡 전투 규칙</div>
       <ul class="list-disc list-inside space-y-1 text-[11px] leading-relaxed">
         <li>이동한 뒤 공격/회복하거나, <b>제자리 타일(⚔/✚ 표시)을 눌러 이동 없이 바로 공격/회복</b>할 수 있습니다. 제자리에 대상이 없으면 선택이 취소되어 다른 캐릭터를 고를 수 있습니다.</li>
-        <li><b>힐러</b>는 자기 자신을 회복할 수 없으며, <b>반경 2칸(대각선 포함, 주변 24칸)</b>의 부상당한 아군만 회복합니다.</li>
+        <li data-unit="HEALER"><b>힐러</b>는 자기 자신을 회복할 수 없으며, <b>반경 2칸(대각선 포함, 주변 24칸)</b>의 부상당한 아군만 회복합니다.</li>
         <li><b>늪</b>에 서 있는 유닛은 다음 이동이 1칸 줄어듭니다. (나이트는 대각선 1칸만 이동) <b>물</b> 타일은 들어가거나 지나갈 수 없습니다. (공격은 물 너머로 가능)</li>
-        <li><b>성 수비 구역</b>(자기 성 상하좌우 칸)에서는 공격력이 <b>2배</b>가 되고, 매 턴 시작 때 <b>최대 체력의 10%</b>를 회복합니다.</li>
-        <li><b>장애물</b>(🧱)은 공격으로 부술 수 있습니다. 적 AI는 장애물을 공격하지 않습니다.</li>
+        <li data-obj="turret"><b>성 수비 구역</b>(자기 성 상하좌우 칸)에서는 공격력이 <b>2배</b>가 되고, 매 턴 시작 때 <b>최대 체력의 10%</b>를 회복합니다.</li>
+        <li data-obj="obstacle"><b>장애물</b>(🧱)은 공격으로 부술 수 있습니다. 적 AI는 장애물을 공격하지 않습니다.</li>
         <li><b>턴 제한</b>: 상단의 턴 수가 제한에 도달하면 남은 체력 합계가 더 많은 쪽이 승리합니다.</li>
-        <li><b>보물상자</b>(📦) 칸에 올라서면 상자가 열리며 우리 팀 전원의 체력이 완전히 회복됩니다. 상자마다 한 번뿐이고, 적도 열 수 있습니다.</li>
-        <li><b>투석기</b> 위에서 공격하면 사거리가 맵 크기에 따라 3~5칸까지 늘어납니다(작은 맵 3칸, 큰 맵일수록 길어짐). 위력은 60%이고, 투석기마다 <b>1번만</b> 쓸 수 있습니다.</li>
+        <li data-obj="chest"><b>보물상자</b>(📦) 칸에 올라서면 상자가 열리며 우리 팀 전원의 체력이 완전히 회복됩니다. 상자마다 한 번뿐이고, 적도 열 수 있습니다.</li>
+        <li data-obj="catapult"><b>투석기</b> 위에서 공격하면 사거리가 맵 크기에 따라 3~5칸까지 늘어납니다(작은 맵 3칸, 큰 맵일수록 길어짐). 위력은 60%이고, 투석기마다 <b>1번만</b> 쓸 수 있습니다.</li>
         <li>이동할 때 <b>아군은 뛰어넘을 수 있지만 적은 뛰어넘을 수 없습니다</b>(나이트의 L자 점프 제외).</li>
         <li>이동 후 범위 내 대상이 없으면 <b>자동으로 대기</b>하고 턴이 넘어갑니다.</li>
         <li>이동 칸 중 <b>흐린 빨강(⚔)/초록(✚)</b>은 그 자리로 이동하면 공격/회복이 가능한 위치입니다.</li>
         <li><b>성(🏰)</b>: 자기 성에는 들어갈 수 없고, <b>적 성 칸에 정확히 도달</b>하면 승리합니다. 성 앞 길목을 막으세요!</li>
-        <li><b>🌫 전장의 안개</b>(🌫 안개가 표시된 일부 스테이지 전용): 아군 캐릭터 주변 <b>3칸 안</b>에 들어온 적만 보입니다. 시야 밖에서는 배경과 지형·오브젝트만 보이고 적은 숨어 있어요. 메뉴에서 끌 수 있습니다.</li>
+        <li data-obj="fog"><b>🌫 전장의 안개</b>(🌫 안개가 표시된 일부 스테이지 전용): 아군 캐릭터 주변 <b>3칸 안</b>에 들어온 적만 보입니다. 시야 밖에서는 배경과 지형·오브젝트만 보이고 적은 숨어 있어요. 메뉴에서 끌 수 있습니다.</li>
         <li><b>🔥 기세</b>(화면 위 게이지): 턴마다 <b>적 성 방향(두 성을 잇는 축)으로 전진</b>하거나 <b>공격</b>하면(옆으로 이동은 전진이 아님) 기세가 +1(둘 다 하면 +2), 전진도 공격도 안 하면 <b>-1</b>(힐러가 회복하면 유지). <b>-3 ~ +3</b>단계이며 한 단계마다 <b>공격력 ±8%, 회피율 ±1.5%p</b>가 팀 전체에 적용됩니다. 적도 똑같이 적용됩니다!</li>
         <li>공격은 대상의 <b>회피율</b>만큼 빗나갈 수 있습니다. 회피율 = 병종 기본값 + 서 있는 지형 보정이며, 최대 15%입니다(기세 보너스 제외).</li>
       </ul>
@@ -499,15 +546,22 @@ body.ai-turn #enemy-banner{display:block}
     </div>
   </div>
   <div id="res-panel" class="panel border-2 border-amber-500 max-w-md w-full p-5 text-center" style="max-height:86dvh;overflow-y:auto">
-    <div id="modal-icon" class="text-6xl mb-3">🏆</div>
-    <h2 id="modal-title" class="title-font text-3xl text-amber-400 mb-2"></h2>
-    <p id="modal-desc" class="text-slate-300 text-sm mb-3"></p>
-    <div id="modal-rating" class="mb-4"></div>
-    <div id="res-btns" class="flex flex-col gap-2 res-hidden">
+    <div id="res-d1">
+      <div id="modal-icon" class="text-6xl mb-3">🏆</div>
+      <h2 id="modal-title" class="title-font text-3xl text-amber-400 mb-2"></h2>
+      <p id="modal-desc" class="text-slate-300 text-sm mb-3"></p>
+      <div id="modal-rating" class="mb-3"></div>
+    </div>
+    <div id="res-d2" class="hidden">
+      <div class="text-[11px] font-black tracking-[.3em] text-amber-300 mb-1">BATTLE RESULT</div>
+      <div id="res-rank" style="display:none"></div>
+      <div id="res-unlock"></div>
+    <div id="res-btns" class="flex flex-col gap-2 res-hidden mt-4">
       <button id="modal-next" onclick="nextStage()" class="hidden w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl">🗺 월드맵으로 — 다음 스테이지 열림 ▶</button>
       <button onclick="initGame()" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl">↻ 다시 도전</button>
       <button onclick="openUpgrade()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl">🛠 병종 강화 <span id="modal-gold" class="text-yellow-300"></span></button>
       <button onclick="openStageSelect()" class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-amber-200 font-bold rounded-xl border border-slate-500">🗺 월드맵</button>
+    </div>
     </div>
   </div>
 </div>
@@ -517,7 +571,13 @@ body.ai-turn #enemy-banner{display:block}
       <div><h2 class="title-font text-2xl text-amber-300">🛠 병종 강화</h2><p class="text-[11px] text-slate-400 mt-1">레벨마다 체력·공격력 +8%, Lv2·Lv4에서 방어력 +1. (플레이어 레벨 1당 전 병종 체력·공격 +1%) 다음 전투부터 적용됩니다.</p></div>
       <button onclick="closeUpgrade()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-bold rounded-lg border border-slate-500">닫기 ✕</button>
     </div>
-    <div class="flex items-center justify-between mb-3 panel p-3"><span class="text-sm text-slate-300">보유 골드</span><span id="upg-gold" class="text-xl font-black text-yellow-300"></span></div>
+    <div id="upg-hud" class="sticky top-0 z-10 pb-2 -mt-1" style="background:linear-gradient(180deg,rgba(2,6,23,.98) 70%,rgba(2,6,23,0))">
+      <div id="upg-hud-in">
+        <div id="upg-lv" class="lv-badge">Lv 1</div>
+        <div id="upg-xp"><div class="xp-bar"><div class="xp-fill" id="upg-xpfill"></div><span id="upg-xptext">0 / 80</span></div></div>
+        <div id="upg-gold">💰 0</div>
+      </div>
+    </div>
     <div id="upg-list" class="flex flex-col gap-2.5"></div>
   </div>
 </div>
@@ -533,9 +593,28 @@ body.ai-turn #enemy-banner{display:block}
       <button onclick="dbgDo('upg')" class="menu-btn" style="min-height:40px">🛠 강화 전부 MAX</button>
       <button onclick="dbgDo('allclear')" class="menu-btn" style="min-height:40px">🏁 전 스테이지 클리어</button>
       <button onclick="dbgDo('unclear')" class="menu-btn" style="min-height:40px">↩ 클리어 기록 삭제</button>
+      <button onclick="dbgDo('promo')" class="menu-btn" style="min-height:40px">⚜ 전직 전부</button>
       <button onclick="dbgDo('seen')" class="menu-btn" style="min-height:40px">❓ 팝업 다시 보기</button>
     </div>
     <button id="dbg-reset" onclick="dbgDo('reset')" class="mt-3 w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-xl text-sm">⚠ 모든 기록 초기화</button>
+  </div>
+</div>
+<div id="ach-toast"></div>
+<div id="ach-screen" class="hidden fixed inset-0 z-[75] overflow-y-auto bg-slate-950/95 backdrop-blur-md">
+  <div class="max-w-xl mx-auto p-4 sm:p-6">
+    <div id="ach-hud" class="sticky top-0 z-10 pb-2" style="background:linear-gradient(180deg,rgba(2,6,23,.98) 70%,rgba(2,6,23,0))">
+      <div id="ach-hud-in">
+        <div id="ach-lv" class="lv-badge">Lv 1</div>
+        <div id="ach-xp"><div class="xp-bar"><div class="xp-fill" id="ach-xpfill"></div><span id="ach-xptext">0 / 80</span></div></div>
+        <div id="ach-gold">💰 0</div>
+      </div>
+    </div>
+    <div class="flex items-center justify-between mb-3">
+      <div><h2 class="title-font text-2xl text-amber-300">🏆 달성 과제</h2><p id="ach-sub" class="text-[11px] text-slate-400 mt-1"></p></div>
+      <button onclick="closeAch()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-bold rounded-lg border border-slate-500">닫기 ✕</button>
+    </div>
+    <button id="ach-all" onclick="achClaimAll()" class="w-full mb-3 py-3 rounded-xl font-black bg-amber-500 hover:bg-amber-400 text-slate-950 disabled:opacity-40 disabled:cursor-not-allowed"></button>
+    <div id="ach-list" class="flex flex-col gap-2"></div>
   </div>
 </div>
 <div id="obj-modal" class="hidden fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
@@ -550,9 +629,9 @@ body.ai-turn #enemy-banner{display:block}
 <div id="stage-select" class="hidden fixed inset-0 z-[60] flex flex-col">
   <div id="wm-head">
     <div class="min-w-0"><h2 id="wm-title" onclick="dbgTap()" class="title-font text-xl text-amber-300 leading-tight" style="user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent">🗺 월드맵</h2><p id="wm-region" class="text-[11px] text-slate-300 truncate"></p></div>
-    <div class="flex items-center gap-2 shrink-0"><span id="stage-gold" class="text-xs font-black text-yellow-300 bg-slate-800 border border-yellow-600/50 rounded-full px-2.5 py-1"></span>
-      <button onclick="openUpgrade()" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg">🛠 강화</button>
-      <button id="stage-close" onclick="closeStageSelect()" class="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold rounded-lg border border-slate-500">닫기 ✕</button></div>
+    <div class="flex items-center gap-2 shrink-0"><button onclick="openAch()" class="relative px-2.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-lg">🏆 과제<i id="ach-dot" class="hidden" style="position:absolute;top:-4px;right:-4px;width:11px;height:11px;border-radius:50%;background:#ef4444;border:2px solid #0f172a"></i></button><span id="stage-gold" class="text-xs font-black text-yellow-300 bg-slate-800 border border-yellow-600/50 rounded-full px-2.5 py-1"></span>
+      
+</div>
   </div>
   <div id="wm-scroll"><div id="wm-wrap"><div id="wm-canvas"></div></div></div>
   <div id="wm-toast"></div>
@@ -666,12 +745,36 @@ const UNIT_SVG = {
   </svg>`
 };
 
+// ---------- 전직 모습: 기본 그림 위에 금빛 갑옷·망토·후광 등을 덧그린 상위 직업 ----------
+const GOLD = '#fcd34d', GOLD_D = '#92400e';
+const PRO_BACK = {
+  SWORDSMAN: `<circle cx="32" cy="34" r="30" fill="#fde68a" opacity=".16"/><circle cx="32" cy="34" r="22" fill="#fde68a" opacity=".16"/><path class="tc2" d="M17 28 Q5 46 9 62 L55 62 Q59 46 47 28Z"/><path d="M17 28 Q5 46 9 62 M47 28 Q59 46 55 62" stroke="${GOLD}" stroke-width="2" fill="none"/>`,
+  SPEARMAN: `<circle cx="32" cy="34" r="30" fill="#fde68a" opacity=".16"/><circle cx="32" cy="34" r="22" fill="#fde68a" opacity=".16"/><path class="tc2" d="M17 28 Q5 46 9 62 L55 62 Q59 46 47 28Z"/><path d="M17 28 Q5 46 9 62 M47 28 Q59 46 55 62" stroke="${GOLD}" stroke-width="2" fill="none"/>`,
+  KNIGHT: `<circle cx="32" cy="32" r="30" fill="#fde68a" opacity=".16"/><circle cx="32" cy="32" r="22" fill="#fde68a" opacity=".16"/>`,
+  ARCHER: `<circle cx="32" cy="34" r="30" fill="#fde68a" opacity=".16"/><circle cx="32" cy="34" r="22" fill="#fde68a" opacity=".16"/><path class="tc2" d="M17 28 Q6 46 10 62 L54 62 Q58 46 47 28Z"/><path d="M17 28 Q6 46 10 62 M47 28 Q58 46 54 62" stroke="${GOLD}" stroke-width="2" fill="none"/>`,
+  MAGE: `<circle cx="32" cy="32" r="31" fill="#c4b5fd" opacity=".2"/><circle cx="32" cy="32" r="22" fill="#c4b5fd" opacity=".2"/><path class="tc2" d="M12 30 Q2 48 6 62 L58 62 Q62 48 52 30Z" opacity=".9"/>`,
+  HEALER: `<circle cx="32" cy="32" r="31" fill="#bbf7d0" opacity=".2"/><circle cx="32" cy="32" r="22" fill="#fef9c3" opacity=".22"/><path d="M19 32 Q-4 28 1 6 Q9 18 22 22Z" fill="#fff" stroke="${GOLD}" stroke-width="1.4"/><path d="M45 32 Q68 28 63 6 Q55 18 42 22Z" fill="#fff" stroke="${GOLD}" stroke-width="1.4"/><path d="M17 34 Q2 36 3 20 Q9 28 20 28Z" fill="#fff" stroke="${GOLD}" stroke-width="1.2"/><path d="M47 34 Q62 36 61 20 Q55 28 44 28Z" fill="#fff" stroke="${GOLD}" stroke-width="1.2"/>`
+};
+const STAR = (x, y, k = 1) => `<path transform="translate(${x} ${y}) scale(${k})" d="M0 -5 l1.5 3.3 3.6 .5 -2.6 2.5 .7 3.6 -3.2 -1.8 -3.2 1.8 .7 -3.6 -2.6 -2.5 3.6 -.5z" fill="${GOLD}" stroke="${GOLD_D}" stroke-width=".7"/>`;
+const PAULD = `<ellipse cx="19" cy="33" rx="6.5" ry="4.4" fill="${GOLD}" stroke="${GOLD_D}" stroke-width=".9"/><ellipse cx="45" cy="33" rx="6.5" ry="4.4" fill="${GOLD}" stroke="${GOLD_D}" stroke-width=".9"/>`;
+const PRO_FRONT = {
+  SWORDSMAN: `${PAULD}<path d="M32 3 Q45 -3 51 9 Q41 6 32 11Z" fill="${GOLD}" stroke="${GOLD_D}" stroke-width=".8"/><path d="M20 19.5 h24" stroke="${GOLD}" stroke-width="2"/><g transform="rotate(22 49 30)"><rect x="46.2" y="6" width="5.8" height="33" rx="2" fill="none" stroke="#fde047" stroke-width="1.6"/><rect x="41.5" y="36.5" width="15" height="3.6" rx="1.4" fill="${GOLD}" stroke="${GOLD_D}" stroke-width=".7"/></g>${STAR(32, 41, 1.1)}${STAR(56, 6, .7)}`,
+  SPEARMAN: `${PAULD}<path d="M32 4 Q42 -4 49 6 Q39 6 32 9Z" fill="#ef4444" stroke="#7f1d1d" stroke-width=".7"/><path d="M53.5 -1 L47.6 15 H59.4Z" fill="${GOLD}" stroke="${GOLD_D}" stroke-width=".9"/><path d="M20 19.5 h24" stroke="${GOLD}" stroke-width="2"/><circle cx="14" cy="43" r="8.8" fill="none" stroke="${GOLD}" stroke-width="2"/>${STAR(32, 41, 1.1)}`,
+  KNIGHT: `<path d="M14 33 Q28 41 42 33" stroke="${GOLD}" stroke-width="2.8" fill="none"/><path d="M8 38 Q10 31 22 31" stroke="${GOLD}" stroke-width="1.6" fill="none"/><path d="M29.5 3 Q38 -7 49 1 Q39 2 33 8Z" fill="${GOLD}" stroke="${GOLD_D}" stroke-width=".8"/><circle cx="29.5" cy="11" r="7.4" fill="none" stroke="${GOLD}" stroke-width="1.6"/><path d="M62 18 L64 22 L62 26 L57 22Z" fill="${GOLD}" stroke="${GOLD_D}" stroke-width=".7"/><path d="M23 22 q3 -3 6 0" stroke="${GOLD}" stroke-width="1.4" fill="none"/>${STAR(29.5, 36, .9)}${STAR(52, 11, .7)}`,
+  ARCHER: `${PAULD}<path d="M14 8 Q-1 32 14 56" stroke="${GOLD}" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M43 12 Q54 0 58 11 Q49 10 44 19Z" fill="${GOLD}" stroke="${GOLD_D}" stroke-width=".8"/><path d="M45 25 l1.8 -6 l1.8 6z" fill="${GOLD}"/>${STAR(32, 41, 1.1)}${STAR(6, 8, .7)}`,
+  MAGE: `<circle cx="51.6" cy="12" r="9" fill="#e9d5ff" opacity=".55"/><circle cx="51.6" cy="12" r="6.4" fill="#a78bfa" stroke="#f5f3ff" stroke-width="1.6"/><circle cx="50" cy="10.4" r="1.8" fill="#fff"/><path d="M16 22 Q32 28 48 22" stroke="${GOLD}" stroke-width="2.6" fill="none"/><path d="M17 34 L10 58 M47 34 L54 58" stroke="${GOLD}" stroke-width="1.8" fill="none"/>${STAR(33, 12, 1.25)}${STAR(8, 12, .8)}${STAR(58, 36, .7)}${STAR(6, 44, .6)}`,
+  HEALER: `<ellipse cx="32" cy="4.4" rx="10.5" ry="3.1" fill="none" stroke="${GOLD}" stroke-width="2.6"/><path d="M17 32 L10 58 M47 32 L54 58" stroke="${GOLD}" stroke-width="1.8" fill="none"/><path d="M30 37 h4 v5 h5 v4 h-5 v6 h-4 v-6 h-5 v-4 h5z" fill="${GOLD}" stroke="#16a34a" stroke-width=".9"/><circle cx="51.5" cy="15" r="6.2" fill="none" stroke="${GOLD}" stroke-width="2.4"/>${STAR(8, 44, .7)}${STAR(57, 40, .6)}`
+};
+const UNIT_SVG_PRO = {};
+Object.keys(UNIT_SVG).forEach(k => { UNIT_SVG_PRO[k] = UNIT_SVG[k].replace(/(<svg[^>]*>)/, '$1' + PRO_BACK[k]).replace('</svg>', PRO_FRONT[k] + '</svg>'); });
+const unitSvg = (k, promo) => promo ? UNIT_SVG_PRO[k] : UNIT_SVG[k];
+
 const TEAM = {
   player: { c1: '#3b82f6', c2: '#1e3a8a', ring: '#93c5fd', base1: '#60a5fa', base2: '#1e40af' },
   ai:     { c1: '#ef4444', c2: '#7f1d1d', ring: '#fca5a5', base1: '#f87171', base2: '#991b1b' }
 };
 const teamStyle = o => `--team:${TEAM[o].c1};--team2:${TEAM[o].c2};--ring:${TEAM[o].ring};--base1:${TEAM[o].base1};--base2:${TEAM[o].base2}`;
-const portrait = (t, o) => `<div class="portrait" style="${teamStyle(o)}">${UNIT_SVG[t]}</div>`;
+const portrait = (t, o, promo) => { const p = promo === undefined ? (o === 'player' && SAVE.promo && SAVE.promo[t]) : promo; return `<div class="portrait${p ? ' promo-art' : ''}" style="${teamStyle(o)}">${unitSvg(t, p)}</div>`; };
 
 function castleSvg(owner) {
   const flag = TEAM[owner].c1;
@@ -1074,7 +1177,7 @@ function damageUnit(u, dmg) {
   showFloatingText(u.r, u.c, `-${dmg}`, 'damage');
   if (u.hp > 0) return false;
   if (u.typeKey === 'OBSTACLE') addTileFx(u.r, u.c, '💥', 'fx-burst', 0, 500);
-  else addTileFx(u.r, u.c, `<div class="unit-art" style="${teamStyle(u.owner)};position:relative;inset:auto;width:80%;height:80%">${UNIT_SVG[u.typeKey]}</div>`, 'fx-ghost', 0, 650);
+  else addTileFx(u.r, u.c, `<div class="unit-art" style="${teamStyle(u.owner)};position:relative;inset:auto;width:80%;height:80%">${unitSvg(u.typeKey, u.promo)}</div>`, 'fx-ghost', 0, 650);
   if (board[u.r][u.c] === u) board[u.r][u.c] = null;
   units = units.filter(x => x !== u);
   if (u.owner === 'ai') rewardKill(u);
@@ -1314,7 +1417,40 @@ const inBounds = (r, c) => r >= 0 && r < ROWS && c >= 0 && c < COLS;
 const isFree = (r, c, u) => inBounds(r, c) && terrainAt(r, c) !== 'WATER' && !board[r][c] && castleAt(r, c) !== u.owner; // 상대 성 칸에는 들어갈 수 있고(도달 = 승리), 자기 성에는 들어갈 수 없다
 
 let currentStage = 0, unitSeq = {}, turnNo = 1, turnLimit = 30;
-function initGame() { loadStage(currentStage); }   // 현재 스테이지 다시 시작
+// 화면 전환: 검은 막이 중앙으로 조여 들었다가(아이리스 클로즈) 새 화면에서 활짝 열린다
+let fadeBusy = false;
+function irisTo(from, to, dur, ease) {
+  const f = document.getElementById('fade');
+  const R = Math.hypot(innerWidth, innerHeight) / 2 + 30;
+  return new Promise(res => {
+    const t0 = performance.now();
+    const step = now => {
+      const k = Math.min(1, (now - t0) / dur), e = ease(k), r = (from + (to - from) * e) * R, soft = 40;
+      const m = `radial-gradient(circle at 50% 50%, transparent ${Math.max(0, r - soft)}px, #000 ${Math.max(1, r)}px)`;
+      f.style.webkitMaskImage = m; f.style.maskImage = m;
+      k < 1 ? requestAnimationFrame(step) : res();
+    };
+    requestAnimationFrame(step);
+  });
+}
+async function transition(fn) {
+  if (fadeBusy) { fn(); return; }
+  fadeBusy = true;
+  const f = document.getElementById('fade');
+  try {
+    f.style.display = 'block'; f.style.pointerEvents = 'auto';
+    try { sound.tone('sawtooth', 900, 120, 0.32, 0.07); } catch (e) {}
+    await irisTo(1, 0, 340, k => k * k);                    // 가속하며 닫힘
+    f.classList.remove('logo'); void f.offsetWidth; f.classList.add('logo');
+    try { fn(); } catch (e) { console.error(e); }
+    await new Promise(r => setTimeout(r, 160));
+    try { sound.tone('sine', 300, 900, 0.3, 0.06); } catch (e) {}
+    await irisTo(0, 1, 520, k => 1 - Math.pow(1 - k, 3));   // 감속하며 활짝 열림
+  } finally {
+    f.style.display = 'none'; f.style.pointerEvents = 'none'; fadeBusy = false;
+  }
+}
+function initGame(noFx) { if (noFx) loadStage(currentStage); else transition(() => loadStage(currentStage)); }   // 현재 스테이지 다시 시작
 
 function loadStage(i) {
   const st = STAGES[i], th = THEMES[st.theme];
@@ -1396,10 +1532,16 @@ const TAB_TITLES = { menu: '⚙️ 메뉴', unit: '🧑‍✈️ 유닛 정보',
 let openTab = null, stageTitle = '';
 function toggleTab(name) {
   openTab = (name === null || name === openTab) ? null : name;
+  applyTab();
+}
+function setTab(name) { openTab = name; applyTab(); }                    // 탭 줄에서 다른 탭으로 이동 (닫지 않음)
+function menuBtn() { openTab = openTab ? null : 'menu'; applyTab(); }     // 오른쪽 위 메뉴 버튼
+function applyTab() {
   $('sheet').classList.toggle('hidden', !openTab);
   document.querySelectorAll('#sheet-body section').forEach(sec => sec.classList.toggle('hidden', sec.dataset.tab !== openTab));
-  document.querySelectorAll('#tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === openTab));
-  if (openTab) { $('sheet-title').innerText = openTab === 'menu' && stageTitle ? '⚙️ ' + stageTitle : TAB_TITLES[openTab]; $('sheet-body').scrollTop = 0; if (openTab === 'log') { const lb = $('game-log'); lb.scrollTop = lb.scrollHeight; } }
+  document.querySelectorAll('#sheet-tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === openTab));
+  $('btn-menu').classList.toggle('on', !!openTab);
+  if (openTab) { $('sheet-title').innerText = openTab === 'menu' && stageTitle ? '⚙️ ' + stageTitle : TAB_TITLES[openTab]; $('sheet-body').scrollTop = 0; if (openTab === 'log') { const lb = $('game-log'); lb.scrollTop = lb.scrollHeight; } renderCodex(); }
   setTimeout(resizeBoard, 0);
 }
 
@@ -1444,17 +1586,136 @@ function dbgDo(a) {
   else if (a === 'allclear') { SAVE.cleared = Array.from({ length: TOTAL_STAGES }, (_, i) => i); SAVE.newUnlock = null; }
   else if (a === 'unclear') { SAVE.cleared = []; SAVE.best = {}; SAVE.newUnlock = null; SAVE.pos = 0; }
   else if (a === 'seen') SAVE.seenObj = {};
-  clearedStages = SAVE.cleared; persist(); refreshGold(); dbgInfo();
+  else if (a === 'promo') UNIT_ORDER.forEach(k => { SAVE.upg[k] = UPG_MAX; SAVE.promo[k] = 1; SAVE.upg2[k] = SAVE.upg2[k] || 0; });
+  clearedStages = SAVE.cleared; persist(); refreshGold(); dbgInfo(); achCheck();
   if (a === 'allclear' || a === 'unclear') { try { wmInit(); } catch (e) {} }
 }
-function markCleared(i) { if (!SAVE.cleared.includes(i)) SAVE.cleared.push(i); persist(); }
+
+// ---------- 달성 과제 ----------
+const UNIT_ICON = { SWORDSMAN: '🗡️', SPEARMAN: '🔱', KNIGHT: '🐎', ARCHER: '🏹', MAGE: '🔮', HEALER: '💚' };
+const UNIT_ORDER = ['SWORDSMAN', 'SPEARMAN', 'KNIGHT', 'ARCHER', 'MAGE', 'HEALER'];
 const upgLv = k => SAVE.upg[k] || 0;
+// ---------- 전직 ----------
+const PROMO_NAME = { SWORDSMAN: '검성', SPEARMAN: '용창병', KNIGHT: '근위기사', ARCHER: '신궁', MAGE: '대마법사', HEALER: '성녀' };
+const PROMO_COST = 3000, UPG2_MAX = 6, UPG2_COST = [1500, 2000, 2600, 3300, 4100, 5000];
+const isPromo = k => !!(SAVE.promo && SAVE.promo[k]);
+const upg2Lv = k => (SAVE.upg2 && SAVE.upg2[k]) || 0;
+const UNIT_KILL_TIERS = [10, 20, 40, 80, 150, 300], UNIT_KILL_REW = [80, 150, 250, 400, 700, 1200];
+const ACH = [
+  { id: 'kill_all', icon: '⚔️', name: '전장의 지휘관', fmt: n => `적군 ${n}명 처치`, val: () => achStat('kill_all'), tiers: [10, 30, 60, 100, 200, 400, 800], rew: [100, 200, 300, 500, 800, 1200, 2000] },
+  ...['SWORDSMAN', 'SPEARMAN', 'KNIGHT', 'ARCHER', 'MAGE', 'HEALER'].map(k => ({ id: 'kill_' + k, icon: { SWORDSMAN: '🗡️', SPEARMAN: '🔱', KNIGHT: '🐎', ARCHER: '🏹', MAGE: '🔮', HEALER: '💚' }[k], name: `${UNIT_TYPES[k].name} 사냥꾼`, fmt: n => `적 ${UNIT_TYPES[k].name} ${n}명 처치`, val: () => achStat('kill_' + k), tiers: UNIT_KILL_TIERS, rew: UNIT_KILL_REW })),
+  { id: 'stage', icon: '🗺️', name: '정복자', fmt: n => `${n}번째 스테이지까지 클리어`, val: () => SAVE.cleared.length, tiers: [3, 5, 10, 20, 30, 50, 70, 90, 110], rew: [100, 150, 300, 500, 700, 1000, 1500, 2000, 3000] },
+  { id: 'chest', icon: '📦', name: '보물 사냥꾼', fmt: n => `보물상자 ${n}개 획득`, val: () => achStat('chest'), tiers: [5, 15, 30, 60, 100, 200], rew: [100, 200, 350, 600, 1000, 1800] },
+  { id: 'catapult', icon: '🪨', name: '투석 장인', fmt: n => `투석기 ${n}번 사용`, val: () => achStat('catapult'), tiers: [3, 10, 25, 50, 100], rew: [100, 250, 500, 900, 1600] },
+  { id: 'castleWin', icon: '🏰', name: '성 점령자', fmt: n => `적의 성을 점령해 ${n}번 승리`, val: () => achStat('castleWin'), tiers: [1, 5, 10, 20, 40, 80], rew: [100, 300, 500, 900, 1500, 2500] },
+  { id: 'win', icon: '👑', name: '연전연승', fmt: n => `전투 ${n}번 승리`, val: () => achStat('win'), tiers: [1, 5, 10, 25, 50, 100], rew: [100, 250, 450, 800, 1400, 2400] },
+  { id: 'sRank', icon: '🌟', name: '완벽주의자', fmt: n => `S랭크 ${n}번 달성`, val: () => achStat('sRank'), tiers: [1, 5, 10, 20, 40], rew: [150, 400, 800, 1400, 2400] },
+  { id: 'heal', icon: '✨', name: '야전 치료사', fmt: n => `아군 회복 ${n}번`, val: () => achStat('heal'), tiers: [5, 15, 30, 60, 120], rew: [80, 200, 400, 700, 1200] },
+  { id: 'barricade', icon: '🧱', name: '길 뚫는 자', fmt: n => `바리케이드 ${n}개 파괴`, val: () => achStat('barricade'), tiers: [5, 15, 30, 60], rew: [80, 200, 400, 800] },
+  ...UNIT_ORDER.map(k => ({ id: 'upg_' + k, icon: UNIT_ICON[k], name: `${UNIT_TYPES[k].name} 강화`, fmt: n => `${UNIT_TYPES[k].name}를 Lv ${n}까지 강화`, val: () => upgLv(k), tiers: [1, 2, 4, 6, 8], rew: [100, 200, 400, 700, 1200] })),
+  { id: 'upg_all', icon: '🛠️', name: '병종 마스터', fmt: n => `모든 병종 강화 레벨 합계 ${n}`, val: () => UNIT_ORDER.reduce((x, k) => x + upgLv(k), 0), tiers: [6, 12, 24, 36, 48], rew: [200, 400, 800, 1400, 2400] },
+  { id: 'promo', icon: '⚜️', name: '전직의 길', fmt: n => `병종 ${n}개 전직`, val: () => UNIT_ORDER.filter(isPromo).length, tiers: [1, 3, 6], rew: [500, 1200, 3000] },
+  { id: 'level', icon: '⭐', name: '단련하는 자', fmt: n => `플레이어 Lv ${n} 달성`, val: () => SAVE.lv, tiers: [5, 10, 20, 30, 40], rew: [200, 500, 1000, 1800, 3000] }
+];
+SAVE.stat = SAVE.stat || {}; SAVE.achClaim = SAVE.achClaim || {}; SAVE.promo = SAVE.promo || {}; SAVE.upg2 = SAVE.upg2 || {};
+const achStat = k => SAVE.stat[k] || 0;
+const achDone = a => a.tiers.filter(t => a.val() >= t).length;            // 달성한 단계 수
+const achClaimed = a => Math.min(a.tiers.length, SAVE.achClaim[a.id] || 0);
+SAVE.achNote = SAVE.achNote || {}; ACH.forEach(a => { if (SAVE.achNote[a.id] === undefined) SAVE.achNote[a.id] = achDone(a); });   // 기존 세이브는 이미 달성한 과제를 알림 없이 넘긴다
+let achQueue = [], achShowing = false;
+function achAdd(k, n = 1) { SAVE.stat[k] = (SAVE.stat[k] || 0) + n; persist(); achCheck(); }
+function achCheck() {
+  ACH.forEach(a => {
+    const d = achDone(a), n = SAVE.achNote[a.id] || 0;
+    for (let i = n; i < d; i++) achQueue.push({ a, tier: i });
+    if (d > n) SAVE.achNote[a.id] = d;
+  });
+  persist(); achDot();
+  if (!achShowing) achNext();
+}
+function achNext() {
+  const it = achQueue.shift();
+  if (!it) { achShowing = false; return; }
+  achShowing = true;
+  const t = $('ach-toast');
+  if (achQueue.length >= 2) {      // 한꺼번에 많이 달성하면 하나로 묶어서 알린다
+    const n = achQueue.length + 1, g = [it, ...achQueue].reduce((x, y) => x + y.a.rew[y.tier], 0); achQueue = [];
+    t.innerHTML = `<div class="at-ic">🏆</div><div class="min-w-0"><div class="at-t">🏆 과제 달성!</div><div class="at-n">${n}개의 과제를 달성했습니다</div><div class="at-r">보상 💰 ${g.toLocaleString()} · 달성 과제에서 받으세요</div></div>`;
+  } else
+  t.innerHTML = `<div class="at-ic">${it.a.icon}</div><div class="min-w-0"><div class="at-t">🏆 과제 달성!</div><div class="at-n">${it.a.fmt(it.a.tiers[it.tier])}</div><div class="at-r">보상 💰 ${it.a.rew[it.tier]} · 달성 과제에서 받으세요</div></div>`;
+  t.classList.add('show');
+  try { [659, 880, 1175].forEach((f, i) => sound.tone('triangle', f, f, 0.16, 0.2, i * 0.09)); } catch (e) {}
+  setTimeout(() => { t.classList.remove('show'); setTimeout(achNext, 450); }, 2600);
+}
+function achReadyList() { return ACH.filter(a => achClaimed(a) < achDone(a)); }
+function achReadyGold() { let g = 0; ACH.forEach(a => { for (let i = achClaimed(a); i < achDone(a); i++) g += a.rew[i]; }); return g; }
+function achDot() { const d = $('ach-dot'); if (d) d.classList.toggle('hidden', !achReadyList().length); }
+const ah = { lv: 1, xp: 0, gold: 0 };          // 과제 화면 헤더에 표시 중인 값 (날아온 코인만큼 올라간다)
+function renderAchHud() {
+  const need = xpNeed(ah.lv);
+  $('ach-lv').textContent = 'Lv ' + ah.lv; $('ach-xpfill').style.width = Math.min(100, ah.xp / need * 100) + '%';
+  $('ach-xptext').textContent = `${ah.xp} / ${need}`; $('ach-gold').textContent = '💰 ' + ah.gold.toLocaleString();
+}
+// 보상 코인이 버튼에서 헤더의 골드로 날아가 도착할 때마다 숫자가 오른다
+function achFly(fromEl, gold) {
+  const tgEl = $('ach-gold'); if (!fromEl || !tgEl || !gold) { ah.gold += gold; renderAchHud(); return; }
+  const from = elCenter(fromEl), to = elCenter(tgEl), N = Math.max(4, Math.min(12, Math.round(gold / 150) + 4));
+  for (let i = 0; i < N; i++) {
+    const amt = Math.floor(gold / N) + (i < gold % N ? 1 : 0);
+    setTimeout(() => launchOrb('gold', from, to, amt, 0, () => { ah.gold += amt; pulse('ach-gold'); renderAchHud(); try { sound.tone('sine', 1100 + i * 40, 1500 + i * 40, 0.07, 0.1); } catch (e) {} }), i * 70);
+  }
+}
+function achClaim(id, silent) {
+  const a = ACH.find(x => x.id === id); if (!a) return 0;
+  const c = achClaimed(a); if (c >= achDone(a)) return 0;
+  const g = a.rew[c]; SAVE.gold += g; SAVE.achClaim[id] = c + 1; persist();
+  if (!silent) { const btn = document.querySelector(`[data-claim="${id}"]`); sound.tone('sine', 1200, 1600, 0.12, 0.12); refreshGold(); achFly(btn, g); renderAch(id); }
+  return g;
+}
+function achClaimAll() {
+  let total = 0;
+  const src = $('ach-all');
+  ACH.forEach(a => { while (achClaimed(a) < achDone(a)) total += achClaim(a.id, true); });
+  if (total) { [523, 659, 784, 1047].forEach((f, i) => sound.tone('triangle', f, f, 0.18, 0.22, i * 0.08)); refreshGold(); achFly(src, total); }
+  renderAch(null, total);
+}
+function renderAch(popId, claimedTotal) {
+  const list = $('ach-list'); if (!list) return;
+  const rows = ACH.map(a => {
+    const c = achClaimed(a), end = c >= a.tiers.length, v = a.val(), tg = a.tiers[Math.min(c, a.tiers.length - 1)];
+    return { a, c, end, v, tg, ready: !end && v >= tg, ratio: end ? 2 : Math.min(1, v / tg) };
+  }).sort((x, y) => (y.ready - x.ready) || (x.end - y.end) || (y.ratio - x.ratio));
+  list.innerHTML = rows.map(r => {
+    const { a } = r;
+    const pct = r.end ? 100 : Math.min(100, r.v / r.tg * 100);
+    return `<div class="ach-card ${r.ready ? 'ready' : ''} ${r.end ? 'done' : ''} ${popId === a.id ? 'ach-pop' : ''}">
+      <div class="ach-ic">${a.icon}</div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center justify-between gap-2"><span class="font-black text-slate-100 text-sm truncate">${a.name}</span><span class="text-[10px] text-slate-400 flex-none">${r.end ? '전체 달성' : `${r.c + 1} / ${a.tiers.length}단계`}</span></div>
+        <div class="text-[11px] text-slate-300">${r.end ? a.fmt(a.tiers[a.tiers.length - 1]) : a.fmt(r.tg)}</div>
+        <div class="ach-bar"><i style="width:${pct}%"></i></div>
+        <div class="text-[10px] text-slate-400 mt-0.5">${r.end ? '✔ 완료' : `${Math.min(r.v, r.tg).toLocaleString()} / ${r.tg.toLocaleString()}`}</div>
+      </div>
+      ${r.end ? '<div class="ach-btn" style="background:none;border:none;color:#34d399;font-size:20px">✔</div>' : `<button class="ach-btn" data-claim="${a.id}" ${r.ready ? '' : 'disabled'} onclick="achClaim('${a.id}')">${r.ready ? '받기<br>💰 ' + a.rew[r.c] : '💰 ' + a.rew[r.c]}</button>`}
+    </div>`;
+  }).join('');
+  const g = achReadyGold(), n = achReadyList().length, totalTiers = ACH.reduce((x, a) => x + a.tiers.length, 0), got = ACH.reduce((x, a) => x + achClaimed(a), 0);
+  const btn = $('ach-all'); btn.disabled = !n;
+  btn.textContent = n ? `🎁 모두 받기 (${n}개 · 💰 ${g.toLocaleString()})` : (claimedTotal ? `💰 ${claimedTotal.toLocaleString()} 획득!` : '받을 보상이 없습니다');
+  $('ach-sub').textContent = `전체 진행 ${got} / ${totalTiers} 단계 · 한 단계를 받으면 다음 단계가 열립니다`;
+  achDot();
+}
+function openAch() { ah.lv = SAVE.lv; ah.xp = SAVE.xp; ah.gold = SAVE.gold; renderAchHud(); renderAch(); $('ach-screen').classList.remove('hidden'); }
+function closeAch() { $('ach-screen').classList.add('hidden'); refreshGold(); }
+function markCleared(i) { if (!SAVE.cleared.includes(i)) SAVE.cleared.push(i); persist(); }
 const isUnlocked = i => i === 0 || SAVE.cleared.includes(i - 1) || SAVE.cleared.includes(i);
 // 병종 레벨에 따른 능력치
-function statsAt(k, lv) {
-  const t = UNIT_TYPES[k], m = 1 + 0.08 * lv + 0.01 * Math.min(40, SAVE.lv - 1);
-  return { maxHp: Math.round(t.maxHp * m), atk: Math.round(t.atk * m), def: t.def + (lv >= 2 ? 1 : 0) + (lv >= 4 ? 1 : 0) + (lv >= 6 ? 1 : 0), healPower: Math.round(t.healPower * m) };
+function statsAt(k, lv, p2) {            // p2: 전직 후 강화 단계 (전직 전이면 undefined)
+  const t = UNIT_TYPES[k], pro = p2 !== undefined && p2 >= 0;
+  const m = (1 + 0.08 * lv + 0.01 * Math.min(40, SAVE.lv - 1)) * (pro ? 1.25 + 0.10 * p2 : 1);
+  return { maxHp: Math.round(t.maxHp * m), atk: Math.round(t.atk * m), def: t.def + (lv >= 2 ? 1 : 0) + (lv >= 4 ? 1 : 0) + (lv >= 6 ? 1 : 0) + (pro ? 1 + (p2 >= 3 ? 1 : 0) + (p2 >= 6 ? 1 : 0) : 0), healPower: Math.round(t.healPower * m) };
 }
+const curStats = k => statsAt(k, upgLv(k), isPromo(k) ? upg2Lv(k) : undefined);
 function refreshGold() {
   if (!hudFlying) syncHud();
   ['stage-gold', 'upg-gold', 'menu-gold', 'modal-gold'].forEach(id => { const e = $(id); if (e) e.innerText = id === 'menu-gold' || id === 'modal-gold' ? `(💰 ${SAVE.gold})` : id === 'stage-gold' ? `Lv ${SAVE.lv} · 💰 ${SAVE.gold}` : `💰 ${SAVE.gold}`; });
@@ -1463,34 +1724,65 @@ function openUpgrade() {
   renderUpgrade(); $('upgrade-screen').classList.remove('hidden');
 }
 function closeUpgrade() { $('upgrade-screen').classList.add('hidden'); }
+function renderUpgHud() {
+  const need = xpNeed(SAVE.lv);
+  $('upg-lv').textContent = 'Lv ' + SAVE.lv; $('upg-xpfill').style.width = Math.min(100, SAVE.xp / need * 100) + '%'; $('upg-xptext').textContent = `${SAVE.xp} / ${need}`;
+}
 function renderUpgrade() {
-  refreshGold();
-  $('upg-list').innerHTML = Object.keys(UNIT_TYPES).map(k => {
-    const t = UNIT_TYPES[k], lv = upgLv(k), cur = statsAt(k, lv), nx = lv < UPG_MAX ? statsAt(k, lv + 1) : null, cost = UPG_COST[lv];
-    const heal = k === 'HEALER';
+  refreshGold(); renderUpgHud();
+  const ks = UNIT_ORDER.filter(seenU);
+  $('upg-list').innerHTML = ks.length ? ks.map(k => {
+    const t = UNIT_TYPES[k], lv = upgLv(k), heal = k === 'HEALER', pro = isPromo(k), p2 = upg2Lv(k);
+    const cur = curStats(k);
     const d = (a, b) => b > a ? ` <b class="text-green-400">→ ${b}</b>` : '';
-    const pips = Array.from({ length: UPG_MAX }, (_, i) => `<span style="color:${i < lv ? '#fbbf24' : '#475569'}">●</span>`).join(' ');
-    const can = nx && SAVE.gold >= cost;
-    return `<div class="panel p-3 flex items-center gap-3">
+    let nx = null, cost = 0, btn = '', pips = '', title = '', extra = '';
+    if (!pro && lv < UPG_MAX) { nx = statsAt(k, lv + 1); cost = UPG_COST[lv]; pips = Array.from({ length: UPG_MAX }, (_, i) => `<span style="color:${i < lv ? '#fbbf24' : '#475569'}">●</span>`).join(' '); title = `Lv ${lv}`;
+      btn = `<button onclick="buyUpgrade('${k}')" ${SAVE.gold >= cost ? '' : 'disabled'} class="shrink-0 px-3 py-2 rounded-lg font-black text-sm ${SAVE.gold >= cost ? 'bg-yellow-400 text-slate-950' : 'bg-slate-700 text-slate-400'}">💰 ${cost}</button>`; }
+    else if (!pro) { nx = statsAt(k, lv, 0); cost = PROMO_COST; title = 'Lv 8 (MAX)'; pips = Array.from({ length: UPG_MAX }, () => '<span style="color:#fbbf24">●</span>').join(' ');
+      extra = `<div class="text-[10px] text-amber-300 mt-0.5">⚜ 전직 → <b>${PROMO_NAME[k]}</b> · 이동력 +1 · 능력치 대폭 상승 · 새로운 모습</div>`;
+      btn = `<button onclick="promote('${k}')" ${SAVE.gold >= cost ? '' : 'disabled'} class="shrink-0 px-3 py-2 rounded-lg font-black text-sm ${SAVE.gold >= cost ? 'promo-btn' : 'bg-slate-700 text-slate-400'}">⚜ 전직<br><span class="text-[11px]">💰 ${cost}</span></button>`; }
+    else if (p2 < UPG2_MAX) { nx = statsAt(k, UPG_MAX, p2 + 1); cost = UPG2_COST[p2]; title = `⚜ ${PROMO_NAME[k]} Lv ${p2}`; pips = Array.from({ length: UPG2_MAX }, (_, i) => `<span style="color:${i < p2 ? '#c084fc' : '#475569'}">◆</span>`).join(' ');
+      btn = `<button onclick="buyPromoUpgrade('${k}')" ${SAVE.gold >= cost ? '' : 'disabled'} class="shrink-0 px-3 py-2 rounded-lg font-black text-sm ${SAVE.gold >= cost ? 'bg-purple-400 text-slate-950' : 'bg-slate-700 text-slate-400'}">💰 ${cost}</button>`; }
+    else { title = `⚜ ${PROMO_NAME[k]} Lv ${p2} (MAX)`; pips = Array.from({ length: UPG2_MAX }, () => '<span style="color:#c084fc">◆</span>').join(' '); btn = '<div class="shrink-0 px-3 py-2 font-black text-sm text-slate-400">MAX</div>'; }
+    return `<div class="panel p-3 flex items-center gap-3 ${pro || (!pro && lv >= UPG_MAX) ? 'promo-card' : ''}">
       <div class="w-12 h-12 shrink-0">${portrait(k, 'player')}</div>
       <div class="flex-1 min-w-0">
-        <div class="flex items-center gap-2"><span class="font-black ${t.color}">${t.name}</span><span class="text-[11px] text-slate-400">Lv ${lv}${lv >= UPG_MAX ? ' (MAX)' : ''}</span><span class="text-[10px]">${pips}</span></div>
-        <div class="text-[11px] text-slate-300 mt-0.5">HP ${cur.maxHp}${nx ? d(cur.maxHp, nx.maxHp) : ''} · ${heal ? '회복' : '공격'} ${heal ? cur.healPower : cur.atk}${nx ? d(heal ? cur.healPower : cur.atk, heal ? nx.healPower : nx.atk) : ''} · 방어 ${cur.def}${nx ? d(cur.def, nx.def) : ''}</div>
-      </div>
-      <button onclick="buyUpgrade('${k}')" ${can ? '' : 'disabled'} class="shrink-0 px-3 py-2 rounded-lg font-black text-sm ${can ? 'bg-yellow-400 text-slate-950' : 'bg-slate-700 text-slate-400'}">${nx ? '💰 ' + cost : 'MAX'}</button>
+        <div class="flex items-center gap-2 flex-wrap"><span class="font-black ${t.color}">${pro ? PROMO_NAME[k] : t.name}</span><span class="text-[11px] text-slate-400">${title}</span><span class="text-[10px]">${pips}</span></div>
+        <div class="text-[11px] text-slate-300 mt-0.5">HP ${cur.maxHp}${nx ? d(cur.maxHp, nx.maxHp) : ''} · ${heal ? '회복' : '공격'} ${heal ? cur.healPower : cur.atk}${nx ? d(heal ? cur.healPower : cur.atk, heal ? nx.healPower : nx.atk) : ''} · 방어 ${cur.def}${nx ? d(cur.def, nx.def) : ''}${pro ? ' · <b class="text-sky-300">이동 +1</b>' : ''}</div>${extra}
+      </div>${btn}
     </div>`;
-  }).join('');
+  }).join('') : '<div class="text-sm text-slate-500 text-center py-6">아직 만난 병종이 없습니다. 출정해서 병종을 만나보세요!</div>';
+}
+function buyPromoUpgrade(k) {
+  const p2 = upg2Lv(k); if (!isPromo(k) || p2 >= UPG2_MAX) return;
+  const cost = UPG2_COST[p2]; if (SAVE.gold < cost) return;
+  SAVE.gold -= cost; SAVE.upg2[k] = p2 + 1; persist(); sound.playHeal(); renderUpgrade(); achCheck();
+}
+function promote(k) {
+  if (isPromo(k) || upgLv(k) < UPG_MAX || SAVE.gold < PROMO_COST) return;
+  SAVE.gold -= PROMO_COST; SAVE.promo[k] = 1; SAVE.upg2[k] = 0; persist(); renderUpgrade(); achCheck(); showPromoPopup(k);
+}
+function showPromoPopup(k) {
+  const t = UNIT_TYPES[k], st = curStats(k), heal = k === 'HEALER';
+  objQueue = [];
+  const img = $('obj-img'); img.style.cssText = 'position:relative;width:120px;height:120px;margin:8px auto;border-radius:16px;overflow:hidden;--tile:100px;background:radial-gradient(circle,#78350f,#1c1917);box-shadow:0 0 0 3px #fcd34d,0 0 26px rgba(251,191,36,.8)';
+  img.innerHTML = `<div class="token relative" style="${teamStyle('player')};width:100%;height:100%"><div class="unit-art promo-art">${unitSvg(k, true)}</div></div>`;
+  $('obj-tag').textContent = '⚜ 전직 완료!'; $('obj-title').textContent = `${t.name} → ${PROMO_NAME[k]}`;
+  $('obj-desc').style.whiteSpace = 'pre-line';
+  $('obj-desc').textContent = `새로운 모습으로 다시 태어났습니다!\n이동력 +1 · 체력 ${st.maxHp} · ${heal ? '회복력 ' + st.healPower : '공격 ' + st.atk} · 방어 ${st.def}\n이제 전직 강화로 능력치를 더 올릴 수 있어요.`;
+  $('obj-ok').textContent = '확인'; $('obj-modal').classList.remove('hidden');
+  try { [523, 659, 784, 1047, 1319].forEach((f, i) => sound.tone('triangle', f, f, 0.25, 0.22, i * 0.1)); confettiBurst(img, 40); } catch (e) {}
 }
 function buyUpgrade(k) {
   const lv = upgLv(k); if (lv >= UPG_MAX) return;
   const cost = UPG_COST[lv]; if (SAVE.gold < cost) return;
-  SAVE.gold -= cost; SAVE.upg[k] = lv + 1; persist(); sound.playHeal(); renderUpgrade();
+  SAVE.gold -= cost; SAVE.upg[k] = lv + 1; persist(); sound.playHeal(); renderUpgrade(); achCheck();
 }
 // 전투 평가: 점수 → 등급(S/A/B/C) → 별
 function rateBattle() {
   const st = STAGES[currentStage];
   const mine = units.filter(u => u.owner === 'player'), total = st.player.length;
-  const maxSum = st.player.reduce((a, [t]) => a + statsAt(t, upgLv(t)).maxHp, 0);
+  const maxSum = st.player.reduce((a, [t]) => a + curStats(t).maxHp, 0);
   const hpRatio = Math.min(1, mine.reduce((a, u) => a + u.hp, 0) / maxSum);
   const alive = mine.length;
   const par = st.par || 12, over = Math.max(0, turnNo - par);
@@ -1655,14 +1947,23 @@ function wmTags(st) {
 }
 function wmShowInfo(i) {
   const st = STAGES[i], th = THEMES[st.theme], done = SAVE.cleared.includes(i), box = $('wm-info');
-  box.innerHTML = `<div class="flex gap-3"><div style="width:92px;flex:none">${miniMap(st)}</div><div class="flex-1 min-w-0">
+  box.innerHTML = `<div class="wm-handle" onclick="wmToggleInfo()"><i></i></div><div class="flex gap-3"><div style="width:92px;flex:none">${miniMap(st)}</div><div class="flex-1 min-w-0">
       <div class="flex items-center justify-between gap-2"><span class="title-font text-amber-300 text-base">STAGE ${i + 1}</span><span class="text-[11px] ${done ? 'text-emerald-300' : 'text-slate-400'}">${done ? '✔ 클리어' : '미클리어'}${SAVE.best[i] ? ` · <b class="text-yellow-300">${SAVE.best[i]}</b>` : ''}</span></div>
       <div class="font-bold text-slate-100 text-sm truncate">${th.icon} ${st.name}</div>
       <div class="text-[11px] text-slate-400 leading-snug mt-0.5" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${st.concept}</div>${wmTags(st)}</div></div>
     <div class="text-[11px] text-emerald-300 mt-1.5 leading-snug">💡 ${st.tip}</div>
-    <div class="flex gap-2 mt-2"><button onclick="wmStart(${i})" class="flex-1 py-2.5 rounded-xl font-black text-slate-950 bg-amber-500 hover:bg-amber-400">⚔ ${done ? '다시 도전' : '출정!'}</button><button onclick="wmHideInfo()" class="px-4 py-2.5 rounded-xl font-bold text-slate-200 bg-slate-700 border border-slate-500">닫기</button></div>`;
-  box.classList.remove('hidden'); setTimeout(() => wmLabel(), 0);
+    <div class="flex gap-2 mt-2"><button onclick="wmStart(${i})" class="flex-1 py-2.5 rounded-xl font-black text-slate-950 bg-amber-500 hover:bg-amber-400">⚔ ${done ? '다시 도전' : '출정!'}</button><button onclick="openUpgrade()" class="px-4 py-2.5 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-500 border border-indigo-400">🛠 강화</button></div>`;
+  box.classList.remove('hidden', 'tuck'); setTimeout(() => wmLabel(), 0);
 }
+function wmToggleInfo() { $('wm-info').classList.toggle('tuck'); }
+// 지도를 손가락/휠로 스크롤하면 하단 카드가 아래로 내려가 손잡이만 남는다 (손잡이를 누르거나 노드를 누르면 다시 올라옴)
+(function () {
+  const sc = document.getElementById('wm-scroll'); let y0 = null;
+  const tuck = () => { const b = document.getElementById('wm-info'); if (b && !b.classList.contains('hidden')) b.classList.add('tuck'); };
+  sc.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; }, { passive: true });
+  sc.addEventListener('touchmove', e => { if (y0 !== null && Math.abs(e.touches[0].clientY - y0) > 8) { tuck(); y0 = null; } }, { passive: true });
+  sc.addEventListener('wheel', tuck, { passive: true });
+})();
 function wmHideInfo() { $('wm-info').classList.add('hidden'); }
 function wmStart(i) { selectStage(i); }
 function wmTap(i) {
@@ -1713,12 +2014,10 @@ function wmInit() {
   }
   try { MUSIC.play(REGIONS[regionOf(a)].theme); } catch (e) {}
 }
-function openStageSelect() {
-  $('game-over-modal').classList.add('hidden'); $('stage-select').classList.remove('hidden');
-  if (!WM.built) wmBuild();
-  wmInit();
+function openStageSelect(noFx) {
+  const go = () => { $('game-over-modal').classList.add('hidden'); $('stage-select').classList.remove('hidden'); if (!WM.built) wmBuild(); wmInit(); };
+  if (noFx) go(); else transition(go);
 }
-function closeStageSelect() { if (WM.walking) return; $('stage-select').classList.add('hidden'); if (!gameActive) $('game-over-modal').classList.remove('hidden'); else try { MUSIC.play(STAGES[currentStage].theme); } catch (e) {} }
 // ---------- 오브젝트 소개 팝업 (처음 한 번만 자동 표시, 규칙 탭에서 다시 볼 수 있음) ----------
 const OBJ_INFO = {
   turret:   { icon: '🛡', title: '성 수비 구역', desc: '자기 성의 상하좌우 칸에 서면 공격력이 ×2가 되고, 턴 시작 때 체력이 10% 회복됩니다. 적의 성 칸에 먼저 도달하면 승리!' },
@@ -1768,11 +2067,12 @@ function objImgHtml(key, themeKey) {
 }
 let objQueue = [];
 function renderObjPopup(key, isNew, total, idx) {
-  const o = OBJ_INFO[key], st = STAGES[currentStage], th = THEMES[(st && st.theme) || 'grass'];
+  const isU = key.startsWith('u:'), uk = isU ? key.slice(2) : null, ut = isU ? UNIT_TYPES[uk] : null;
+  const o = isU ? { icon: UNIT_ICON[uk], title: ut.name, desc: `${ut.desc}\n${uk === 'HEALER' ? `체력 ${ut.maxHp} · 회복력 ${ut.healPower}` : `체력 ${ut.maxHp} · 공격 ${ut.atk * DAMAGE_SCALE}`} · 방어 ${ut.def} · 회피 ${ut.evade}%` } : OBJ_INFO[key], st = STAGES[currentStage], th = THEMES[(st && st.theme) || 'grass'];
   const img = $('obj-img'); img.style.cssText = `position:relative;width:104px;height:104px;margin:8px auto;border-radius:14px;overflow:hidden;--tile:100px;background:${th.colors.PLAIN[0]};box-shadow:0 0 0 3px #e7c36a,0 6px 14px rgba(0,0,0,.5)`;
-  img.innerHTML = objImgHtml(key, st && st.theme);
-  $('obj-tag').textContent = isNew ? `NEW 오브젝트${total > 1 ? ` · ${idx}/${total}` : ''}` : '오브젝트 도감';
-  $('obj-title').textContent = `${o.icon} ${o.title}`; $('obj-desc').textContent = o.desc;
+  img.innerHTML = isU ? `<div class="token relative" style="${teamStyle('player')};width:100%;height:100%"><div class="unit-art">${UNIT_SVG[uk]}</div></div>` : objImgHtml(key, st && st.theme);
+  $('obj-tag').textContent = isNew ? `NEW ${isU ? '병종' : '오브젝트'}${total > 1 ? ` · ${idx}/${total}` : ''}` : (isU ? '병종 도감' : '오브젝트 도감');
+  $('obj-title').textContent = `${o.icon} ${o.title}`; $('obj-desc').style.whiteSpace = 'pre-line'; $('obj-desc').textContent = o.desc;
   $('obj-ok').textContent = objQueue.length ? '다음 ▶' : '확인';
   $('obj-modal').classList.remove('hidden');
 }
@@ -1780,22 +2080,25 @@ let objTotal = 0, objShown = 0;
 function objNext() {
   if (!objQueue.length) { $('obj-modal').classList.add('hidden'); return; }
   const k = objQueue.shift(); objShown++;
-  SAVE.seenObj = SAVE.seenObj || {}; SAVE.seenObj[k] = 1; persist();
+  if (k.startsWith('u:')) { SAVE.seenUnit = SAVE.seenUnit || {}; SAVE.seenUnit[k.slice(2)] = 1; } else { SAVE.seenObj = SAVE.seenObj || {}; SAVE.seenObj[k] = 1; }
+  persist(); renderCodex();
   renderObjPopup(k, true, objTotal, objShown);
 }
 function showObjIntro(i) {            // 스테이지에 처음 등장하는 오브젝트만 소개
   const st = STAGES[i]; if (!st) return;
-  SAVE.seenObj = SAVE.seenObj || {};
-  const q = objKeysOf(st).filter(k => !SAVE.seenObj[k]);
+  SAVE.seenObj = SAVE.seenObj || {}; SAVE.seenUnit = SAVE.seenUnit || {};
+  const types = new Set([...st.player, ...st.ai].map(x => x[0]));
+  const q = [...UNIT_ORDER.filter(k => types.has(k) && !SAVE.seenUnit[k]).map(k => 'u:' + k), ...objKeysOf(st).filter(k => !SAVE.seenObj[k])];
   if (!q.length) return;
   objQueue = q; objTotal = q.length; objShown = 0; objNext();
 }
 function openObjInfo(key) { objQueue = []; renderObjPopup(key, false, 1, 1); }   // 규칙 탭에서 다시 보기
 function renderObjCodex() {
   const box = $('obj-codex'); if (!box) return;
-  box.innerHTML = OBJ_ORDER.map(k => `<button onclick="openObjInfo('${k}')" class="menu-btn" style="min-height:40px;font-size:12px;padding:0 6px">${OBJ_INFO[k].icon} ${OBJ_INFO[k].title}</button>`).join('');
+  const ks = OBJ_ORDER.filter(seenO);
+  box.innerHTML = ks.length ? ks.map(k => `<button onclick="openObjInfo('${k}')" class="menu-btn" style="min-height:40px;font-size:12px;padding:0 6px">${OBJ_INFO[k].icon} ${OBJ_INFO[k].title}</button>`).join('') : '<div class="col-span-2 text-[11px] text-slate-500 py-1">아직 발견한 오브젝트가 없습니다.</div>';
 }
-function selectStage(i) { if (!isUnlocked(i) || WM.walking) return; if (SAVE.newUnlock === i) SAVE.newUnlock = null; SAVE.pos = i; persist(); $('stage-select').classList.add('hidden'); loadStage(i); setTimeout(() => showObjIntro(i), 450); }
+function selectStage(i) { if (!isUnlocked(i) || WM.walking) return; if (SAVE.newUnlock === i) SAVE.newUnlock = null; SAVE.pos = i; persist(); transition(() => { $('stage-select').classList.add('hidden'); loadStage(i); }).then(() => setTimeout(() => showObjIntro(i), 150)); }
 
 // ---------- 배경음악 (WebAudio 절차 생성) ----------
 const MUSIC_THEMES = {
@@ -1880,16 +2183,32 @@ function createUnit(owner, typeKey, r, c) {
   const t = UNIT_TYPES[typeKey];
   const n = unitSeq[owner + typeKey] = (unitSeq[owner + typeKey] || 0) + 1;
   let st8 = { maxHp: t.maxHp, atk: t.atk, def: t.def, healPower: t.healPower };
-  if (owner === 'player') st8 = statsAt(typeKey, upgLv(typeKey));                                   // 병종 강화 적용
+  if (owner === 'player') st8 = curStats(typeKey);                                                  // 병종 강화·전직 적용
   else { const bst = 1 + aiBoost(currentStage); st8 = { maxHp: Math.round(t.maxHp * bst), atk: Math.round(t.atk * bst), def: t.def, healPower: t.healPower }; } // 후반 스테이지 적 강화
-  const u = { id: owner + typeKey + n, owner, typeKey, name: t.name, hp: st8.maxHp, maxHp: st8.maxHp, atk: st8.atk, def: st8.def, healPower: st8.healPower, r, c };
+  const promo = owner === 'player' && isPromo(typeKey);
+  const u = { id: owner + typeKey + n, owner, typeKey, name: promo ? PROMO_NAME[typeKey] : t.name, promo, hp: st8.maxHp, maxHp: st8.maxHp, atk: st8.atk, def: st8.def, healPower: st8.healPower, r, c };
   board[r][c] = u; units.push(u);
 }
 
+const seenU = k => !!(SAVE.seenUnit && SAVE.seenUnit[k]), seenO = k => !!(SAVE.seenObj && SAVE.seenObj[k]);
 function renderLegend() {
-  $('legend').innerHTML = Object.entries(UNIT_TYPES).map(([k, t]) =>
-    `<div class="panel p-1"><div class="w-8 h-8 mx-auto">${portrait(k, 'player')}</div><div class="font-bold ${t.color}">${t.name}</div><div class="text-[9px] text-slate-400">${t.tag}</div><div class="text-[9px] text-sky-300">회피 ${t.evade}%</div></div>`).join('');
+  const ks = UNIT_ORDER.filter(seenU);
+  $('legend').innerHTML = ks.length ? ks.map(k => { const t = UNIT_TYPES[k];
+    return `<button onclick="openObjInfo('u:${k}')" class="panel p-1"><div class="w-8 h-8 mx-auto">${portrait(k, 'player')}</div><div class="font-bold ${t.color}">${t.name}</div><div class="text-[9px] text-slate-400">${t.tag}</div><div class="text-[9px] text-sky-300">회피 ${t.evade}%</div></button>`; }).join('')
+    : '<div class="col-span-3 text-[11px] text-slate-500 py-2">아직 만난 병종이 없습니다.</div>';
+  renderMatchup();
 }
+function renderMatchup() {
+  const box = $('matchup-box'); if (!box) return;
+  const chain = ['SWORDSMAN', 'SPEARMAN', 'KNIGHT', 'ARCHER'].filter(seenU), col = { SWORDSMAN: 'text-blue-400', SPEARMAN: 'text-green-400', KNIGHT: 'text-amber-400', ARCHER: 'text-purple-400' };
+  let h = '';
+  if (chain.length >= 2) h += `<div class="bg-slate-950/50 p-2 rounded-lg border border-slate-700 text-[11px] font-bold flex items-center justify-between gap-1 text-center">${chain.map(k => `<span class="${col[k]}">${UNIT_TYPES[k].name}</span>`).join('<span class="text-slate-500">›</span>')}</div>
+      <div class="mt-1.5 flex justify-between text-[10px] pt-1.5"><span class="text-green-400 font-semibold">▲ 우세: +50%</span><span class="text-red-400 font-semibold">▼ 열세: -65%</span></div>`;
+  else h += '<div class="text-[11px] text-slate-500">병종을 더 만나면 상성이 표시됩니다.</div>';
+  if (seenU('MAGE') || seenU('HEALER')) h += `<div class="mt-1 text-[10px] text-emerald-400 font-semibold">♥ ${seenU('MAGE') ? '마법사: 공격 시 항상 우세 · 피격 시 항상 열세' : ''}${seenU('MAGE') && seenU('HEALER') ? ' / ' : ''}${seenU('HEALER') ? '힐러: 피격 시 항상 열세' : ''}</div>`;
+  box.innerHTML = h;
+}
+function renderCodex() { renderObjCodex(); renderLegend(); document.querySelectorAll('[data-obj]').forEach(e => e.classList.toggle('hidden', !seenO(e.dataset.obj))); document.querySelectorAll('[data-unit]').forEach(e => e.classList.toggle('hidden', !seenU(e.dataset.unit))); }
 function renderTerrainLegend() {
   const th = THEMES[STAGES[currentStage].theme];
   const sw = Object.fromEntries(Object.keys(th.colors).map(k => [k, th.colors[k][0]]));
@@ -1993,7 +2312,7 @@ function renderBoard() {
         }
       }
       if (selectedUnit === unit) ue.classList.add('is-sel');
-      ue.innerHTML = `${badge}<div class="unit-art idle idle-${unit.typeKey}" style="animation-delay:${idleDelay(unit)}">${UNIT_SVG[unit.typeKey]}</div>
+      ue.innerHTML = `${badge}<div class="unit-art idle idle-${unit.typeKey}${unit.promo ? ' promo-art' : ''}" style="animation-delay:${idleDelay(unit)}">${unitSvg(unit.typeKey, unit.promo)}</div>
         <div class="hpbar"><div class="hpfill ${mine ? 'bg-green-400' : 'bg-red-400'}" style="width:${unit.hp / unit.maxHp * 100}%"></div><span class="hpnum">${unit.hp}/${unit.maxHp}</span></div>`;
       const ufx = unitFx[unit.id];
       if (ufx && nowMs() < ufx.start + ufx.dur) {
@@ -2156,7 +2475,7 @@ function dropUnitOn(r, c, trail) {
 function initPointerDrag() {
   const grid = $('chessboard');
   let cand = null, ghost = null, over = null;
-  const DY = e => (e && e.pointerType === 'mouse') ? 0 : 56;      // 터치는 손가락 위쪽에 아이콘이 뜨므로 아이콘 중심 기준으로 판정
+  const DY = e => 0;      // 아이콘은 손가락(포인터) 바로 아래에 뜨고, 손가락을 뗀 칸이 그대로 드롭 대상
   let lastPt = null, trail = [];
   const droppable = t => { if (!t || !selectedUnit) return false; const r = +t.dataset.r, c = +t.dataset.c, tg = seenAt(r, c);
     if (!tg) return validMoveTiles.some(m => m.r === r && m.c === c);
@@ -2272,7 +2591,7 @@ function initPointerDrag() {
   });
   const endPan = e => { if (!pan || e.pointerId !== pan.id) return; if (pan.started) { suppressClickUntil = Date.now() + 350; try { grid.releasePointerCapture(pan.id); } catch (_) {} } pan = null; };
   grid.addEventListener('pointerup', endPan); grid.addEventListener('pointercancel', endPan);
-  grid.addEventListener('pointermove', e => {
+  window.addEventListener('pointermove', e => {
     if (!cand || e.pointerId !== cand.id) return;
     if (!cand.started) {
       if (Math.hypot(e.clientX - cand.x, e.clientY - cand.y) < 10) return;
@@ -2280,7 +2599,7 @@ function initPointerDrag() {
       if (selectedUnit !== cand.unit) selectUnitForMove(cand.unit.r, cand.unit.c);
       document.querySelectorAll('#drag-ghost').forEach(n => n.remove());
       ghost = document.createElement('div'); ghost.id = 'drag-ghost';
-      ghost.innerHTML = `<div class="token relative" style="${teamStyle('player')};width:100%;height:100%"><div class="unit-art">${UNIT_SVG[cand.unit.typeKey]}</div></div>`;
+      ghost.innerHTML = `<div class="token relative" style="${teamStyle('player')};width:100%;height:100%"><div class="unit-art">${unitSvg(cand.unit.typeKey, cand.unit.promo)}</div></div>`;
       document.body.appendChild(ghost);
     }
     lastEv = e;
@@ -2293,8 +2612,8 @@ function initPointerDrag() {
     if (!cand || e.pointerId !== cand.id) return;
     const started = cand.started, id = cand.id, unit = cand.unit, tr = trail.slice();
     let t = drop ? tileAt(e.clientX, e.clientY - DY(e)) : null;
+    if (drop && started && !t && lastPt) t = tileAt(lastPt.x, lastPt.y);
     if (drop && !droppable(t) && lastPt) { const t2 = tileAt(lastPt.x, lastPt.y); if (droppable(t2)) t = t2; }
-    if (drop && !droppable(t) && over && droppable(over)) t = over;   // 손이 미끄러져도 마지막으로 강조되던 칸 사용
     end();
     try { grid.releasePointerCapture(id); } catch (_) {}
     if (started) {
@@ -2306,12 +2625,25 @@ function initPointerDrag() {
       if (tt) { handleTileClick(+tt.dataset.r, +tt.dataset.c); suppressClickUntil = Date.now() + 350; }
     }
   };
+  // 아이폰 사파리에서는 손가락을 뗐는데 pointerup 이 오지 않거나, 드래그 도중 pointercancel / lostpointercapture 가 먼저 오는 경우가 있다.
+  // 그럴 때 조용히 취소하지 않고, 마지막으로 손가락이 있던 칸(또는 touchend 좌표)에 그대로 드롭한다.
+  const dropAtLast = (x, y) => {
+    if (!cand) return;
+    const p = lastPt || { x: cand.x, y: cand.y };
+    finish({ pointerId: cand.id, clientX: x == null ? p.x : x, clientY: y == null ? p.y : y }, true);
+  };
   grid.addEventListener('pointerup', e => finish(e, true));
-  grid.addEventListener('pointercancel', e => finish(e, false));
-  grid.addEventListener('lostpointercapture', e => { if (cand) finish(e, false); });
-  // 보드 밖/다른 요소 위에서 손을 떼거나, 화면 전환·앱 전환이 일어나도 잔상이 남지 않도록 안전망
-  window.addEventListener('pointerup', e => { if (cand) finish(e, false); });
-  window.addEventListener('pointercancel', e => { if (cand) finish(e, false); });
+  grid.addEventListener('pointercancel', e => {
+    if (!cand || e.pointerId !== cand.id) return;
+    if (cand.started) { const id = cand.id; setTimeout(() => { if (cand && cand.id === id) dropAtLast(); }, 350); }   // touchend 가 먼저 오면 그쪽 좌표로 처리됨
+    else finish(e, false);
+  });
+  grid.addEventListener('lostpointercapture', e => {
+    if (!cand || e.pointerId !== cand.id) return;
+    try { grid.setPointerCapture(cand.id); } catch (_) {}                     // 아직 손가락이 닿아 있으면 다시 잡는다 (끝났다면 무시됨)
+  });
+  window.addEventListener('pointerup', e => { if (cand) finish(e, true); });
+  window.addEventListener('pointercancel', e => { if (cand && cand.started && e.pointerId === cand.id) { const id = cand.id; setTimeout(() => { if (cand && cand.id === id) dropAtLast(); }, 350); } });
   window.addEventListener('blur', end);
   document.addEventListener('visibilitychange', () => { if (document.hidden) end(); });
   // 터치 기기: 타일 내부 요소는 pointer-events:none 이라 클릭이 보드(grid)로 들어온다 → 좌표로 타일을 찾아 처리
@@ -2321,7 +2653,10 @@ function initPointerDrag() {
     if (t) handleTileClick(+t.dataset.r, +t.dataset.c);
   });
   // iOS 사파리 안전망: 손가락을 뗐는데 pointerup 이 오지 않아 드래그 잔상이 남는 경우를 정리
-  ['touchend', 'touchcancel'].forEach(n => window.addEventListener(n, () => { setTimeout(() => { if (cand) end(); }, 350); }, { passive: true }));
+  ['touchend', 'touchcancel'].forEach(n => window.addEventListener(n, ev => {
+    const ct = ev.changedTouches && ev.changedTouches[0], x = ct ? ct.clientX : null, y = ct ? ct.clientY : null;
+    setTimeout(() => { if (!cand) return; if (cand.started) dropAtLast(x, y); else end(); }, 40);   // pointerup 이 정상이면 이미 cand 가 비어 있음
+  }, { passive: true }));
 }
 
 function selectUnitForMove(r, c) {
@@ -2348,6 +2683,7 @@ function executeMoveTo(toR, toC) {
   if (castleAt(toR, toC) === 'ai') {
     renderBoard();
     addLog('전투', `<b>${selectedUnit.name}</b>(이)가 적의 성에 도달했습니다!`, 'text-amber-400 font-bold');
+    achAdd('castleWin');
     endGame(true, '적의 성을 점령했습니다!');
     return;
   }
@@ -2402,6 +2738,7 @@ function getValidMoves(unit, r, c) {
   const moves = [];
   // 아군은 뛰어넘을 수 있지만(그 칸에 멈출 수는 없음) 적은 뛰어넘을 수 없다. 자기 성은 진입/통과 불가.
   const slow = terrainAt(r, c) === 'SWAMP' ? 1 : 0; // 늪에 서 있으면 이동 -1
+  const bonus = unit.promo ? 1 : 0;                   // 전직하면 이동력 +1
   const passable = (tr, tc) => inBounds(tr, tc) && terrainAt(tr, tc) !== 'WATER' && castleAt(tr, tc) !== unit.owner && !(board[tr][tc] && board[tr][tc].owner !== unit.owner);
   const slide = (dirs, max) => dirs.forEach(([dr, dc]) => {
     for (let i = 1; i <= max; i++) {
@@ -2413,31 +2750,29 @@ function getValidMoves(unit, r, c) {
     }
   });
   switch (unit.typeKey) {
-    case 'SWORDSMAN': slide(DIRS_ORTHO, 3 - slow); break;
-    case 'SPEARMAN': slide(DIRS_ORTHO, 2 - slow); break;
-    case 'ARCHER': slide(DIRS_DIAG, 2 - slow); break;
-    case 'HEALER': slide(DIRS_DIAG, 2 - slow); break;
+    case 'SWORDSMAN': slide(DIRS_ORTHO, 3 - slow + bonus); break;
+    case 'SPEARMAN': slide(DIRS_ORTHO, 2 - slow + bonus); break;
+    case 'ARCHER': slide(DIRS_DIAG, 2 - slow + bonus); break;
+    case 'HEALER': slide(DIRS_DIAG, 2 - slow + bonus); break;
     case 'KNIGHT':
       if (slow) { slide(DIRS_DIAG, 1); break; } // 늪: 대각선 1칸만
       [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]].forEach(([dr, dc]) => {
         if (isFree(r + dr, c + dc, unit)) moves.push({ r: r + dr, c: c + dc });
       });
+      if (bonus) slide([...DIRS_ORTHO, ...DIRS_DIAG], 1);   // 전직 나이트는 인접 8칸도 한 걸음 이동 가능
       break;
-    case 'MAGE': { // 상하좌우로 최대 2걸음 (길목에 적이 있으면 막힘, 아군은 통과 가능)
-      const seen = new Set();
-      const add = (tr, tc) => { const k = tr + ',' + tc; if (!board[tr][tc] && !seen.has(k)) { seen.add(k); moves.push({ r: tr, c: tc }); } };
-      DIRS_ORTHO.forEach(([dr, dc]) => {
-        const r1 = r + dr, c1 = c + dc;
-        if (!passable(r1, c1)) return;
-        add(r1, c1);
-        if (castleAt(r1, c1)) return;
-        if (slow) return;
-        DIRS_ORTHO.forEach(([er, ec]) => {
-          const r2 = r1 + er, c2 = c1 + ec;
-          if ((r2 === r && c2 === c) || !passable(r2, c2)) return;
-          add(r2, c2);
-        });
-      });
+    case 'MAGE': { // 상하좌우로 최대 2걸음(전직 3걸음) (길목에 적이 있으면 막힘, 아군은 통과 가능)
+      const steps = 2 - slow + bonus, seen = new Set([r + ',' + c]); let frontier = [[r, c]];
+      for (let d = 0; d < steps; d++) {
+        const next = [];
+        frontier.forEach(([fr, fc]) => DIRS_ORTHO.forEach(([dr, dc]) => {
+          const tr = fr + dr, tc = fc + dc, k = tr + ',' + tc;
+          if (seen.has(k) || !passable(tr, tc)) return;
+          seen.add(k); if (!board[tr][tc]) moves.push({ r: tr, c: tc });
+          if (!castleAt(tr, tc)) next.push([tr, tc]);
+        }));
+        frontier = next;
+      }
       break;
     }
   }
@@ -2531,6 +2866,7 @@ function launchOrb(kind, from, to, amt, ep, cb) {
 }
 // 적을 처치하면 그 자리에서 골드/경험치가 헤더로 날아간다
 function rewardKill(def) {
+  achAdd('kill_all', 1); achAdd('kill_' + def.typeKey, 1);
   const g = 8 + Math.round(def.maxHp * 0.3) + Math.floor(currentStage * 0.8), x = 4 + Math.floor(currentStage * 0.15);
   grant(SAVE, g, x); persist(); stats.kills = (stats.kills || 0) + 1;
   try {
@@ -2641,6 +2977,7 @@ function executeAttack(att, def) {
   // 피해 계산(성 수비 ×2 / 투석 약화)은 투석기를 소모하기 전에 먼저 한다
   if (dmgInfo.shot) {
     catapultAt(att.r, att.c).used = true; // 투석기는 1회용
+    if (att.owner === 'player') achAdd('catapult');
     addLog(att.owner === 'player' ? '아군' : '적군', `<b>${att.name}</b>(이)가 <b>투석기</b>를 발사했습니다! <span class="text-slate-500">(1회용 · 위력 ${Math.round(SHOT_MULT * 100)}%)</span>`, 'text-orange-300');
   }
 
@@ -2680,10 +3017,11 @@ function executeAttack(att, def) {
   addLog(att.owner === 'player' ? '아군' : '적군', `<b>${att.name}</b>(이)가 <b>${def.name}</b>에게 <span class="text-red-400 font-bold">${damage}</span> 데미지!${crit ? ' <span class="text-yellow-300 font-bold">[✨크리티컬 ×' + CRIT_MULT + '!]</span>' : ''}${label}${bonus > 1 ? ' <span class="text-amber-300 font-bold">[성 수비 ×2]</span>' : ''}${shot ? ' <span class="text-orange-300 font-bold">[투석]</span>' : ''}`, att.owner === 'player' ? 'text-blue-300' : 'text-red-300');
   if (def.hp <= 0) {
     if (def.typeKey === 'OBSTACLE') addTileFx(def.r, def.c, '💥', 'fx-burst', 0, 500);
-    else addTileFx(def.r, def.c, `<div class="unit-art" style="${teamStyle(def.owner)};position:relative;inset:auto;width:80%;height:80%">${UNIT_SVG[def.typeKey]}</div>`, 'fx-ghost', 0, 650);
+    else addTileFx(def.r, def.c, `<div class="unit-art" style="${teamStyle(def.owner)};position:relative;inset:auto;width:80%;height:80%">${unitSvg(def.typeKey, def.promo)}</div>`, 'fx-ghost', 0, 650);
     board[def.r][def.c] = null;
     units = units.filter(u => u !== def);
     if (def.owner === 'ai') rewardKill(def);
+    if (def.typeKey === 'OBSTACLE' && !def.bomb && att.owner === 'player') achAdd('barricade');
     addLog('전투', `<b>${def.name}</b>(이)가 ${def.typeKey === 'OBSTACLE' ? '파괴되었습니다! 길이 열렸습니다.' : '쓰러졌습니다!'}`, 'text-amber-400 font-bold');
     if (def.bomb) setTimeout(() => explodeBomb(def), 300);
   }
@@ -2698,7 +3036,7 @@ function openChestIfAny(unit) {
   const ch = chestAt(unit.r, unit.c);
   if (!ch || ch.opened) return;
   ch.opened = true;
-  if (unit.owner === 'player') stats.chests++;
+  if (unit.owner === 'player') { stats.chests++; achAdd('chest'); }
   let n = 0;
   units.filter(u => u.owner === unit.owner && u.hp < u.maxHp).forEach(u => {
     const gain = u.maxHp - u.hp; u.hp = u.maxHp; n++;
@@ -2727,6 +3065,7 @@ function executeHeal(healer, target) {
   const prev = target.hp;
   target.hp = Math.min(target.maxHp, target.hp + healer.healPower);
   const healed = target.hp - prev;
+  if (healer.owner === 'player' && healed > 0) achAdd('heal');
   const hx = target.c - healer.c, hy = target.r - healer.r, hl = Math.hypot(hx, hy) || 1;
   addUnitFx(healer, 'fx-lunge', hx / hl, hy / hl, 0, 350);
   addUnitFx(target, 'fx-heal', 0, 0, 100, 500);
@@ -3058,10 +3397,16 @@ async function playResultSeq(o) {
       }
       setTimeout(() => { $('res-total').style.opacity = .35; $('res-xpline').style.opacity = .35; }, 500);
     }), wait(5000)]);
-    await wait(o.ups ? 1500 : 500);
+    await resWait(o.ups ? 1500 : 500);
     if (o.ups) { const n = document.createElement('div'); n.className = 'text-[11px] text-yellow-200 mt-1 text-center'; n.textContent = `플레이어 레벨 ${SAVE.lv}: 전 병종 체력·공격력 +${SAVE.lv - 1}% 적용 중`; $('res-rewards').appendChild(n); }
-    // 랭크 공개 → 언락 공개
+    // ---- 1뎁스(보상) 연출이 끝나면 자동으로 2뎁스(랭크·상세·언락·버튼)로 넘어간다 ----
     resSkip = false;
+    await wait(350);
+    const d1 = $('res-d1'), d2 = $('res-d2');
+    d1.classList.add('res-out'); sound.tone('sine', 500, 900, 0.18, 0.08);
+    await wait(280);
+    d1.classList.add('hidden'); d1.classList.remove('res-out'); d2.classList.remove('hidden'); d2.classList.add('res-in'); panel.scrollTop = 0;
+    await wait(450);
     if (o.rankHtml) {
       const rk = $('res-rank'); rk.style.display = 'block'; rk.classList.add('res-pop');
       [392, 523, 659].forEach((f, i) => sound.tone('triangle', f, f, 0.18, 0.2, i * 0.1));
@@ -3077,6 +3422,7 @@ async function playResultSeq(o) {
   finally {
     panel.removeEventListener('pointerdown', onTap);
     try {
+      $('res-d1').classList.add('hidden'); $('res-d2').classList.remove('hidden');
       if (o.rankHtml) $('res-rank').style.display = 'block';
       if (o.unlockHtml && !$('res-unlock').innerHTML) $('res-unlock').innerHTML = o.unlockHtml;
       rs.lv = SAVE.lv; rs.xp = SAVE.xp; rs.gold = SAVE.gold; renderResHud();
@@ -3104,7 +3450,7 @@ function showResult(win, reason) {
     gold = rows.reduce((a, x) => a + x[1], 0);
     const prev = SAVE.best[currentStage];
     if (!prev || GRADE_ORDER.indexOf(r.grade) > GRADE_ORDER.indexOf(prev)) SAVE.best[currentStage] = r.grade;
-    markCleared(currentStage);
+    markCleared(currentStage); SAVE.stat.win = (SAVE.stat.win || 0) + 1; if (r.grade === 'S') SAVE.stat.sRank = (SAVE.stat.sRank || 0) + 1;
     const col = { S: '#fde047', A: '#4ade80', B: '#60a5fa', C: '#cbd5e1' }[r.grade];
     rankHtml = `<div class="flex items-center justify-center gap-4 mt-3 mb-3">
         <div style="font-size:64px;line-height:1;font-weight:900;color:${col};text-shadow:0 0 18px ${col}88" class="title-font">${r.grade}</div>
@@ -3124,7 +3470,7 @@ function showResult(win, reason) {
     unlockHtml = `<div class="unlock-banner" id="unlock-banner"><div class="ub-lock"><span class="l1">🔒</span><span class="l2">🔓</span></div><div class="flex-1 min-w-0"><div class="text-[10px] text-amber-300 font-black tracking-widest">NEW STAGE UNLOCKED</div><div class="font-black text-amber-100 leading-tight">STAGE ${currentStage + 2} · ${nx.name}</div><div class="text-[10px] text-slate-300">${nx.layout[0].length}×${nx.layout.length} · ${THEMES[nx.theme].icon} 새로운 전장이 열렸습니다!${(nx.newObj || []).length ? ' · ✨ 새 오브젝트: ' + nx.newObj.map(x => UNLOCK_LABEL[x]).join(', ') : ''}</div></div></div>`;
   }
   // 저장은 즉시 (연출 도중 닫혀도 보상은 반영), 화면의 헤더 값은 연출에 맞춰 천천히 따라간다
-  SAVE.gold += gold; const ups = grant(SAVE, 0, xpGain); persist();
+  SAVE.gold += gold; const ups = grant(SAVE, 0, xpGain); persist(); setTimeout(achCheck, 1200);
   rs.lv = lv0; rs.xp = xp0; rs.gold = g0; renderResHud();
   $('modal-rating').innerHTML = `<div id="res-rewards">
       <div class="bg-slate-950/50 border border-yellow-700/40 rounded-xl p-2.5 text-left text-xs">
@@ -3134,8 +3480,10 @@ function showResult(win, reason) {
       </div>
       <div id="res-hint" class="text-[10px] text-slate-500 mt-1.5">터치하면 건너뜁니다</div>
     </div>
-    <div id="res-rank" style="display:none">${rankHtml}</div>
-    <div id="res-unlock"></div>`;
+    `;
+  $('res-rank').innerHTML = rankHtml; $('res-rank').style.display = 'none'; $('res-rank').classList.remove('res-pop'); $('res-unlock').innerHTML = '';
+  $('res-d1').classList.remove('hidden', 'res-out'); $('res-d2').classList.add('hidden'); $('res-d2').classList.remove('res-in');
+  $('res-panel').scrollTop = 0;
   $('res-btns').classList.add('res-hidden');
   $('modal-next').classList.toggle('hidden', !(win && !last));
   $('game-over-modal').classList.remove('hidden');
@@ -3170,7 +3518,7 @@ function updateDetailPanel(unit) {
   const sign = v => v > 0 ? `+${v}` : `${v}`;
   box.innerHTML = `
     <div class="w-full flex items-center gap-3 mb-3 border-b border-slate-700 pb-2">
-      <div class="token relative w-14 h-14 shrink-0" style="${teamStyle(unit.owner)}"><div class="unit-art">${UNIT_SVG[unit.typeKey]}</div></div>
+      <div class="token relative w-14 h-14 shrink-0" style="${teamStyle(unit.owner)}"><div class="unit-art${unit.promo ? ' promo-art' : ''}">${unitSvg(unit.typeKey, unit.promo)}</div></div>
       <div class="flex-grow">
         <div class="flex justify-between items-center">
           <span class="font-black text-base ${mine ? 'text-blue-300' : 'text-red-300'}">${unit.name}</span>
@@ -3201,8 +3549,8 @@ function addLog(speaker, text, cls = 'text-slate-300') {
 function clearLogs() { $('game-log').innerHTML = ''; }
 
 window.onload = () => {
-  loadSettings(); syncAudioUi(); syncHud(); refreshGold(); renderMo(); renderObjCodex();
-  initGame(); initPointerDrag(); resizeBoard(); openStageSelect();
+  loadSettings(); syncAudioUi(); syncHud(); refreshGold(); renderMo(); renderCodex();
+  initGame(true); initPointerDrag(); resizeBoard(); openStageSelect(true);
   // 브라우저 정책상 소리는 첫 터치 이후에 시작한다
   const unlock = () => { MUSIC.unlock(); window.removeEventListener('pointerdown', unlock); };
   window.addEventListener('pointerdown', unlock);
