@@ -1103,6 +1103,14 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
 .sc-st{display:inline-flex;align-items:center;gap:3px;padding:2px 8px 2px 5px;border-radius:99px;background:rgba(8,18,44,.55);border:1px solid rgba(231,195,106,.55);font-size:11px;color:#dbe6ff;white-space:nowrap}
 .sc-st em{font-style:normal;font-size:12px}.sc-st b{font-family:'Jua',sans-serif;font-weight:400;color:#ffe27a;margin-left:2px}
 .sc-st.up b{color:#ffb347}.sc-st.down b{color:#7dd3fc}
+#wm-head{position:relative}
+#wm-loc{position:absolute;right:10px;top:calc(100% + 8px);width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(180deg,#f59e0b,#d97706);border:2px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.45);z-index:6;-webkit-tap-highlight-color:transparent}
+#wm-loc:active{transform:scale(.92)}
+
+.ct2-word .fl,.mo-ban-t .fl{background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;-webkit-text-fill-color:#ffd23f!important;color:#ffd23f!important}
+.foe .ct2-word .fl,.mo-ban.foe .mo-ban-t .fl{-webkit-text-fill-color:#ff8fa3!important;color:#ff8fa3!important}
+.fc-num{background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;-webkit-text-fill-color:#ffd23f!important;color:#ffd23f!important}
+.wm-size{-webkit-backdrop-filter:none}
 </style>
 </head>
 <body>
@@ -1288,6 +1296,7 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
     </div>
     <div id="wm-sub"><p id="wm-region" class="truncate"></p></div>
     <span id="stage-gold" class="hidden"></span>
+    <button id="wm-loc" onclick="wmLocate()" aria-label="내 위치"><svg viewBox='0 0 24 24' width='24' height='24' fill='none' stroke='#fff' stroke-width='2.2' stroke-linecap='round'><circle cx='12' cy='12' r='6.5'/><circle cx='12' cy='12' r='2.2' fill='#fff'/><path d='M12 1.5v4M12 18.5v4M1.5 12h4M18.5 12h4'/></svg></button>
   </div>
   <div id="wm-scroll"><div id="wm-wrap"><div id="wm-canvas"></div></div></div>
   <div id="wm-toast"></div>
@@ -2445,7 +2454,7 @@ function rateBattle() {
 let stats = { chests: 0 }, resultGiven = false;
 function miniMap(st) {
   const th = THEMES[st.theme], rows = st.layout.length, cols = st.layout[0].length;
-  let h = `<div class="grid rounded-md overflow-hidden border border-slate-600" style="grid-template-columns:repeat(${cols},1fr);aspect-ratio:${cols}/${rows}">`;
+  let h = `<div class="grid rounded-md overflow-hidden border border-slate-600" style="width:92px;height:${Math.round(92 * rows / cols)}px;grid-template-columns:repeat(${cols},minmax(0,1fr));grid-template-rows:repeat(${rows},minmax(0,1fr))">`;
   for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
     const tk = TERRAIN_KEY[st.layout[r][c]];
     let mark = '';
@@ -2460,7 +2469,7 @@ function miniMap(st) {
     else if ((st.warps || []).some(k => (k[0] === r && k[1] === c) || (k[2] === r && k[3] === c))) mark = '<span style="color:#c084fc">◎</span>';
     else if (st.player.some(u => u[1] === r && u[2] === c)) mark = '<span style="color:#93c5fd">▪</span>';
     else if (st.ai.some(u => u[1] === r && u[2] === c)) mark = '<span style="color:#fca5a5">▪</span>';
-    h += `<div style="background:${th.colors[tk][(r + c) % 2]};font-size:11px;line-height:1;display:flex;align-items:center;justify-content:center;aspect-ratio:1/1;text-shadow:0 0 2px #000">${mark}</div>`;
+    h += `<div style="background:${th.colors[tk][(r + c) % 2]};font-size:${Math.max(4, Math.min(11, Math.floor(92 / cols * 0.85)))}px;line-height:1;overflow:hidden;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;text-shadow:0 0 2px #000">${mark}</div>`;
   }
   return h + '</div>';
 }
@@ -2624,6 +2633,12 @@ function wmToggleInfo() { $('wm-info').classList.toggle('tuck'); }
   sc.addEventListener('touchmove', e => { if (y0 !== null && Math.abs(e.touches[0].clientY - y0) > 8) { tuck(); y0 = null; } }, { passive: true });
   sc.addEventListener('wheel', tuck, { passive: true });
 })();
+function wmLocate() {
+  if (WM.walking) return;
+  const p = WM.pts && WM.pts[WM.avatar * 10]; if (!p) return;
+  const sc = $('wm-scroll'); if (sc) sc.scrollTo({ top: Math.max(0, p.y * WM.scale - sc.clientHeight * 0.55), behavior: 'smooth' });
+  try { sound.playMove(); } catch (e) {}
+}
 function wmHideInfo() { $('wm-info').classList.add('hidden'); }
 function wmStart(i) { selectStage(i); }
 function wmTap(i) {
