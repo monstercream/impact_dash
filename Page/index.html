@@ -1254,7 +1254,7 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
 .slot-title{font-size:30px;line-height:1.1;color:#fde047;-webkit-text-stroke:1.5px #7c2d12;paint-order:stroke fill;text-shadow:0 4px 0 #7c2d12,0 0 18px rgba(251,191,36,.6)}
 .slot-sub{font-size:11px;color:#cbd5e1;margin-top:2px}.slot-sub b{color:#fde047}
 .slot-wrap{position:relative;margin:12px auto 6px;width:fit-content}
-.slot-rays{position:absolute;left:50%;top:50%;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;opacity:0;pointer-events:none;background:repeating-conic-gradient(from 0deg,rgba(253,224,71,.55) 0 10deg,transparent 10deg 24deg);-webkit-mask:radial-gradient(circle,#000 20%,transparent 68%);mask:radial-gradient(circle,#000 20%,transparent 68%)}
+.slot-rays{--ray:rgba(253,224,71,.55);position:absolute;left:50%;top:50%;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;opacity:0;pointer-events:none;transition:opacity .3s;background:repeating-conic-gradient(from 0deg,var(--ray) 0 10deg,transparent 10deg 24deg);-webkit-mask:radial-gradient(circle,#000 20%,transparent 68%);mask:radial-gradient(circle,#000 20%,transparent 68%)}
 .slot-wrap.jackpot .slot-rays{opacity:1;animation:slotRays 6s linear infinite}
 @keyframes slotRays{to{transform:rotate(360deg)}}
 .slot-machine{position:relative;padding:14px;border-radius:22px;background:linear-gradient(180deg,#b91c1c,#7f1d1d);box-shadow:inset 0 0 0 3px #fde68a,inset 0 0 0 6px #92400e,0 8px 20px rgba(0,0,0,.5)}
@@ -1291,11 +1291,51 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
 .slot-lever.done{animation:none}
 @keyframes leverPulse{50%{transform:scale(1.04);box-shadow:0 4px 0 #92400e,0 0 30px rgba(251,191,36,.95)}}
 .slot-flash{position:fixed;inset:0;z-index:960;pointer-events:none;background:radial-gradient(circle,#fff,rgba(253,224,71,.6));animation:slotFlash .7s ease-out forwards}
+.slot-flash.k-blue{background:radial-gradient(circle,rgba(255,255,255,.9),rgba(56,189,248,.45));animation-duration:.55s}
 @keyframes slotFlash{from{opacity:1}to{opacity:0}}
 .slot-coin{position:fixed;z-index:955;pointer-events:none;width:26px;height:26px;margin:-13px 0 0 -13px;animation:slotCoin 1.3s cubic-bezier(.2,.7,.4,1) both}
 .slot-coin .ic{width:26px;height:26px;margin:0}
 @keyframes slotCoin{0%{transform:translate(0,0) scale(.4) rotate(0);opacity:1}60%{opacity:1}100%{transform:translate(var(--dx),calc(var(--dy) + 140px)) scale(1) rotate(540deg);opacity:0}}
 @media (prefers-reduced-motion:reduce){.slot-wrap.jackpot .slot-rays,.slot-machine.tension,.slot-lever{animation:none}}
+/* ---------- 월드맵: 노드 아래 보상 재료 ---------- */
+.wm-rw{position:absolute;z-index:2;display:flex;gap:1px;padding:1px 3px;border-radius:9px;transform:translate(-50%,24px);background:rgba(15,23,42,.62);box-shadow:0 1px 3px rgba(0,0,0,.4);pointer-events:none}
+.wm-rw.off{display:none}.wm-rw.done{transform:translate(-50%,35px)}.wm-rw.cur{transform:translate(-50%,29px);box-shadow:0 0 0 1.5px #fde047,0 1px 3px rgba(0,0,0,.4)}.wm-rw.lock{opacity:.7}
+.itm.xs{width:16px;height:16px;border-radius:4px;box-shadow:none}.itm.xs::after{display:none}
+/* ---------- 보상 슬롯: 슬로 모션 · DOUBLE · JACKPOT ---------- */
+.slot-machine{transition:transform .5s cubic-bezier(.2,.9,.3,1),box-shadow .5s}
+.slot-wrap.slowmo .slot-machine{transform:scale(1.1);box-shadow:inset 0 0 0 3px #fde68a,inset 0 0 0 6px #92400e,0 0 30px 8px rgba(253,224,71,.55),0 0 0 100vmax rgba(2,6,23,.62)}
+.slot-wrap.slowmo .slot-bulbs{animation:slotBulbs 1.1s steps(2) infinite;opacity:1}
+.slot-msg{position:relative;z-index:3}
+.reel.lock{box-shadow:0 0 0 3px #fde047,0 0 16px 3px rgba(253,224,71,.85);animation:reelLock .9s ease-in-out infinite}
+@keyframes reelLock{50%{box-shadow:0 0 0 3px #fff7ae,0 0 26px 7px rgba(253,224,71,1)}}
+.reel.slow .strip{filter:blur(.6px)}
+.reel.stop::before{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(255,255,255,.85),transparent) 0 -120%/100% 60% no-repeat;animation:reelSweep .35s ease-out forwards}
+@keyframes reelSweep{to{background-position:0 220%}}
+.slot-msg .t-beat{font-size:22px;color:#fca5a5;text-shadow:0 0 12px #ef4444;animation:beatPulse .9s ease-in-out infinite}
+@keyframes beatPulse{0%,100%{transform:scale(1)}12%{transform:scale(1.18)}24%{transform:scale(1)}36%{transform:scale(1.1)}}
+.slot-msg .t-miss{font-size:20px;color:#cbd5e1;animation:missDrop .5s cubic-bezier(.3,1.5,.5,1) both}
+@keyframes missDrop{from{opacity:0;transform:translateY(-14px) rotate(-4deg)}to{opacity:1;transform:none}}
+.slot-wrap.pair .slot-rays{--ray:rgba(125,211,252,.55);opacity:1;animation:slotRays 9s linear infinite}
+.slot-wrap.jackpot .slot-rays{--ray:rgba(253,224,71,.65);opacity:1;animation:slotRays 4s linear infinite;background:repeating-conic-gradient(from 0deg,rgba(248,113,113,.55) 0 8deg,transparent 8deg 15deg,rgba(253,224,71,.65) 15deg 23deg,transparent 23deg 30deg,rgba(74,222,128,.5) 30deg 38deg,transparent 38deg 45deg,rgba(96,165,250,.55) 45deg 53deg,transparent 53deg 60deg)}
+.slot-wrap.shake-small{animation:shakeS .45s ease-out}
+.slot-wrap.shake-big{animation:shakeB .65s ease-out}
+@keyframes shakeS{20%{transform:translate(-4px,2px)}40%{transform:translate(4px,-2px)}60%{transform:translate(-3px,1px)}80%{transform:translate(2px,-1px)}}
+@keyframes shakeB{10%{transform:translate(-9px,4px) rotate(-1.5deg)}25%{transform:translate(9px,-5px) rotate(1.5deg)}40%{transform:translate(-7px,3px) rotate(-1deg)}55%{transform:translate(6px,-3px) rotate(1deg)}70%{transform:translate(-4px,2px)}85%{transform:translate(2px,-1px)}}
+.slot-msg .t-pair{position:relative;font-size:38px;color:#fff;-webkit-text-stroke:2.5px #0369a1;paint-order:stroke fill;text-shadow:0 4px 0 #0c4a6e,0 0 18px #38bdf8;animation:pairStamp .55s cubic-bezier(.2,1.5,.4,1) both,pairGlow 1s .55s ease-in-out infinite}
+@keyframes pairStamp{0%{opacity:0;transform:scale(3) rotate(-8deg)}60%{opacity:1;transform:scale(.92) rotate(2deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes pairGlow{50%{text-shadow:0 4px 0 #0c4a6e,0 0 30px #7dd3fc,0 0 10px #fff}}
+.slot-msg .x2{position:absolute;right:-30px;top:-12px;display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;font-size:16px;font-family:'Black Han Sans',sans-serif;color:#451a03;-webkit-text-stroke:0;text-shadow:none;background:radial-gradient(circle at 35% 30%,#fff7ae,#fbbf24 60%,#b45309);box-shadow:0 0 0 2px #fff,0 0 14px rgba(253,224,71,.9);animation:x2Pop .5s .35s cubic-bezier(.2,1.8,.4,1) both}
+@keyframes x2Pop{from{opacity:0;transform:scale(0) rotate(-120deg)}to{opacity:1;transform:scale(1) rotate(12deg)}}
+.slot-msg .t-jack{animation:none;background:none;-webkit-text-stroke:0;filter:drop-shadow(0 0 14px rgba(253,224,71,.95)) drop-shadow(0 3px 0 rgba(124,45,18,.7))}
+.slot-msg .t-jack i{display:inline-block;font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(124,45,18,.6);background:linear-gradient(90deg,#f87171,#fbbf24,#fde047,#4ade80,#38bdf8,#c084fc,#f87171) 0 0/700% 100%;-webkit-background-clip:text;background-clip:text;animation:jackDrop .55s cubic-bezier(.2,1.6,.4,1) both,jackBob 1.1s .6s ease-in-out infinite,jackHue 1.4s linear infinite}
+@keyframes jackDrop{from{opacity:0;transform:translateY(-60px) scale(2.2) rotate(-20deg)}to{opacity:1;transform:none}}
+@keyframes jackBob{50%{transform:translateY(-5px) scale(1.08)}}
+.slot-wrap.jackpot .slot-machine{animation:jackGlow .5s ease-in-out infinite alternate}
+@keyframes jackGlow{to{box-shadow:inset 0 0 0 3px #fff7ae,inset 0 0 0 6px #f59e0b,0 0 40px 12px rgba(253,224,71,.9)}}
+.slot-rain{position:fixed;top:-40px;z-index:955;pointer-events:none;width:28px;height:28px;animation:slotRain 1.6s cubic-bezier(.4,0,.8,1) both}
+.slot-rain .ic{width:28px;height:28px;margin:0}
+@keyframes slotRain{from{transform:translateY(0) rotate(0)}to{transform:translateY(calc(100vh + 80px)) rotate(var(--rot))}}
+@media (prefers-reduced-motion:reduce){.slot-wrap.shake-small,.slot-wrap.shake-big,.reel.lock,.slot-wrap.jackpot .slot-machine{animation:none}.slot-rain{display:none}}
 </style>
 <style id="item-art">/*ITEM-ART-START*/
 .itm-herb{background:none!important;box-shadow:none!important}.itm-herb::after{display:none!important}.itm-herb>i.ic{inset:0!important;background-image:url(data:image/webp;base64,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)!important;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))!important}
@@ -2903,11 +2943,13 @@ function wmBuild() {
   h += `<div class="wm-castle" style="${pc(pL.x, pL.y - 72)};width:120px;height:118px"><span class="wmc wmi-castle_ai"></span></div><div class="wm-banner" style="${pc(200, 22)}">👑 마왕의 성</div>`;
   for (let r = 1; r < REGIONS.length; r++) h += `<div class="wm-banner" style="${pc(200, yb(r))}">${REGIONS[r].icon} ${REGIONS[r].name}</div>`;
   for (let i = 0; i < STAGES.length; i += PER_SIZE) { const p = wmXY(i), n = SIZES[i / PER_SIZE]; h += `<div class="wm-size" style="${pc(p.x < 200 ? p.x + 70 : p.x - 70, p.y + 4)}">${n}×${n} 구역</div>`; }
+  // 노드 아래 보상 재료 (노드의 랭크 필터가 번지지 않게 노드 밖에 따로 둔다)
+  h += STAGES.map((_, i) => { const p = wmXY(i); return `<div class="wm-rw off" style="${pc(p.x, p.y)}">${stageMats(i).map(id => matIcon(id, 'xs')).join('')}</div>`; }).join('');
   WM.nodes = STAGES.map((_, i) => { const p = wmXY(i); return `<button class="wm-node locked" data-i="${i}" style="${pc(p.x, p.y)}" onclick="wmTap(${i})"></button>`; });
   h += WM.nodes.join('');
   h += `<div id="wm-avatar"><div class="wm-av-in">${portrait('SWORDSMAN', 'player')}</div></div>`;
   cv.insertAdjacentHTML('beforeend', h);
-  WM.nodes = Array.from(cv.querySelectorAll('.wm-node'));
+  WM.nodes = Array.from(cv.querySelectorAll('.wm-node')); WM.rws = Array.from(cv.querySelectorAll('.wm-rw'));
   $('wm-scroll').addEventListener('scroll', () => { if (WM.labelRaf) return; WM.labelRaf = requestAnimationFrame(() => { WM.labelRaf = 0; wmLabel(); }); }, { passive: true });
   WM.built = true;
 }
@@ -2930,6 +2972,8 @@ function wmRender() {
   refreshGold();
   const f = wmFrontier();
   WM.nodes.forEach((n, i) => {
+    const rw = WM.rws && WM.rws[i];
+    if (rw) rw.className = 'wm-rw' + (WM.pending === i || (!isUnlocked(i) && i > f + 3) ? ' off' : SAVE.cleared.includes(i) ? ' done' : isUnlocked(i) ? ' cur' : ' lock');
     if (WM.pending === i) { n.className = 'wm-node locked pend'; n.innerHTML = '<span>🔒</span>'; return; }
     const done = SAVE.cleared.includes(i), unl = isUnlocked(i);
     if (done) { const g = SAVE.best[i] || 'C'; n.className = 'wm-node cleared rk-' + g; n.innerHTML = `<span>${i + 1}</span><em class="rk-b"><b class="gl gl-${g}"></b></em>`; }
@@ -4485,7 +4529,18 @@ const SLOT_SYM = 76;   // 심볼 한 칸 높이(px)
 async function playSlot(sl) {
   const box = $('res-slot'), d1 = $('res-d1');
   d1.classList.add('res-out'); await wait(280); d1.classList.add('hidden'); d1.classList.remove('res-out');
-  const strips = sl.reels.map((k, j) => { const n = 26 + j * 8, a = []; for (let x = 0; x < n; x++) a.push(sl.pool[Math.floor(Math.random() * sl.pool.length)]); a.push(k, sl.pool[(sl.pool.indexOf(k) + 1) % sl.pool.length]); return a; });
+  const k0 = sl.reels[0], tension = sl.reels[1] === k0, hit = tension && sl.reels[2] === k0;
+  const other = k => sl.pool.find(x => x !== k) || k;
+  // 릴 띠: 무작위 … [바로 위][목표][바로 아래]. 앞 두 개가 같으면 마지막 릴은
+  //  · 맞을 때: 바로 위·아래를 다른 그림으로 (마지막 순간에야 맞춰진다)
+  //  · 빗나갈 때: 맞는 그림이 바로 아래에 걸려 보인다 (한 칸만 더 갔으면…)
+  const strips = sl.reels.map((k, j) => {
+    const n = 26 + j * 8, a = [];
+    for (let x = 0; x < n; x++) a.push(sl.pool[Math.floor(Math.random() * sl.pool.length)]);
+    if (j === 2 && tension) { a[n - 1] = hit ? other(k0) : a[n - 1]; a.push(k, hit ? other(k0) : k0); }
+    else a.push(k, sl.pool[(sl.pool.indexOf(k) + 1) % sl.pool.length]);
+    return a;
+  });
   box.innerHTML = `<div class="slot-head"><div class="slot-title title-font">보상 슬롯</div><div class="slot-sub">같은 재료 2개 <b>×2</b> · 3개 <b>JACKPOT ×3</b></div></div>
     <div class="slot-wrap"><div class="slot-rays"></div><div class="slot-machine" id="slot-machine"><div class="slot-bulbs"></div>
       <div class="slot-reels">${strips.map((a, j) => `<div class="reel" id="reel-${j}"><div class="strip">${a.map(k => `<div class="sym">${matIcon(k)}</div>`).join('')}</div></div>`).join('')}</div>
@@ -4494,59 +4549,80 @@ async function playSlot(sl) {
     <div id="slot-gain" class="slot-gain"></div>
     <button id="slot-lever" class="slot-lever">레버 당기기!</button>`;
   box.classList.remove('hidden'); box.classList.add('res-in');
-  strips.forEach((a, j) => { $('reel-' + j).firstElementChild.style.transform = 'translateY(0)'; });
   sound.tone('triangle', 660, 990, 0.12, 0.15);
-  // 레버를 당기거나(또는 화면 터치) 4초가 지나면 돈다
   resSkip = false;
   await new Promise(go => { const lv = $('slot-lever'); let t = 0; const f = () => { clearTimeout(t); lv.onclick = null; go(); }; lv.onclick = f; t = setTimeout(f, 4000); });
-  const lever = $('slot-lever'); lever.classList.add('pulled'); lever.textContent = '돌아가는 중...';
-  const mach = $('slot-machine'); mach.classList.add('on'); vibrate(30);
-  sound.tone('sawtooth', 180, 90, 0.25, 0.15);
-  const tension = sl.reels[0] === sl.reels[1];
-  const stopAt = [1300, 2000, tension ? 4300 : 2700];
+  const lever = $('slot-lever'), mach = $('slot-machine'), wrap = box.querySelector('.slot-wrap'), msg = $('slot-msg');
+  lever.classList.add('pulled'); lever.textContent = '돌아가는 중...';
+  mach.classList.add('on'); vibrate(30); sound.tone('sawtooth', 180, 90, 0.25, 0.15);
+  const reel = j => $('reel-' + j), stripOf = j => reel(j).firstElementChild, yEnd = j => -(strips[j].length - 2) * SLOT_SYM;
+  const stopAt = [1300, 2000, 2700];
   let ticking = true, tickGap = 55;
   (async () => { while (ticking) { sound.tone('square', 900 + Math.random() * 300, 700, 0.03, 0.05); await wait(tickGap); } })();
   strips.forEach((a, j) => {
-    const r = $('reel-' + j), st = r.firstElementChild, y = -(a.length - 2) * SLOT_SYM;
-    r.classList.add('spin');
-    st.style.transition = `transform ${stopAt[j]}ms cubic-bezier(.15,.55,.22,1.06)`;
-    requestAnimationFrame(() => { st.style.transform = `translateY(${y}px)`; });
+    const st = stripOf(j), slow = j === 2 && tension;
+    reel(j).classList.add('spin');
+    // 슬로 모션 릴은 목표 2.5칸 앞까지만 빠르게 돌고, 거기서부터 천천히 기어간다
+    st.style.transition = `transform ${stopAt[j]}ms ${slow ? 'cubic-bezier(.2,.55,.45,1)' : 'cubic-bezier(.15,.55,.22,1.06)'}`;
+    requestAnimationFrame(() => { st.style.transform = `translateY(${slow ? yEnd(j) + SLOT_SYM * 2.5 : yEnd(j)}px)`; });
   });
-  for (let j = 0; j < 3; j++) {
-    await wait(stopAt[j] - (j ? stopAt[j - 1] : 0) - (j === 2 && tension ? 0 : 0));
-    const r = $('reel-' + j); r.classList.remove('spin'); r.classList.add('stop');
+  const stopFx = j => {
+    const r = reel(j); r.classList.remove('spin', 'slow'); r.classList.add('stop');
     sound.tone('square', 220, 110, 0.12, 0.25); sound.tone('sine', 140, 70, 0.18, 0.3); vibrate(25);
     mach.classList.remove('thud'); void mach.offsetWidth; mach.classList.add('thud');
-    if (j === 0) tickGap = 75;
-    if (j === 1 && tension) {
-      tickGap = 120; mach.classList.add('tension'); $('slot-msg').innerHTML = '<span class="t-hot">두근두근... 하나만 더!</span>';
-      (async () => { for (let b = 0; b < 8 && ticking; b++) { sound.tone('sine', 70, 55, 0.14, 0.5); await wait(140); sound.tone('sine', 70, 55, 0.1, 0.35); await wait(140); } })();
+  };
+  await wait(stopAt[0]); stopFx(0); tickGap = 75;
+  await wait(stopAt[1] - stopAt[0]); stopFx(1);
+  if (!tension) { await wait(stopAt[2] - stopAt[1]); stopFx(2); }
+  else {
+    // ---- 슬로 모션: 스포트라이트, 확대, 느려지는 심장 소리, 한 칸씩 넘어가는 틱 ----
+    ticking = false; mach.classList.remove('on');
+    wrap.classList.add('slowmo'); reel(0).classList.add('lock'); reel(1).classList.add('lock');
+    msg.innerHTML = '<span class="t-beat">두근... 두근...</span>';
+    let beating = true;
+    (async () => { let gap = 420; while (beating) { sound.tone('sine', 70, 50, 0.16, 0.55); await wait(150); sound.tone('sine', 66, 48, 0.12, 0.4); vibrate(15); await wait(gap); gap = Math.min(900, gap + 90); } })();
+    await wait(stopAt[2] - stopAt[1]);
+    const st = stripOf(2); reel(2).classList.remove('spin'); reel(2).classList.add('slow');
+    const CRAWL = 2300;
+    st.style.transition = `transform ${CRAWL}ms cubic-bezier(.33,.08,.25,1)`;
+    st.style.transform = `translateY(${yEnd(2) - (hit ? SLOT_SYM * 0.14 : 0)}px)`;
+    [0, 560, 1300, 2150].forEach((t, i) => setTimeout(() => sound.tone('square', 520 - i * 70, 380 - i * 50, 0.05, 0.12), t));
+    await wait(CRAWL);
+    if (hit) { st.style.transition = 'transform 220ms cubic-bezier(.3,1.6,.5,1)'; st.style.transform = `translateY(${yEnd(2)}px)`; await wait(160); }
+    beating = false; stopFx(2); wrap.classList.remove('slowmo');
+    if (!hit) {
+      msg.innerHTML = '<span class="t-miss">아깝다! 한 칸 차이!</span>';
+      sound.tone('sawtooth', 300, 120, 0.3, 0.2); await wait(700);
     }
   }
-  ticking = false; mach.classList.remove('on', 'tension');
+  ticking = false; mach.classList.remove('on');
   // ---- 결과 연출 ----
-  const msg = $('slot-msg'), wrap = box.querySelector('.slot-wrap');
   if (sl.kind === 'jackpot') {
-    wrap.classList.add('jackpot'); [0, 1, 2].forEach(j => $('reel-' + j).classList.add('win'));
-    msg.innerHTML = '<span class="t-jack">JACKPOT!!</span>';
-    const fl = document.createElement('div'); fl.className = 'slot-flash'; document.body.appendChild(fl); setTimeout(() => fl.remove(), 700);
-    (sound.play('jingle_win') || 0); setTimeout(() => sound.play('achievement'), 350);
-    [523, 659, 784, 1047].forEach((f, i) => sound.tone('triangle', f, f, 0.25, 0.25, i * 0.09));
-    vibrate([80, 40, 80, 40, 220]);
-    confettiBurst(wrap, 60); setTimeout(() => confettiBurst(wrap, 50), 450); setTimeout(() => confettiBurst(msg, 40), 900);
-    slotCoins(wrap, 26);
+    wrap.classList.add('jackpot'); [0, 1, 2].forEach(j => reel(j).classList.add('win'));
+    msg.innerHTML = `<span class="t-jack">${'JACKPOT!!'.split('').map((c, i) => `<i style="animation-delay:${i * 0.07}s">${c}</i>`).join('')}</span>`;
+    [0, 200, 400].forEach(t => setTimeout(() => slotFlash('gold'), t));
+    slotShake(wrap, 'big');
+    (sound.play('jingle_win') || 0); setTimeout(() => sound.play('achievement'), 380);
+    [523, 659, 784, 1047, 1319, 1568].forEach((f, i) => sound.tone('triangle', f, f, 0.22, 0.28, i * 0.08));
+    vibrate([90, 40, 90, 40, 260]);
+    confettiBurst(wrap, 70);
+    [0, 1, 2].forEach(j => setTimeout(() => confettiBurst(reel(j), 30), 250 + j * 220));
+    setTimeout(() => confettiBurst(msg, 50), 900);
+    slotCoins(wrap, 30); slotRain(46);
   } else if (sl.kind === 'pair') {
     const k = sl.reels.find((x, j) => sl.reels.indexOf(x) !== j);
-    sl.reels.forEach((x, j) => { if (x === k) $('reel-' + j).classList.add('win'); });
-    msg.innerHTML = '<span class="t-pair">DOUBLE!</span>';
-    (sound.play('levelup') || 0); [523, 784].forEach((f, i) => sound.tone('triangle', f, f, 0.2, 0.2, i * 0.1));
-    vibrate([50, 40, 90]); confettiBurst(wrap, 34); slotCoins(wrap, 10);
+    wrap.classList.add('pair');
+    sl.reels.forEach((x, j) => { if (x === k) { reel(j).classList.add('win'); setTimeout(() => confettiBurst(reel(j), 26), j * 120); } });
+    msg.innerHTML = '<span class="t-pair">DOUBLE!<b class="x2">×2</b></span>';
+    slotFlash('blue'); slotShake(wrap, 'small');
+    (sound.play('levelup') || 0); [523, 659, 784, 1047].forEach((f, i) => sound.tone('triangle', f, f, 0.2, 0.22, i * 0.09));
+    vibrate([60, 40, 120]); confettiBurst(wrap, 40); slotCoins(wrap, 18);
   } else {
     msg.innerHTML = '<span class="t-norm">보상 획득!</span>';
     [440, 554, 659].forEach((f, i) => sound.tone('triangle', f, f, 0.15, 0.18, i * 0.08));
   }
-  await wait(650);
-  // 획득한 증표가 하나씩 튀어나온다
+  await wait(sl.kind === 'jackpot' ? 1100 : 750);
+  // 획득한 재료가 하나씩 튀어나온다
   const g = $('slot-gain');
   for (const [k, n] of Object.entries(sl.gain)) {
     const el = document.createElement('div'); el.className = 'sg-item';
@@ -4557,6 +4633,24 @@ async function playSlot(sl) {
   resSkip = false;
   await new Promise(go => { let t = 0; const f = () => { clearTimeout(t); lever.onclick = null; go(); }; lever.onclick = f; t = setTimeout(f, 3500); });
   box.classList.add('res-out'); await wait(280); box.classList.remove('res-out', 'res-in');
+}
+function slotFlash(kind) {
+  const fl = document.createElement('div'); fl.className = 'slot-flash k-' + kind; document.body.appendChild(fl); setTimeout(() => fl.remove(), 700);
+}
+function slotShake(el, size) {
+  el.classList.remove('shake-small', 'shake-big'); void el.offsetWidth; el.classList.add('shake-' + size);
+  setTimeout(() => el.classList.remove('shake-' + size), 700);
+}
+// 화면 위에서 동전이 쏟아진다 (JACKPOT)
+function slotRain(n) {
+  try {
+    for (let i = 0; i < n; i++) {
+      const c = document.createElement('div'); c.className = 'slot-rain'; c.innerHTML = '<span class="ic ic-coin"></span>';
+      c.style.left = (Math.random() * 100) + 'vw'; c.style.animationDelay = (Math.random() * 1.1) + 's';
+      c.style.animationDuration = (1.2 + Math.random() * 0.9) + 's'; c.style.setProperty('--rot', (Math.random() < 0.5 ? -1 : 1) * (360 + Math.random() * 540) + 'deg');
+      document.body.appendChild(c); setTimeout(() => c.remove(), 3400);
+    }
+  } catch (e) {}
 }
 function slotCoins(anchor, n) {
   try {
