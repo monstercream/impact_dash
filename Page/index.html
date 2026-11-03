@@ -1168,7 +1168,7 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
 #wm-xp{flex:3 1 0!important}
 #wm-gold{flex:2 1 0;min-width:0;white-space:nowrap}
 #wm-body{flex:1 1 auto;min-height:0;position:relative;display:flex;flex-direction:column}
-/* 하단 탭: 월드맵·업적·강화 화면이 열려 있을 때만 보이고, 열린 화면에 맞춰 탭이 켜진다 */
+/* 하단 탭: 월드맵·업적·업그레이드 화면이 열려 있을 때만 보이고, 열린 화면에 맞춰 탭이 켜진다 */
 #wm-tabs{display:none;position:fixed;left:0;right:0;bottom:calc(6px + env(safe-area-inset-bottom));z-index:78;isolation:isolate;align-items:center;width:calc(100% - 16px);max-width:544px;height:56px;box-sizing:border-box;margin:0 auto;padding:4px 18px}
 #stage-select:not(.hidden)~#wm-tabs,#ach-screen:not(.hidden)~#wm-tabs,#upgrade-screen:not(.hidden)~#wm-tabs{display:flex}
 #wm-tabs-sp{flex:none;height:calc(66px + env(safe-area-inset-bottom))}
@@ -1212,6 +1212,83 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
 #res-panel{max-height:100%!important}
 /* 월드맵 설명창도 화면 전체가 아니라 UI 폭(최대 560px)에 맞춘다 */
 #wm-info{margin:0 auto;max-width:560px;box-sizing:border-box}
+/* ---------- 병종 증표 아이콘 ---------- */
+.mat-ic{--mc:#3b82f6;position:relative;display:inline-block;flex:none;width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff8 0,transparent 32%),radial-gradient(circle,var(--mc) 0,color-mix(in srgb,var(--mc) 55%,#0b1220) 100%);box-shadow:inset 0 0 0 3px #fde68a,inset 0 0 0 5px #92400e,0 3px 6px rgba(0,0,0,.45);vertical-align:middle}
+.mat-ic>i{position:absolute;inset:9%;background-position:center;background-size:contain;background-repeat:no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.4))}
+.mat-ic.sm{width:22px;height:22px;box-shadow:inset 0 0 0 1.5px #fde68a,inset 0 0 0 2.5px #92400e,0 1px 2px rgba(0,0,0,.45)}
+.mat-SWORDSMAN{--mc:#3b82f6}.mat-SPEARMAN{--mc:#ef4444}.mat-KNIGHT{--mc:#f59e0b}.mat-ARCHER{--mc:#22c55e}.mat-MAGE{--mc:#a855f7}.mat-HEALER{--mc:#ec4899}
+.stars{display:inline-flex;gap:1px;font-size:13px;line-height:1}.stars i{font-style:normal;color:#475569;text-shadow:0 1px 0 #000}.stars i.on{color:#fde047;text-shadow:0 0 6px #f59e0b,0 1px 0 #7c2d12}
+/* 월드맵 정보창: 승리 보상 미리보기 */
+.wm-mats{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px;padding:5px 8px;border-radius:10px;background:rgba(15,23,42,.55);border:1px solid rgba(250,204,21,.35);font-size:11px}
+.wm-mats-t{font-weight:900;color:#fcd34d;margin-right:2px}.wm-mat{display:inline-flex;align-items:center;gap:3px;color:#e2e8f0;font-weight:700}.wm-mats-q{margin-left:auto;font-weight:900;color:#fde047}
+/* 업그레이드 화면 */
+.upg-inv{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;padding:8px;border-radius:12px;background:rgba(15,23,42,.6);border:1px solid rgba(250,204,21,.3)}
+.upg-inv-i{display:flex;flex-direction:column;align-items:center;gap:2px}.upg-inv-i .mat-ic{width:40px;height:40px}.upg-inv-i b{font-size:12px;color:#fde047}.upg-inv-i.none{opacity:.45}
+.upg-lv{display:flex;align-items:center;gap:6px;margin-top:3px;font-size:10px;color:#94a3b8}.upg-lv b{color:#fde68a;font-size:12px}
+.upg-xp{flex:1 1 60px;min-width:56px;max-width:120px;height:6px;border-radius:9px;background:#1e293b;box-shadow:inset 0 0 0 1px #334155;overflow:hidden}.upg-xp i{display:block;height:100%;background:linear-gradient(90deg,#38bdf8,#a5f3fc)}
+.upg-cost{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;padding-top:6px;border-top:1px dashed rgba(148,163,184,.3);font-size:11px;color:#cbd5e1}
+.upg-cost>span{display:inline-flex;align-items:center;gap:4px}.upg-cost b{color:#fde047}.upg-cost .lack b{color:#f87171}
+/* 전투: 병종 경험치 · 레벨업 */
+.sc-lv{font-size:10px;font-weight:900;color:#fde047;margin-left:4px}
+.cxp-tag{position:fixed;z-index:400;pointer-events:none;font-weight:900;font-size:13px;color:#7dd3fc;text-shadow:0 0 6px #0369a1,0 2px 0 #0c4a6e;white-space:nowrap;transform:translate(-50%,0);animation:reward-tag 1.1s ease-out forwards}
+.clv-up{position:fixed;z-index:410;pointer-events:none;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);animation:clvUp 1.7s cubic-bezier(.2,1.3,.4,1) forwards}
+.clv-up b{font-family:'Black Han Sans',sans-serif;font-size:24px;letter-spacing:.04em;color:#fde047;-webkit-text-stroke:1.5px #7c2d12;paint-order:stroke fill;text-shadow:0 0 14px #f59e0b}
+.clv-up span{font-size:11px;font-weight:900;color:#fff;background:rgba(124,45,18,.85);padding:1px 8px;border-radius:99px;margin-top:1px}
+@keyframes clvUp{0%{opacity:0;transform:translate(-50%,-30%) scale(.3)}18%{opacity:1;transform:translate(-50%,-60%) scale(1.25)}30%{transform:translate(-50%,-60%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-120%) scale(1)}}
+/* 결과: 병종 경험치 */
+.res-cxp{margin-top:10px;padding:8px;border-radius:12px;background:rgba(2,6,23,.5);border:1px solid rgba(56,189,248,.35)}
+.res-cxp-t{font-size:10px;font-weight:900;letter-spacing:.2em;color:#7dd3fc;margin-bottom:6px}
+.res-cxp-l{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.rc-i{position:relative;display:flex;flex-direction:column;align-items:center;min-width:48px;font-size:10px}.rc-i b{color:#fde68a}.rc-i span{color:#7dd3fc;font-weight:900}
+.rc-i i{position:absolute;top:-6px;right:-6px;font-style:normal;font-size:9px;font-weight:900;color:#451a03;background:linear-gradient(#fde047,#f59e0b);padding:0 4px;border-radius:6px;animation:titleBlink 1s ease-in-out infinite}
+/* ---------- 보상 슬롯 ---------- */
+#res-slot{padding:2px 0 4px}
+.slot-head{text-align:center}
+.slot-title{font-size:30px;line-height:1.1;color:#fde047;-webkit-text-stroke:1.5px #7c2d12;paint-order:stroke fill;text-shadow:0 4px 0 #7c2d12,0 0 18px rgba(251,191,36,.6)}
+.slot-sub{font-size:11px;color:#cbd5e1;margin-top:2px}.slot-sub b{color:#fde047}
+.slot-wrap{position:relative;margin:12px auto 6px;width:fit-content}
+.slot-rays{position:absolute;left:50%;top:50%;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;opacity:0;pointer-events:none;background:repeating-conic-gradient(from 0deg,rgba(253,224,71,.55) 0 10deg,transparent 10deg 24deg);-webkit-mask:radial-gradient(circle,#000 20%,transparent 68%);mask:radial-gradient(circle,#000 20%,transparent 68%)}
+.slot-wrap.jackpot .slot-rays{opacity:1;animation:slotRays 6s linear infinite}
+@keyframes slotRays{to{transform:rotate(360deg)}}
+.slot-machine{position:relative;padding:14px;border-radius:22px;background:linear-gradient(180deg,#b91c1c,#7f1d1d);box-shadow:inset 0 0 0 3px #fde68a,inset 0 0 0 6px #92400e,0 8px 20px rgba(0,0,0,.5)}
+.slot-machine.thud{animation:slotThud .22s ease-out}
+@keyframes slotThud{0%{transform:translateY(0)}35%{transform:translateY(4px) scale(1.01)}100%{transform:none}}
+.slot-machine.tension{animation:slotShake .12s linear infinite;box-shadow:inset 0 0 0 3px #fde68a,inset 0 0 0 6px #92400e,0 0 26px 6px rgba(239,68,68,.85)}
+@keyframes slotShake{0%,100%{transform:translate(0,0)}25%{transform:translate(-1.5px,1px)}75%{transform:translate(1.5px,-1px)}}
+.slot-bulbs{position:absolute;inset:4px;border-radius:19px;pointer-events:none;background:radial-gradient(circle,#fef3c7 0 2.5px,transparent 3.5px) 0 0/14px 14px;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;padding:4px;opacity:.55}
+.slot-machine.on .slot-bulbs,.slot-wrap.jackpot .slot-bulbs{animation:slotBulbs .3s steps(2) infinite;opacity:1}
+@keyframes slotBulbs{to{background-position:7px 7px}}
+.slot-reels{display:flex;gap:8px;padding:6px;border-radius:12px;background:#1c1917;box-shadow:inset 0 3px 8px #000}
+.reel{position:relative;width:76px;height:114px;overflow:hidden;border-radius:9px;background:linear-gradient(180deg,#e7e5e4,#fff 30%,#fff 70%,#d6d3d1)}
+.reel::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.55),transparent 28%,transparent 72%,rgba(0,0,0,.55))}
+.reel .strip{will-change:transform;margin-top:19px}
+.reel .sym{height:76px;display:flex;align-items:center;justify-content:center}
+.reel.spin .strip{filter:blur(2px)}
+.reel.stop .strip{filter:none}
+.reel.win{animation:reelWin .5s ease-in-out 3;box-shadow:0 0 0 3px #fde047,0 0 18px 4px rgba(253,224,71,.9)}
+@keyframes reelWin{50%{transform:scale(1.07)}}
+.slot-line{position:absolute;left:10px;right:10px;top:50%;height:2px;margin-top:-1px;background:rgba(239,68,68,.75);box-shadow:0 0 6px #ef4444;pointer-events:none}
+.slot-msg{min-height:40px;display:flex;align-items:center;justify-content:center;text-align:center}
+.slot-msg span{font-family:'Black Han Sans',sans-serif;display:inline-block;animation:endPop .5s cubic-bezier(.2,1.4,.4,1) both}
+.slot-msg .t-hot{font-size:18px;color:#fca5a5;animation:titleBlink .5s ease-in-out infinite}
+.slot-msg .t-norm{font-size:22px;color:#fde68a}
+.slot-msg .t-pair{font-size:30px;color:#7dd3fc;-webkit-text-stroke:1.5px #0c4a6e;paint-order:stroke fill;text-shadow:0 0 16px #38bdf8}
+.slot-msg .t-jack{font-size:40px;background:linear-gradient(90deg,#f87171,#fbbf24,#fde047,#4ade80,#38bdf8,#c084fc,#f87171) 0 0/200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1px rgba(124,45,18,.6);filter:drop-shadow(0 0 12px rgba(253,224,71,.9));animation:endPop .5s cubic-bezier(.2,1.4,.4,1) both,jackHue 1.2s linear infinite}
+@keyframes jackHue{to{background-position:200% 0}}
+.slot-gain{display:flex;flex-direction:column;gap:6px;margin:4px 0 10px}
+.sg-item{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:12px;background:rgba(2,6,23,.55);border:1px solid rgba(250,204,21,.4);text-align:left;animation:endPop .4s cubic-bezier(.2,1.4,.4,1) both}
+.sg-item .mat-ic{width:40px;height:40px}.sg-item div{flex:1;display:flex;flex-direction:column}.sg-item b{font-size:13px;color:#fde68a}.sg-item span{font-size:10px;color:#94a3b8}
+.sg-item em{font-style:normal;font-family:'Black Han Sans',sans-serif;font-size:24px;color:#fde047;text-shadow:0 0 10px #f59e0b}
+.slot-lever{display:block;width:100%;padding:12px 0;border-radius:14px;font-weight:900;font-size:17px;color:#3b2205;background:linear-gradient(#fde047,#f59e0b);border:2px solid #fff7ae;box-shadow:0 4px 0 #92400e,0 0 18px rgba(251,191,36,.6);animation:leverPulse 1s ease-in-out infinite}
+.slot-lever.pulled{animation:none;opacity:.6;transform:translateY(3px);box-shadow:0 1px 0 #92400e}
+.slot-lever.done{animation:none}
+@keyframes leverPulse{50%{transform:scale(1.04);box-shadow:0 4px 0 #92400e,0 0 30px rgba(251,191,36,.95)}}
+.slot-flash{position:fixed;inset:0;z-index:960;pointer-events:none;background:radial-gradient(circle,#fff,rgba(253,224,71,.6));animation:slotFlash .7s ease-out forwards}
+@keyframes slotFlash{from{opacity:1}to{opacity:0}}
+.slot-coin{position:fixed;z-index:955;pointer-events:none;width:26px;height:26px;margin:-13px 0 0 -13px;animation:slotCoin 1.3s cubic-bezier(.2,.7,.4,1) both}
+.slot-coin .ic{width:26px;height:26px;margin:0}
+@keyframes slotCoin{0%{transform:translate(0,0) scale(.4) rotate(0);opacity:1}60%{opacity:1}100%{transform:translate(var(--dx),calc(var(--dy) + 140px)) scale(1) rotate(540deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){.slot-wrap.jackpot .slot-rays,.slot-machine.tension,.slot-lever{animation:none}}
 </style>
 <script>window.__boot&&__boot(50)</script>
 </head>
@@ -1316,14 +1393,16 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
       <p id="modal-desc" class="text-slate-300 text-sm mb-3"></p>
       <div id="modal-rating" class="mb-3"></div>
     </div>
+    <div id="res-slot" class="hidden"></div>
     <div id="res-d2" class="hidden">
       <div class="text-[11px] font-black tracking-[.3em] text-amber-300 mb-1">BATTLE RESULT</div>
       <div id="res-rank" style="display:none"></div>
+      <div id="res-cxp"></div>
       
     <div id="res-btns" class="flex flex-col gap-2 res-hidden mt-4">
       <button id="modal-next" onclick="nextStage()" class="hidden w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl">▶ 진행</button>
       <button onclick="initGame()" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl">↻ 다시 도전</button>
-      <button onclick="openUpgrade()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl">🛠 병종 강화</button>
+      <button onclick="openUpgrade()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl">⚜ 병종 업그레이드</button>
     </div>
     </div>
   </div>
@@ -1339,7 +1418,7 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
       </div>
     </div>
     <div class="flex items-center justify-between mb-3">
-      <div><h2 class="title-font text-2xl text-amber-300">🛠 병종 강화</h2><p class="text-[11px] text-slate-400 mt-1">레벨마다 체력·공격력 +8%, Lv2·Lv4에서 방어력 +1. (플레이어 레벨 1당 전 병종 체력·공격 +1%) 다음 전투부터 적용됩니다.</p></div>
+      <div><h2 class="title-font text-2xl text-amber-300">⚜ 병종 업그레이드</h2><p class="text-[11px] text-slate-400 mt-1">적을 처치하면(힐러는 회복하면) 병종 레벨이 올라 체력·공격력 +2.5%, Lv5·12·20에서 방어력 +1. 승리 보상 슬롯에서 얻는 증표와 골드로 ★ 등급을 올리세요. ★마다 능력치 +15%, ★1에서 전직합니다.</p></div>
     </div>
     <div id="upg-list" class="flex flex-col gap-2.5"></div>
   </div>
@@ -1353,11 +1432,12 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
       <button onclick="dbgDo('gold2')" class="menu-btn" style="min-height:40px">💰 +100,000</button>
       <button onclick="dbgDo('xp1')" class="menu-btn" style="min-height:40px">⭐ 경험치 +500</button>
       <button onclick="dbgDo('lv1')" class="menu-btn" style="min-height:40px">⬆ 레벨 +1</button>
-      <button onclick="dbgDo('upg')" class="menu-btn" style="min-height:40px">🛠 강화 전부 MAX</button>
+      <button onclick="dbgDo('upg')" class="menu-btn" style="min-height:40px">🎁 증표 +50 (전 병종)</button>
       <button onclick="dbgDo('allclear')" class="menu-btn" style="min-height:40px">🏁 전 스테이지 클리어</button>
       <button onclick="dbgDo('unclear')" class="menu-btn" style="min-height:40px">↩ 클리어 기록 삭제</button>
-      <button onclick="dbgDo('promo')" class="menu-btn" style="min-height:40px">⚜ 전직 전부</button>
+      <button onclick="dbgDo('promo')" class="menu-btn" style="min-height:40px">⚜ 전 병종 Lv MAX · ★5</button>
       <button onclick="dbgDo('seen')" class="menu-btn" style="min-height:40px">❓ 팝업 다시 보기</button>
+      <button onclick="dbgClose();dbgDo('slot')" class="menu-btn" style="min-height:40px">🎁 슬롯 테스트 (승리 화면)</button>
     </div>
     <button id="dbg-reset" onclick="dbgDo('reset')" class="mt-3 w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-xl text-sm">⚠ 모든 기록 초기화</button>
   </div>
@@ -1421,7 +1501,7 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
 <div id="wm-tabs">
   <button data-t="map" onclick="wmTab('map')" aria-label="월드맵"><span class="t-map">🗺<b>월드맵</b></span><span class="t-back">↩<b>돌아가기</b></span></button>
   <button data-t="ach" onclick="wmTab('ach')" aria-label="업적">🏆<b>업적</b><i id="ach-dot" class="hidden"></i></button>
-  <button data-t="upg" onclick="wmTab('upg')" aria-label="강화">🛠<b>강화</b></button>
+  <button data-t="upg" onclick="wmTab('upg')" aria-label="병종 업그레이드">⚜<b>업그레이드</b></button>
   <button data-t="set" onclick="openWmSet()" aria-label="게임 설정">⚙️<b>설정</b></button>
 </div>
 
@@ -2363,12 +2443,13 @@ function dbgDo(a) {
   if (a === 'gold1') SAVE.gold += 1000;
   else if (a === 'gold2') SAVE.gold += 100000;
   else if (a === 'xp1') dbgAddXp(500);
+  else if (a === 'slot') { stats = { chests: 0 }; $('stage-select').classList.add('hidden'); showResult(true); }
   else if (a === 'lv1') dbgAddXp(xpNeed(SAVE.lv) - SAVE.xp);
-  else if (a === 'upg') Object.keys(UNIT_TYPES).forEach(k => { SAVE.upg[k] = UPG_MAX; });
+  else if (a === 'upg') UNIT_ORDER.forEach(k => { SAVE.mat[k] = matOf(k) + 50; });
   else if (a === 'allclear') { SAVE.cleared = Array.from({ length: TOTAL_STAGES }, (_, i) => i); SAVE.newUnlock = null; }
   else if (a === 'unclear') { SAVE.cleared = []; SAVE.best = {}; SAVE.newUnlock = null; SAVE.pos = 0; }
   else if (a === 'seen') SAVE.seenObj = {};
-  else if (a === 'promo') UNIT_ORDER.forEach(k => { SAVE.upg[k] = UPG_MAX; SAVE.promo[k] = 1; SAVE.upg2[k] = SAVE.upg2[k] || 0; });
+  else if (a === 'promo') UNIT_ORDER.forEach(k => { SAVE.clv[k] = CLV_MAX; SAVE.cxp[k] = 0; SAVE.star[k] = STAR_MAX; SAVE.promo[k] = 1; });
   clearedStages = SAVE.cleared; persist(); refreshGold(); dbgInfo(); achCheck();
   if (a === 'allclear' || a === 'unclear') { try { wmInit(); } catch (e) {} }
 }
@@ -2376,12 +2457,28 @@ function dbgDo(a) {
 // ---------- 달성 과제 ----------
 const UNIT_ICON = { SWORDSMAN: '🗡️', SPEARMAN: '🔱', KNIGHT: '🐎', ARCHER: '🏹', MAGE: '🔮', HEALER: '💚' };
 const UNIT_ORDER = ['SWORDSMAN', 'SPEARMAN', 'KNIGHT', 'ARCHER', 'MAGE', 'HEALER'];
-const upgLv = k => SAVE.upg[k] || 0;
-// ---------- 전직 ----------
+const upgLv = k => SAVE.upg[k] || 0;                                       // (구) 골드 강화 레벨 — 세이브 변환에만 쓴다
+// ---------- 병종 레벨: 적을 처치(힐러는 회복)하면 그 병종의 경험치가 오른다 ----------
+const CLV_MAX = 30;
+const clvNeed = lv => 15 + 10 * (lv - 1);
+const clv = k => (SAVE.clv && SAVE.clv[k]) || 1;
+const cxp = k => (SAVE.cxp && SAVE.cxp[k]) || 0;
+// ---------- 병종 업그레이드: 증표 + 골드로 ★ 등급을 올린다 (★1 = 전직) ----------
 const PROMO_NAME = { SWORDSMAN: '검성', SPEARMAN: '용창병', KNIGHT: '근위기사', ARCHER: '신궁', MAGE: '대마법사', HEALER: '성녀' };
-const PROMO_COST = 3000, UPG2_MAX = 6, UPG2_COST = [1500, 2000, 2600, 3300, 4100, 5000];
-const isPromo = k => !!(SAVE.promo && SAVE.promo[k]);
-const upg2Lv = k => (SAVE.upg2 && SAVE.upg2[k]) || 0;
+const STAR_MAX = 5, STAR_MAT = [6, 12, 20, 30, 45], STAR_GOLD = [800, 1600, 3000, 5000, 8000];
+const starOf = k => (SAVE.star && SAVE.star[k]) || 0;
+const isPromo = k => starOf(k) >= 1;
+const matOf = k => (SAVE.mat && SAVE.mat[k]) || 0;
+const matName = k => `${UNIT_TYPES[k].name}의 증표`;
+const matIcon = (k, cls = '') => `<span class="mat-ic mat-${k} ${cls}"><i class="ui-player-${k}"></i></span>`;
+const starsHtml = (n, max = STAR_MAX) => `<span class="stars">${Array.from({ length: max }, (_, i) => `<i class="${i < n ? 'on' : ''}">★</i>`).join('')}</span>`;
+// 스테이지마다 정해진 증표 3종 (시드 고정) · 후반일수록 한 칸에 더 많이
+function stageMats(i) {
+  const rng = mulberry32(48271 * (i + 1) + 11), ks = UNIT_ORDER.slice();
+  for (let j = ks.length - 1; j > 0; j--) { const r = Math.floor(rng() * (j + 1)); [ks[j], ks[r]] = [ks[r], ks[j]]; }
+  return ks.slice(0, 3);
+}
+const matQty = i => 1 + Math.floor(i / 40);
 const UNIT_KILL_TIERS = [10, 20, 40, 80, 150, 300], UNIT_KILL_REW = [80, 150, 250, 400, 700, 1200];
 const ACH = [
   { id: 'kill_all', icon: '⚔️', name: '전장의 지휘관', fmt: n => `적군 ${n}명 처치`, val: () => achStat('kill_all'), tiers: [10, 30, 60, 100, 200, 400, 800], rew: [100, 200, 300, 500, 800, 1200, 2000] },
@@ -2394,12 +2491,24 @@ const ACH = [
   { id: 'sRank', icon: '🌟', name: '완벽주의자', fmt: n => `S랭크 ${n}번 달성`, val: () => achStat('sRank'), tiers: [1, 5, 10, 20, 40], rew: [150, 400, 800, 1400, 2400] },
   { id: 'heal', icon: '✨', name: '야전 치료사', fmt: n => `아군 회복 ${n}번`, val: () => achStat('heal'), tiers: [5, 15, 30, 60, 120], rew: [80, 200, 400, 700, 1200] },
   { id: 'barricade', icon: '🧱', name: '길 뚫는 자', fmt: n => `바리케이드 ${n}개 파괴`, val: () => achStat('barricade'), tiers: [5, 15, 30, 60], rew: [80, 200, 400, 800] },
-  ...UNIT_ORDER.map(k => ({ id: 'upg_' + k, icon: UNIT_ICON[k], name: `${UNIT_TYPES[k].name} 강화`, fmt: n => `${UNIT_TYPES[k].name}를 Lv ${n}까지 강화`, val: () => upgLv(k), tiers: [1, 2, 4, 6, 8], rew: [100, 200, 400, 700, 1200] })),
-  { id: 'upg_all', icon: '🛠️', name: '병종 마스터', fmt: n => `모든 병종 강화 레벨 합계 ${n}`, val: () => UNIT_ORDER.reduce((x, k) => x + upgLv(k), 0), tiers: [6, 12, 24, 36, 48], rew: [200, 400, 800, 1400, 2400] },
+  ...UNIT_ORDER.map(k => ({ id: 'clv_' + k, icon: UNIT_ICON[k], name: `${UNIT_TYPES[k].name} 단련`, fmt: n => `${UNIT_TYPES[k].name} 병종 Lv ${n} 달성`, val: () => clv(k), tiers: [5, 10, 15, 20, 30], rew: [100, 200, 400, 700, 1200] })),
+  { id: 'clv_all', icon: '🛠️', name: '병종 마스터', fmt: n => `모든 병종 레벨 합계 ${n}`, val: () => UNIT_ORDER.reduce((x, k) => x + clv(k), 0), tiers: [30, 60, 90, 120, 180], rew: [200, 400, 800, 1400, 2400] },
+  { id: 'star', icon: '⭐', name: '★ 수집가', fmt: n => `모든 병종 ★ 합계 ${n}`, val: () => UNIT_ORDER.reduce((x, k) => x + starOf(k), 0), tiers: [3, 8, 15, 22, 30], rew: [300, 700, 1200, 2000, 3000] },
+  { id: 'jackpot', icon: '🎁', name: '행운의 손', fmt: n => `보상 슬롯 JACKPOT ${n}번`, val: () => achStat('jackpot'), tiers: [1, 5, 10, 25], rew: [200, 500, 1000, 2000] },
   { id: 'promo', icon: '⚜️', name: '전직의 길', fmt: n => `병종 ${n}개 전직`, val: () => UNIT_ORDER.filter(isPromo).length, tiers: [1, 3, 6], rew: [500, 1200, 3000] },
   { id: 'level', icon: '⭐', name: '단련하는 자', fmt: n => `플레이어 Lv ${n} 달성`, val: () => SAVE.lv, tiers: [5, 10, 20, 30, 40], rew: [200, 500, 1000, 1800, 3000] }
 ];
 SAVE.stat = SAVE.stat || {}; SAVE.achClaim = SAVE.achClaim || {}; SAVE.promo = SAVE.promo || {}; SAVE.upg2 = SAVE.upg2 || {};
+SAVE.clv = SAVE.clv || {}; SAVE.cxp = SAVE.cxp || {}; SAVE.star = SAVE.star || {}; SAVE.mat = SAVE.mat || {};
+// 병종 개편: 골드 강화 레벨 → 병종 레벨, 전직·전직 강화 → ★ 등급으로 옮긴다 (골드는 그대로)
+if (!SAVE.v3) {
+  SAVE.v3 = 1;
+  UNIT_ORDER.forEach(k => {
+    if (upgLv(k)) SAVE.clv[k] = Math.max(clv(k), Math.min(CLV_MAX, 1 + 3 * upgLv(k)));
+    if (SAVE.promo[k]) SAVE.star[k] = Math.max(starOf(k), Math.min(4, 1 + Math.floor((SAVE.upg2[k] || 0) / 2)));
+  });
+  persist();
+}
 const achStat = k => SAVE.stat[k] || 0;
 const achDone = a => a.tiers.filter(t => a.val() >= t).length;            // 달성한 단계 수
 const achClaimed = a => Math.min(a.tiers.length, SAVE.achClaim[a.id] || 0);
@@ -2492,12 +2601,52 @@ function closeAch() { $('ach-screen').classList.add('hidden'); refreshGold(); }
 function markCleared(i) { if (!SAVE.cleared.includes(i)) SAVE.cleared.push(i); persist(); }
 const isUnlocked = i => i === 0 || SAVE.cleared.includes(i - 1) || SAVE.cleared.includes(i);
 // 병종 레벨에 따른 능력치
-function statsAt(k, lv, p2) {            // p2: 전직 후 강화 단계 (전직 전이면 undefined)
-  const t = UNIT_TYPES[k], pro = p2 !== undefined && p2 >= 0;
-  const m = (1 + 0.08 * lv + 0.01 * Math.min(40, SAVE.lv - 1)) * (pro ? 1.25 + 0.10 * p2 : 1);
-  return { maxHp: Math.round(t.maxHp * m), atk: Math.round(t.atk * m), def: t.def + (lv >= 2 ? 1 : 0) + (lv >= 4 ? 1 : 0) + (lv >= 6 ? 1 : 0) + (pro ? 1 + (p2 >= 3 ? 1 : 0) + (p2 >= 6 ? 1 : 0) : 0), healPower: Math.round(t.healPower * m) };
+function statsAt(k, lv, star) {          // lv: 병종 레벨(1~30), star: ★ 등급(0~5)
+  const t = UNIT_TYPES[k];
+  const m = (1 + 0.025 * (lv - 1) + 0.01 * Math.min(40, SAVE.lv - 1)) * (1 + 0.15 * star);
+  const def = t.def + (lv >= 5) + (lv >= 12) + (lv >= 20) + (star >= 1) + (star >= 3) + (star >= 5);
+  return { maxHp: Math.round(t.maxHp * m), atk: Math.round(t.atk * m), def, healPower: Math.round(t.healPower * m) };
 }
-const curStats = k => statsAt(k, upgLv(k), isPromo(k) ? upg2Lv(k) : undefined);
+const curStats = k => statsAt(k, clv(k), starOf(k));
+// 병종 경험치: 레벨이 오르면 전장에 있는 같은 병종 아군도 바로 강해진다
+function gainClassXp(k, n, unit) {
+  if (!UNIT_TYPES[k] || clv(k) >= CLV_MAX || n <= 0) return;
+  SAVE.cxp[k] = cxp(k) + n;
+  const lv0 = clv(k);
+  while (clv(k) < CLV_MAX && SAVE.cxp[k] >= clvNeed(clv(k))) { SAVE.cxp[k] -= clvNeed(clv(k)); SAVE.clv[k] = clv(k) + 1; }
+  if (clv(k) >= CLV_MAX) SAVE.cxp[k] = 0;
+  persist();
+  stats.cxp = stats.cxp || {}; stats.cxp[k] = (stats.cxp[k] || 0) + n;
+  if (clv(k) > lv0) { stats.clvUp = stats.clvUp || {}; stats.clvUp[k] = clv(k); }
+  classXpFx(unit, n, clv(k) > lv0 ? clv(k) : 0);
+  if (clv(k) > lv0) {
+    const st = curStats(k);
+    units.forEach(u => {
+      if (u.owner !== 'player' || u.typeKey !== k || u.hp <= 0) return;
+      u.hp = Math.min(st.maxHp, u.hp + Math.max(0, st.maxHp - u.maxHp));
+      u.maxHp = st.maxHp; u.atk = st.atk; u.def = st.def; u.healPower = st.healPower;
+    });
+    addLog('성장', `<b>${UNIT_TYPES[k].name}</b> 병종 <b class="text-yellow-300">Lv ${clv(k)}</b> 달성! 체력·${k === 'HEALER' ? '회복력' : '공격력'}이 올랐습니다.`, 'text-yellow-300 font-bold');
+    achCheck();
+  }
+}
+const killXp = def => 8 + Math.round(def.maxHp * 0.08) + Math.floor(currentStage * 0.4);
+function classXpFx(unit, n, newLv) {
+  try {
+    const t = unit && document.querySelector(`#chessboard .tile[data-r="${unit.r}"][data-c="${unit.c}"]`); if (!t) return;
+    const b = t.getBoundingClientRect(), x = b.left + b.width / 2, y = b.top + b.height * 0.15;
+    setTimeout(() => {
+      const tag = document.createElement('div'); tag.className = 'cxp-tag'; tag.textContent = `+${n} EXP`;
+      tag.style.left = x + 'px'; tag.style.top = y + 'px'; document.body.appendChild(tag); setTimeout(() => tag.remove(), 1200);
+    }, 450);
+    if (newLv) setTimeout(() => {
+      const lu = document.createElement('div'); lu.className = 'clv-up'; lu.innerHTML = `<b>LEVEL UP!</b><span>${UNIT_TYPES[unit.typeKey].name} Lv ${newLv}</span>`;
+      lu.style.left = x + 'px'; lu.style.top = (y - 6) + 'px'; document.body.appendChild(lu); setTimeout(() => lu.remove(), 1700);
+      addUnitFx(unit, 'fx-heal', 0, 0, 0, 600); addTileFx(unit.r, unit.c, '✨', 'fx-burst', 0, 700);
+      (sound.play('levelup') || sound.tone('triangle', 520, 1040, 0.3, 0.2)); vibrate([30, 40, 60]);
+    }, 900);
+  } catch (e) {}
+}
 function refreshGold() {
   if (!hudFlying) syncHud();
   try { const _n = xpNeed(SAVE.lv); $('wm-lv').textContent = 'Lv ' + SAVE.lv; $('wm-xpfill').style.width = Math.min(100, SAVE.xp / _n * 100) + '%'; $('wm-xptext').textContent = `${SAVE.xp} / ${_n}`; $('wm-gold').textContent = '💰 ' + SAVE.gold.toLocaleString(); } catch (e) {}
@@ -2514,52 +2663,47 @@ function renderUpgHud() {
 function renderUpgrade() {
   refreshGold(); renderUpgHud();
   const ks = UNIT_ORDER.filter(seenU);
-  $('upg-list').innerHTML = ks.length ? ks.map(k => {
-    const t = UNIT_TYPES[k], lv = upgLv(k), heal = k === 'HEALER', pro = isPromo(k), p2 = upg2Lv(k);
-    const cur = curStats(k);
-    const d = (a, b) => b > a ? ` <b class="text-green-400">→ ${b}</b>` : '';
-    let nx = null, cost = 0, btn = '', pips = '', title = '', extra = '';
-    if (!pro && lv < UPG_MAX) { nx = statsAt(k, lv + 1); cost = UPG_COST[lv]; pips = Array.from({ length: UPG_MAX }, (_, i) => `<span style="color:${i < lv ? '#fbbf24' : '#475569'}">●</span>`).join(' '); title = `Lv ${lv}`;
-      btn = `<button onclick="buyUpgrade('${k}')" ${SAVE.gold >= cost ? '' : 'disabled'} class="shrink-0 px-3 py-2 rounded-lg font-black text-sm ${SAVE.gold >= cost ? 'bg-yellow-400 text-slate-950' : 'bg-slate-700 text-slate-400'}">💰 ${cost}</button>`; }
-    else if (!pro) { nx = statsAt(k, lv, 0); cost = PROMO_COST; title = 'Lv 8 (MAX)'; pips = Array.from({ length: UPG_MAX }, () => '<span style="color:#fbbf24">●</span>').join(' ');
-      extra = `<div class="text-[10px] text-amber-300 mt-0.5">⚜ 전직 → <b>${PROMO_NAME[k]}</b> · 이동력 +1 · 능력치 대폭 상승 · 새로운 모습</div>`;
-      btn = `<button onclick="promote('${k}')" ${SAVE.gold >= cost ? '' : 'disabled'} class="shrink-0 px-3 py-2 rounded-lg font-black text-sm ${SAVE.gold >= cost ? 'promo-btn' : 'bg-slate-700 text-slate-400'}">⚜ 전직<br><span class="text-[11px]">💰 ${cost}</span></button>`; }
-    else if (p2 < UPG2_MAX) { nx = statsAt(k, UPG_MAX, p2 + 1); cost = UPG2_COST[p2]; title = `⚜ ${PROMO_NAME[k]} Lv ${p2}`; pips = Array.from({ length: UPG2_MAX }, (_, i) => `<span style="color:${i < p2 ? '#c084fc' : '#475569'}">◆</span>`).join(' ');
-      btn = `<button onclick="buyPromoUpgrade('${k}')" ${SAVE.gold >= cost ? '' : 'disabled'} class="shrink-0 px-3 py-2 rounded-lg font-black text-sm ${SAVE.gold >= cost ? 'bg-purple-400 text-slate-950' : 'bg-slate-700 text-slate-400'}">💰 ${cost}</button>`; }
-    else { title = `⚜ ${PROMO_NAME[k]} Lv ${p2} (MAX)`; pips = Array.from({ length: UPG2_MAX }, () => '<span style="color:#c084fc">◆</span>').join(' '); btn = '<div class="shrink-0 px-3 py-2 font-black text-sm text-slate-400">MAX</div>'; }
-    return `<div class="panel p-3 flex items-center gap-3 ${pro || (!pro && lv >= UPG_MAX) ? 'promo-card' : ''}">
-      <div class="w-12 h-12 shrink-0">${portrait(k, 'player')}</div>
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center gap-2 flex-wrap"><span class="font-black ${t.color}">${pro ? PROMO_NAME[k] : t.name}</span><span class="text-[11px] text-slate-400">${title}</span><span class="text-[10px]">${pips}</span></div>
-        <div class="text-[11px] text-slate-300 mt-0.5">HP ${cur.maxHp}${nx ? d(cur.maxHp, nx.maxHp) : ''} · ${heal ? '회복' : '공격'} ${heal ? cur.healPower : cur.atk}${nx ? d(heal ? cur.healPower : cur.atk, heal ? nx.healPower : nx.atk) : ''} · 방어 ${cur.def}${nx ? d(cur.def, nx.def) : ''}${pro ? ' · <b class="text-sky-300">이동 +1</b>' : ''}</div>${extra}
-      </div>${btn}
+  const inv = `<div class="upg-inv">${UNIT_ORDER.map(k => `<div class="upg-inv-i${matOf(k) ? '' : ' none'}">${matIcon(k)}<b>${matOf(k)}</b></div>`).join('')}</div>`;
+  $('upg-list').innerHTML = inv + (ks.length ? ks.map(k => {
+    const t = UNIT_TYPES[k], lv = clv(k), star = starOf(k), heal = k === 'HEALER', cur = curStats(k), max = star >= STAR_MAX;
+    const nx = max ? null : statsAt(k, lv, star + 1);
+    const d = (a, b) => nx && b > a ? ` <b class="text-green-400">→ ${b}</b>` : '';
+    const needM = max ? 0 : STAR_MAT[star], needG = max ? 0 : STAR_GOLD[star], okM = matOf(k) >= needM, okG = SAVE.gold >= needG;
+    const xpPct = lv >= CLV_MAX ? 100 : Math.min(100, cxp(k) / clvNeed(lv) * 100);
+    const cost = max ? '' : `<div class="upg-cost"><span class="${okM ? '' : 'lack'}">${matIcon(k, 'sm')} ${matName(k)} <b>${matOf(k)}</b> / ${needM}</span><span class="${okG ? '' : 'lack'}">💰 <b>${needG.toLocaleString()}</b></span></div>`;
+    const btn = max ? '<div class="shrink-0 px-3 py-2 font-black text-sm text-amber-300">MAX</div>'
+      : `<button onclick="starUp('${k}')" ${okM && okG ? '' : 'disabled'} class="shrink-0 px-3 py-2 rounded-lg font-black text-sm ${okM && okG ? (star ? 'bg-yellow-400 text-slate-950' : 'promo-btn') : 'bg-slate-700 text-slate-400'}">${star ? '★ 업그레이드' : '⚜ 전직'}</button>`;
+    return `<div class="panel p-3 ${star ? 'promo-card' : ''}">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 shrink-0">${portrait(k, 'player')}</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap"><span class="font-black ${t.color}">${star ? PROMO_NAME[k] : t.name}</span>${starsHtml(star)}</div>
+          <div class="upg-lv"><b>Lv ${lv}</b><div class="upg-xp"><i style="width:${xpPct}%"></i></div><span>${lv >= CLV_MAX ? 'MAX' : `${cxp(k)} / ${clvNeed(lv)} EXP`}</span></div>
+          <div class="text-[11px] text-slate-300 mt-0.5">HP ${cur.maxHp}${d(cur.maxHp, nx && nx.maxHp)} · ${heal ? '회복' : '공격'} ${heal ? cur.healPower : cur.atk}${d(heal ? cur.healPower : cur.atk, nx && (heal ? nx.healPower : nx.atk))} · 방어 ${cur.def}${d(cur.def, nx && nx.def)}${star ? ' · <b class="text-sky-300">이동 +1</b>' : ''}</div>
+        </div>${btn}
+      </div>
+      ${!star ? `<div class="text-[10px] text-amber-300 mt-1.5">⚜ ★1 전직 → <b>${PROMO_NAME[k]}</b> · 이동력 +1 · 능력치 상승 · 새로운 모습</div>` : ''}${cost}
     </div>`;
-  }).join('') : '<div class="text-sm text-slate-500 text-center py-6">아직 만난 병종이 없습니다. 출정해서 병종을 만나보세요!</div>';
+  }).join('') : '<div class="text-sm text-slate-500 text-center py-6">아직 만난 병종이 없습니다. 출정해서 병종을 만나보세요!</div>');
 }
-function buyPromoUpgrade(k) {
-  const p2 = upg2Lv(k); if (!isPromo(k) || p2 >= UPG2_MAX) return;
-  const cost = UPG2_COST[p2]; if (SAVE.gold < cost) return;
-  SAVE.gold -= cost; SAVE.upg2[k] = p2 + 1; persist(); (sound.play('upgrade') || sound.playHeal()); renderUpgrade(); achCheck();
-}
-function promote(k) {
-  if (isPromo(k) || upgLv(k) < UPG_MAX || SAVE.gold < PROMO_COST) return;
-  SAVE.gold -= PROMO_COST; SAVE.promo[k] = 1; SAVE.upg2[k] = 0; persist(); renderUpgrade(); achCheck(); showPromoPopup(k);
+function starUp(k) {
+  const star = starOf(k); if (star >= STAR_MAX) return;
+  const needM = STAR_MAT[star], needG = STAR_GOLD[star]; if (matOf(k) < needM || SAVE.gold < needG) return;
+  SAVE.mat[k] = matOf(k) - needM; SAVE.gold -= needG; SAVE.star[k] = star + 1;
+  if (star === 0) SAVE.promo[k] = 1;
+  persist(); renderUpgrade(); achCheck(); showPromoPopup(k);
 }
 function showPromoPopup(k) {
-  const t = UNIT_TYPES[k], st = curStats(k), heal = k === 'HEALER';
+  const t = UNIT_TYPES[k], st = curStats(k), heal = k === 'HEALER', star = starOf(k), first = star === 1;
   objQueue = [];
   const img = $('obj-img'); img.style.cssText = 'position:relative;width:120px;height:120px;margin:8px auto;border-radius:16px;overflow:hidden;--tile:100px;background:radial-gradient(circle,#78350f,#1c1917);box-shadow:0 0 0 3px #fcd34d,0 0 26px rgba(251,191,36,.8)';
   img.innerHTML = `<div class="token relative" style="${teamStyle('player')};width:100%;height:100%"><div class="unit-art promo-art">${unitSvg(k, true, 'player')}</div></div>`;
-  $('obj-tag').textContent = '⚜ 전직 완료!'; $('obj-title').textContent = `${t.name} → ${PROMO_NAME[k]}`;
+  $('obj-tag').innerHTML = first ? '⚜ 전직 완료!' : `${starsHtml(star)} 등급 상승!`;
+  $('obj-title').textContent = first ? `${t.name} → ${PROMO_NAME[k]}` : `${PROMO_NAME[k]} ★${star}`;
   $('obj-desc').style.whiteSpace = 'pre-line';
-  $('obj-desc').textContent = `새로운 모습으로 다시 태어났습니다!\n이동력 +1 · 체력 ${st.maxHp} · ${heal ? '회복력 ' + st.healPower : '공격 ' + st.atk} · 방어 ${st.def}\n이제 전직 강화로 능력치를 더 올릴 수 있어요.`;
+  $('obj-desc').textContent = `${first ? '새로운 모습으로 다시 태어났습니다!\n이동력 +1 · ' : ''}체력 ${st.maxHp} · ${heal ? '회복력 ' + st.healPower : '공격 ' + st.atk} · 방어 ${st.def}\n${star < STAR_MAX ? '증표를 모아 ★ 등급을 더 올릴 수 있어요.' : '최고 등급에 도달했습니다!'}`;
   $('obj-ok').textContent = '확인'; $('obj-modal').classList.remove('hidden');
   try { sound.play('promote'); confettiBurst(img, 40); } catch (e) {}
-}
-function buyUpgrade(k) {
-  const lv = upgLv(k); if (lv >= UPG_MAX) return;
-  const cost = UPG_COST[lv]; if (SAVE.gold < cost) return;
-  SAVE.gold -= cost; SAVE.upg[k] = lv + 1; persist(); (sound.play('upgrade') || sound.playHeal()); renderUpgrade(); achCheck();
 }
 // 전투 평가: 점수 → 등급(S/A/B/C) → 별
 function rateBattle() {
@@ -2744,7 +2888,8 @@ function wmShowInfo(i) {
       <div class="font-bold text-slate-100 text-sm truncate">${th.icon} ${st.name}</div>
       <div class="text-[11px] text-slate-400 leading-snug mt-0.5" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${st.concept}</div>${wmTags(st)}</div></div>
     <div class="text-[11px] text-emerald-300 mt-1.5 leading-snug">💡 ${st.tip}</div>
-    <div class="flex gap-2 mt-2"><button onclick="wmStart(${i})" class="flex-1 py-2.5 rounded-xl font-black text-slate-950 bg-amber-500 hover:bg-amber-400">⚔ ${done ? '다시 도전' : '출정!'}</button><button onclick="openUpgrade()" class="px-4 py-2.5 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-500 border border-indigo-400">🛠 강화</button></div>`;
+    <div class="wm-mats"><span class="wm-mats-t">🎁 승리 보상 슬롯</span>${stageMats(i).map(k => `<span class="wm-mat">${matIcon(k, 'sm')}<span>${UNIT_TYPES[k].name}</span></span>`).join('')}<span class="wm-mats-q">×${matQty(i)}</span></div>
+    <div class="flex gap-2 mt-2"><button onclick="wmStart(${i})" class="flex-1 py-2.5 rounded-xl font-black text-slate-950 bg-amber-500 hover:bg-amber-400">⚔ ${done ? '다시 도전' : '출정!'}</button><button onclick="openUpgrade()" class="px-4 py-2.5 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-500 border border-indigo-400">⚜ 업그레이드</button></div>`;
   box.classList.remove('hidden', 'tuck'); setTimeout(() => wmLabel(), 0);
 }
 function wmToggleInfo() { $('wm-info').classList.toggle('tuck'); }
@@ -3899,6 +4044,7 @@ function executeAttack(att, def) {
     units = units.filter(u => u !== def);
     if (def.typeKey !== 'OBSTACLE') setTimeout(() => sound.play('unit_down'), 260);
     if (def.owner === 'ai') rewardKill(def);
+    if (def.owner === 'ai' && att.owner === 'player') gainClassXp(att.typeKey, killXp(def), att);
     if (def.typeKey === 'OBSTACLE' && !def.bomb && att.owner === 'player') achAdd('barricade');
     addLog('전투', `<b>${def.name}</b>(이)가 ${def.typeKey === 'OBSTACLE' ? '파괴되었습니다! 길이 열렸습니다.' : '쓰러졌습니다!'}`, 'text-amber-400 font-bold');
     if (def.bomb) setTimeout(() => explodeBomb(def), 300);
@@ -3943,7 +4089,7 @@ function executeHeal(healer, target) {
   const prev = target.hp;
   target.hp = Math.min(target.maxHp, target.hp + healer.healPower);
   const healed = target.hp - prev;
-  if (healer.owner === 'player' && healed > 0) achAdd('heal');
+  if (healer.owner === 'player' && healed > 0) { achAdd('heal'); gainClassXp('HEALER', 4 + Math.round(healed * 0.15), healer); }
   const hx = target.c - healer.c, hy = target.r - healer.r, hl = Math.hypot(hx, hy) || 1;
   addUnitFx(healer, 'fx-lunge', hx / hl, hy / hl, 0, 350);
   addUnitFx(target, 'fx-heal', 0, 0, 100, 500);
@@ -4246,6 +4392,117 @@ function resCount(el, to, dur, fmt) {
   });
 }
 const elCenter = el => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
+// ---------- 보상 슬롯 ----------
+// 결과는 먼저 정하고(rollSlot) 연출은 그 결과에 맞춰 멈춘다. 랭크가 높을수록 JACKPOT 확률이 오른다.
+function rollSlot(i, grade) {
+  const pool = stageMats(i), q = matQty(i), pick = () => pool[Math.floor(Math.random() * pool.length)];
+  const pJack = { S: 0.2, A: 0.13, B: 0.08, C: 0.05 }[grade] || 0.05, r = Math.random();
+  let reels, kind;
+  if (r < pJack) { const k = pick(); reels = [k, k, k]; kind = 'jackpot'; }
+  else if (r < pJack + 0.4) {
+    const k = pick(), o = pool.filter(x => x !== k)[Math.floor(Math.random() * 2)], at = Math.floor(Math.random() * 3);
+    reels = [k, k, k]; reels[at] = o; kind = 'pair';
+  } else { reels = pool.slice().sort(() => Math.random() - 0.5); kind = 'none'; }
+  const gain = {}, pairK = kind === 'pair' ? reels.find((x, j) => reels.indexOf(x) !== j) : null;
+  reels.forEach(k => { gain[k] = (gain[k] || 0) + q * (kind === 'jackpot' ? 3 : k === pairK ? 2 : 1); });
+  return { stage: i, pool, q, reels, kind, gain };
+}
+const SLOT_SYM = 76;   // 심볼 한 칸 높이(px)
+async function playSlot(sl) {
+  const box = $('res-slot'), d1 = $('res-d1');
+  d1.classList.add('res-out'); await wait(280); d1.classList.add('hidden'); d1.classList.remove('res-out');
+  const strips = sl.reels.map((k, j) => { const n = 26 + j * 8, a = []; for (let x = 0; x < n; x++) a.push(sl.pool[Math.floor(Math.random() * sl.pool.length)]); a.push(k, sl.pool[(sl.pool.indexOf(k) + 1) % sl.pool.length]); return a; });
+  box.innerHTML = `<div class="slot-head"><div class="slot-title title-font">보상 슬롯</div><div class="slot-sub">같은 증표 2개 <b>×2</b> · 3개 <b>JACKPOT ×3</b></div></div>
+    <div class="slot-wrap"><div class="slot-rays"></div><div class="slot-machine" id="slot-machine"><div class="slot-bulbs"></div>
+      <div class="slot-reels">${strips.map((a, j) => `<div class="reel" id="reel-${j}"><div class="strip">${a.map(k => `<div class="sym">${matIcon(k)}</div>`).join('')}</div></div>`).join('')}</div>
+      <div class="slot-line"></div></div></div>
+    <div id="slot-msg" class="slot-msg"></div>
+    <div id="slot-gain" class="slot-gain"></div>
+    <button id="slot-lever" class="slot-lever">레버 당기기!</button>`;
+  box.classList.remove('hidden'); box.classList.add('res-in');
+  strips.forEach((a, j) => { $('reel-' + j).firstElementChild.style.transform = 'translateY(0)'; });
+  sound.tone('triangle', 660, 990, 0.12, 0.15);
+  // 레버를 당기거나(또는 화면 터치) 4초가 지나면 돈다
+  resSkip = false;
+  await new Promise(go => { const lv = $('slot-lever'); let t = 0; const f = () => { clearTimeout(t); lv.onclick = null; go(); }; lv.onclick = f; t = setTimeout(f, 4000); });
+  const lever = $('slot-lever'); lever.classList.add('pulled'); lever.textContent = '돌아가는 중...';
+  const mach = $('slot-machine'); mach.classList.add('on'); vibrate(30);
+  sound.tone('sawtooth', 180, 90, 0.25, 0.15);
+  const tension = sl.reels[0] === sl.reels[1];
+  const stopAt = [1300, 2000, tension ? 4300 : 2700];
+  let ticking = true, tickGap = 55;
+  (async () => { while (ticking) { sound.tone('square', 900 + Math.random() * 300, 700, 0.03, 0.05); await wait(tickGap); } })();
+  strips.forEach((a, j) => {
+    const r = $('reel-' + j), st = r.firstElementChild, y = -(a.length - 2) * SLOT_SYM;
+    r.classList.add('spin');
+    st.style.transition = `transform ${stopAt[j]}ms cubic-bezier(.15,.55,.22,1.06)`;
+    requestAnimationFrame(() => { st.style.transform = `translateY(${y}px)`; });
+  });
+  for (let j = 0; j < 3; j++) {
+    await wait(stopAt[j] - (j ? stopAt[j - 1] : 0) - (j === 2 && tension ? 0 : 0));
+    const r = $('reel-' + j); r.classList.remove('spin'); r.classList.add('stop');
+    sound.tone('square', 220, 110, 0.12, 0.25); sound.tone('sine', 140, 70, 0.18, 0.3); vibrate(25);
+    mach.classList.remove('thud'); void mach.offsetWidth; mach.classList.add('thud');
+    if (j === 0) tickGap = 75;
+    if (j === 1 && tension) {
+      tickGap = 120; mach.classList.add('tension'); $('slot-msg').innerHTML = '<span class="t-hot">두근두근... 하나만 더!</span>';
+      (async () => { for (let b = 0; b < 8 && ticking; b++) { sound.tone('sine', 70, 55, 0.14, 0.5); await wait(140); sound.tone('sine', 70, 55, 0.1, 0.35); await wait(140); } })();
+    }
+  }
+  ticking = false; mach.classList.remove('on', 'tension');
+  // ---- 결과 연출 ----
+  const msg = $('slot-msg'), wrap = box.querySelector('.slot-wrap');
+  if (sl.kind === 'jackpot') {
+    wrap.classList.add('jackpot'); [0, 1, 2].forEach(j => $('reel-' + j).classList.add('win'));
+    msg.innerHTML = '<span class="t-jack">JACKPOT!!</span>';
+    const fl = document.createElement('div'); fl.className = 'slot-flash'; document.body.appendChild(fl); setTimeout(() => fl.remove(), 700);
+    (sound.play('jingle_win') || 0); setTimeout(() => sound.play('achievement'), 350);
+    [523, 659, 784, 1047].forEach((f, i) => sound.tone('triangle', f, f, 0.25, 0.25, i * 0.09));
+    vibrate([80, 40, 80, 40, 220]);
+    confettiBurst(wrap, 60); setTimeout(() => confettiBurst(wrap, 50), 450); setTimeout(() => confettiBurst(msg, 40), 900);
+    slotCoins(wrap, 26);
+  } else if (sl.kind === 'pair') {
+    const k = sl.reels.find((x, j) => sl.reels.indexOf(x) !== j);
+    sl.reels.forEach((x, j) => { if (x === k) $('reel-' + j).classList.add('win'); });
+    msg.innerHTML = '<span class="t-pair">DOUBLE!</span>';
+    (sound.play('levelup') || 0); [523, 784].forEach((f, i) => sound.tone('triangle', f, f, 0.2, 0.2, i * 0.1));
+    vibrate([50, 40, 90]); confettiBurst(wrap, 34); slotCoins(wrap, 10);
+  } else {
+    msg.innerHTML = '<span class="t-norm">보상 획득!</span>';
+    [440, 554, 659].forEach((f, i) => sound.tone('triangle', f, f, 0.15, 0.18, i * 0.08));
+  }
+  await wait(650);
+  // 획득한 증표가 하나씩 튀어나온다
+  const g = $('slot-gain');
+  for (const [k, n] of Object.entries(sl.gain)) {
+    const el = document.createElement('div'); el.className = 'sg-item';
+    el.innerHTML = `${matIcon(k)}<div><b>${matName(k)}</b><span>보유 ${matOf(k)}</span></div><em>+${n}</em>`;
+    g.appendChild(el); sound.play('gold') || sound.tone('sine', 880, 1320, 0.1, 0.15); await wait(260);
+  }
+  lever.textContent = '계속'; lever.classList.remove('pulled'); lever.classList.add('done');
+  resSkip = false;
+  await new Promise(go => { let t = 0; const f = () => { clearTimeout(t); lever.onclick = null; go(); }; lever.onclick = f; t = setTimeout(f, 3500); });
+  box.classList.add('res-out'); await wait(280); box.classList.remove('res-out', 'res-in');
+}
+function slotCoins(anchor, n) {
+  try {
+    const b = anchor.getBoundingClientRect(), cx = b.left + b.width / 2, cy = b.top + b.height / 2;
+    for (let i = 0; i < n; i++) {
+      const c = document.createElement('div'); c.className = 'slot-coin'; c.innerHTML = '<span class="ic ic-coin"></span>';
+      const a = Math.random() * Math.PI * 2, d = 90 + Math.random() * 160;
+      c.style.left = cx + 'px'; c.style.top = cy + 'px';
+      c.style.setProperty('--dx', Math.cos(a) * d + 'px'); c.style.setProperty('--dy', (Math.sin(a) * d - 80) + 'px');
+      c.style.animationDelay = (Math.random() * 0.25) + 's';
+      document.body.appendChild(c); setTimeout(() => c.remove(), 1600);
+    }
+  } catch (e) {}
+}
+// 결과 2뎁스: 이번 전투에서 오른 병종 경험치
+function cxpHtml() {
+  const g = stats.cxp || {}, ks = UNIT_ORDER.filter(k => g[k]);
+  if (!ks.length) return '';
+  return `<div class="res-cxp"><div class="res-cxp-t">병종 경험치</div><div class="res-cxp-l">${ks.map(k => `<div class="rc-i${stats.clvUp && stats.clvUp[k] ? ' up' : ''}"><div class="w-9 h-9">${portrait(k, 'player')}</div><b>Lv ${clv(k)}</b><span>+${g[k]}</span>${stats.clvUp && stats.clvUp[k] ? '<i>UP!</i>' : ''}</div>`).join('')}</div></div>`;
+}
 async function playResultSeq(o) {
   resSkip = false; resBusy = true;
   const panel = $('res-panel'), onTap = () => { resSkip = true; };
@@ -4280,10 +4537,13 @@ async function playResultSeq(o) {
     }), wait(5000)]);
     await resWait(o.ups ? 1500 : 500);
     if (o.ups) { const n = document.createElement('div'); n.className = 'text-[11px] text-yellow-200 mt-1 text-center'; n.textContent = `플레이어 레벨 ${SAVE.lv}: 전 병종 체력·공격력 +${SAVE.lv - 1}% 적용 중`; $('res-rewards').appendChild(n); }
+    // ---- 승리하면 보상 슬롯 ----
+    if (o.slot) await playSlot(o.slot);
     // ---- 1뎁스(보상) 연출이 끝나면 자동으로 2뎁스(랭크·상세·언락·버튼)로 넘어간다 ----
     resSkip = false;
     await wait(350);
     const d1 = $('res-d1'), d2 = $('res-d2');
+    $('res-slot').classList.add('hidden');
     d1.classList.add('res-out'); sound.tone('sine', 500, 900, 0.18, 0.08);
     await wait(280);
     d1.classList.add('hidden'); d1.classList.remove('res-out'); d2.classList.remove('hidden'); d2.classList.add('res-in'); panel.scrollTop = 0;
@@ -4303,7 +4563,7 @@ async function playResultSeq(o) {
   finally {
     panel.removeEventListener('pointerdown', onTap);
     try {
-      $('res-d1').classList.add('hidden'); $('res-d2').classList.remove('hidden');
+      $('res-d1').classList.add('hidden'); $('res-slot').classList.add('hidden'); $('res-d2').classList.remove('hidden');
       if (o.rankHtml) $('res-rank').style.display = 'block';
       if (o.unlockHtml && !$('res-unlock').innerHTML && !$('res-unlock').dataset.done) $('res-unlock').innerHTML = o.unlockHtml;
       rs.lv = SAVE.lv; rs.xp = SAVE.xp; rs.gold = SAVE.gold; renderResHud();
@@ -4317,7 +4577,7 @@ function showResult(win, reason) {
   $('modal-icon').innerHTML = `<span class="ui-ico" style="background-image:var(--u-res_${win ? 'win' : 'lose'})"></span>`;
   $('modal-title').innerText = win ? '승리하였습니다!' : '패배하였습니다...';
   $('modal-title').className = `title-font text-3xl mb-2 ${win ? 'text-amber-400' : 'text-red-400'}`;
-  $('modal-desc').innerText = reason ? reason : win ? (!last ? '모든 적군을 물리쳤습니다. 다음 전장이 기다립니다!' : '모든 스테이지를 정복했습니다! 당신이 진정한 지휘관입니다.') : '아군 부대가 전멸했습니다. 병종을 강화하거나 난이도를 조절해 다시 도전해보세요.';
+  $('modal-desc').innerText = reason ? reason : win ? (!last ? '모든 적군을 물리쳤습니다. 다음 전장이 기다립니다!' : '모든 스테이지를 정복했습니다! 당신이 진정한 지휘관입니다.') : '아군 부대가 전멸했습니다. 병종 레벨을 올리거나 ★ 업그레이드 후 다시 도전해보세요.';
   const base = stageGold(currentStage);
   const g0 = SAVE.gold, lv0 = SAVE.lv, xp0 = SAVE.xp;
   let rankHtml = '', unlockHtml = '', rows = [], gold = 0, rateGrade = 'C', firstClear = false;
@@ -4343,7 +4603,7 @@ function showResult(win, reason) {
         <div class="bg-slate-950/50 border border-slate-700 rounded-lg p-1.5"><div class="text-slate-400">남은 체력</div><div class="font-black text-emerald-300">${Math.round(r.hpRatio * 100)}%</div></div>
       </div>`;
   } else {
-    gold = Math.round(base * 0.15); rows = [['위로 보상', gold, '병종 강화로 다음 도전을 준비하세요']];
+    gold = Math.round(base * 0.15); rows = [['위로 보상', gold, '병종 업그레이드로 다음 도전을 준비하세요']];
   }
   const xpGain = win ? Math.round((50 + currentStage * 4) * { S: 1.5, A: 1.25, B: 1, C: 0.8 }[rateGrade] + (firstClear ? 40 : 0)) : 20;
   if (win && firstClear && !last) {
@@ -4351,7 +4611,10 @@ function showResult(win, reason) {
     unlockHtml = `<div class="unlock-banner" id="unlock-banner"><div class="ub-lock"><span class="l1">🔒</span><span class="l2">🔓</span></div><div class="flex-1 min-w-0"><div class="text-[10px] text-amber-300 font-black tracking-widest">NEW STAGE UNLOCKED</div><div class="font-black text-amber-100 leading-tight">STAGE ${currentStage + 2} · ${nx.name}</div><div class="text-[10px] text-slate-300">${nx.layout[0].length}×${nx.layout.length} · ${THEMES[nx.theme].icon} 새로운 전장이 열렸습니다!${(nx.newObj || []).length ? ' · ✨ 새 오브젝트: ' + nx.newObj.map(x => UNLOCK_LABEL[x]).join(', ') : ''}</div></div></div>`;
   }
   // 저장은 즉시 (연출 도중 닫혀도 보상은 반영), 화면의 헤더 값은 연출에 맞춰 천천히 따라간다
-  SAVE.gold += gold; const ups = grant(SAVE, 0, xpGain); persist(); setTimeout(achCheck, 1200);
+  SAVE.gold += gold; const ups = grant(SAVE, 0, xpGain);
+  const slot = win ? rollSlot(currentStage, rateGrade) : null;           // 증표는 결과가 뜨는 즉시 저장 (연출을 건너뛰어도 받음)
+  if (slot) { Object.entries(slot.gain).forEach(([k, n]) => { SAVE.mat[k] = matOf(k) + n; }); if (slot.kind === 'jackpot') SAVE.stat.jackpot = (SAVE.stat.jackpot || 0) + 1; }
+  persist(); setTimeout(achCheck, 1200);
   rs.lv = lv0; rs.xp = xp0; rs.gold = g0; renderResHud();
   $('modal-rating').innerHTML = `<div id="res-rewards">
       <div class="bg-slate-950/50 border border-yellow-700/40 rounded-xl p-2.5 text-left text-xs">
@@ -4362,13 +4625,15 @@ function showResult(win, reason) {
       <div id="res-hint" class="text-[10px] text-slate-500 mt-1.5">터치하면 건너뜁니다</div>
     </div>
     `;
+  $('res-cxp').innerHTML = cxpHtml();
+  $('res-slot').classList.add('hidden'); $('res-slot').innerHTML = '';
   $('res-rank').innerHTML = rankHtml; $('res-rank').style.display = 'none'; $('res-rank').classList.remove('res-pop'); $('res-unlock').innerHTML = ''; delete $('res-unlock').dataset.done;
   $('res-d1').classList.remove('hidden', 'res-out'); $('res-d2').classList.add('hidden'); $('res-d2').classList.remove('res-in');
   $('res-panel').scrollTop = 0;
   $('res-btns').classList.add('res-hidden');
   $('modal-next').classList.toggle('hidden', !(win && !last));
   $('game-over-modal').classList.remove('hidden');
-  playResultSeq({ rows, gold, xp: xpGain, ups, rankHtml, unlockHtml, grade: rateGrade });
+  playResultSeq({ rows, gold, xp: xpGain, ups, rankHtml, unlockHtml, grade: rateGrade, slot });
 }
 
 function updateTurnBadge(deferDim) {
@@ -4394,7 +4659,7 @@ function scHtml(unit) {
   const t = UNIT_TYPES[unit.typeKey], mine = unit.owner === 'player', heal = unit.typeKey === 'HEALER', ev = evadeParts(unit), mo = momentum[unit.owner] || 0;
   const atk = heal ? unit.healPower : unit.atk * DAMAGE_SCALE * castleBonus(unit, unit.r, unit.c);
   const ex = (mo ? `<span class="sc-st ${mo > 0 ? 'up' : 'down'}"><em>${mo > 0 ? '🔥' : '🧊'}</em>기세<b>${mo > 0 ? '+' : ''}${mo}</b></span>` : '') + (castleBonus(unit, unit.r, unit.c) > 1 ? '<span class="sc-st up"><em>🛡</em>성 수비<b>×2</b></span>' : '') + (!heal && catapultActive(unit.r, unit.c) ? '<span class="sc-st up"><em>🪨</em>투석기<b></b></span>' : '');
-  return `<div class="sc-face ${mine ? 'ally' : 'foe'}">${portrait(unit.typeKey, unit.owner, !!unit.promo)}</div><div class="sc-body"><div class="sc-top"><b class="sc-name">${unit.name}</b><span class="sc-tag ${mine ? 'ally' : 'foe'}">${mine ? '아군' : '적군'}</span><span class="sc-cls">${t.tag}</span></div><div class="sc-hp">${bar(mine ? 'ally' : 'foe', unit.hp / unit.maxHp)}<b>${unit.hp}/${unit.maxHp}</b></div><div class="sc-stats">${stat(heal ? '💚' : '⚔', heal ? '회복' : '공격', atk)}${stat('🛡', '방어', unit.def)}${stat('💨', '회피', ev.total + '%')}${ex}</div></div>`;
+  return `<div class="sc-face ${mine ? 'ally' : 'foe'}">${portrait(unit.typeKey, unit.owner, !!unit.promo)}</div><div class="sc-body"><div class="sc-top"><b class="sc-name">${unit.name}</b>${mine ? `<span class="sc-lv">Lv ${clv(unit.typeKey)}${starOf(unit.typeKey) ? ' ★' + starOf(unit.typeKey) : ''}</span>` : ''}<span class="sc-tag ${mine ? 'ally' : 'foe'}">${mine ? '아군' : '적군'}</span><span class="sc-cls">${t.tag}</span></div><div class="sc-hp">${bar(mine ? 'ally' : 'foe', unit.hp / unit.maxHp)}<b>${unit.hp}/${unit.maxHp}</b></div><div class="sc-stats">${stat(heal ? '💚' : '⚔', heal ? '회복' : '공격', atk)}${stat('🛡', '방어', unit.def)}${stat('💨', '회피', ev.total + '%')}${ex}</div></div>`;
 }
 { const _udp = updateDetailPanel; updateDetailPanel = function (unit) { _udp(unit); const chip = $('unit-chip'); if (chip) chip.innerHTML = unit ? scHtml(unit) : ''; }; }
 function setInstruction(msg) { $('phase-instruction').innerText = msg; }
