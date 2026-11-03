@@ -1170,9 +1170,9 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
 #wm-body{flex:1 1 auto;min-height:0;position:relative;display:flex;flex-direction:column}
 /* 하단 탭: 월드맵·업적·업그레이드 화면이 열려 있을 때만 보이고, 열린 화면에 맞춰 탭이 켜진다 */
 #wm-tabs{display:none;position:fixed;left:0;right:0;bottom:calc(6px + env(safe-area-inset-bottom));z-index:78;isolation:isolate;align-items:center;width:calc(100% - 16px);max-width:544px;height:56px;box-sizing:border-box;margin:0 auto;padding:4px 18px}
-#stage-select:not(.hidden)~#wm-tabs,#ach-screen:not(.hidden)~#wm-tabs,#upgrade-screen:not(.hidden)~#wm-tabs{display:flex}
+#stage-select:not(.hidden)~#wm-tabs,#ach-screen:not(.hidden)~#wm-tabs,#upgrade-screen:not(.hidden)~#wm-tabs,#inv-screen:not(.hidden)~#wm-tabs{display:flex}
 #wm-tabs-sp{flex:none;height:calc(66px + env(safe-area-inset-bottom))}
-#ach-screen>div,#upgrade-screen>div{padding-bottom:calc(84px + env(safe-area-inset-bottom))!important}
+#ach-screen>div,#upgrade-screen>div,#inv-screen>div{padding-bottom:calc(84px + env(safe-area-inset-bottom))!important}
 #wm-tabs::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;border:solid transparent;border-width:0 31px 0 30px;border-image-source:var(--u-n_tab_bar);border-image-slice:0 78 0 74 fill;border-image-width:0 31px 0 30px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.45))}
 #wm-tabs button{flex:1;position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;height:48px;padding:0;background:none;border:0;font-size:24px;line-height:1;-webkit-tap-highlight-color:transparent;transition:transform .12s}
 #wm-tabs button>span{display:flex;flex-direction:column;align-items:center;gap:1px}
@@ -1181,8 +1181,8 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
 #wm-tabs button:active{transform:scale(.9)}
 #wm-tabs button .ic{width:26px;height:26px;margin:0;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
 #wm-tabs button b{font-size:11px;font-weight:900;color:#5b3a14;text-shadow:0 1px 0 rgba(255,240,180,.7)}
-#upgrade-screen.hidden~#ach-screen.hidden~#wm-tabs [data-t=map]::before,#ach-screen:not(.hidden)~#wm-tabs [data-t=ach]::before,#upgrade-screen:not(.hidden)~#wm-tabs [data-t=upg]::before{content:'';position:absolute;inset:-2px 4px;background:var(--u-n_tab_hl) center/contain no-repeat;z-index:-1}
-#upgrade-screen.hidden~#ach-screen.hidden~#wm-tabs [data-t=map] .ic,#ach-screen:not(.hidden)~#wm-tabs [data-t=ach] .ic,#upgrade-screen:not(.hidden)~#wm-tabs [data-t=upg] .ic{animation:uiBob 1.7s ease-in-out infinite}
+#upgrade-screen.hidden~#ach-screen.hidden~#inv-screen.hidden~#wm-tabs [data-t=map]::before,#ach-screen:not(.hidden)~#wm-tabs [data-t=ach]::before,#upgrade-screen:not(.hidden)~#wm-tabs [data-t=upg]::before,#inv-screen:not(.hidden)~#wm-tabs [data-t=inv]::before{content:'';position:absolute;inset:-2px 4px;background:var(--u-n_tab_hl) center/contain no-repeat;z-index:-1}
+#upgrade-screen.hidden~#ach-screen.hidden~#inv-screen.hidden~#wm-tabs [data-t=map] .ic,#ach-screen:not(.hidden)~#wm-tabs [data-t=ach] .ic,#upgrade-screen:not(.hidden)~#wm-tabs [data-t=upg] .ic,#inv-screen:not(.hidden)~#wm-tabs [data-t=inv] .ic{animation:uiBob 1.7s ease-in-out infinite}
 #wm-tabs #ach-dot{position:absolute;top:3px;left:calc(50% + 9px);width:11px;height:11px;border-radius:50%;background:#ef4444;border:2px solid #fff}
 #wm-tabs #ach-dot.hidden{display:none}
 /* 타이틀 화면: 세로 아트를 가운데 두고, 넓은 화면에서는 남는 양옆을 흐린 같은 그림으로 채운다 */
@@ -1451,6 +1451,75 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
 /* 타이틀: 좌우를 꽉 채우고 위아래를 자른다 */
 #title::before{display:none}
 #title-art{width:100%;height:100%;max-width:none;aspect-ratio:auto;flex:1 1 auto;background-position:center 42%;background-size:cover;box-shadow:none}
+/* 슬롯: 뒤쪽 빛줄기(520px)가 패널 밖으로 넘쳐 스크롤이 생기지 않게 슬롯 안에서 자른다 */
+#res-slot{position:relative;overflow:hidden}
+.stars.promo i.on{color:#e9d5ff;text-shadow:0 0 6px #a855f7,0 1px 0 #581c87}
+
+/* 가방 화면 헤더: 업적 헤더와 같은 모양 */
+#inv-hud-in{position:relative;display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:12px;background:linear-gradient(180deg,rgba(30,41,59,.97),rgba(15,23,42,.97));border:1px solid rgba(250,204,21,.5);box-shadow:0 4px 14px rgba(0,0,0,.5)}
+#inv-hud .lv-badge{min-width:42px;height:26px;font-size:13px;flex:none}
+#inv-xp{flex:1;min-width:0}
+#inv-hud .xp-bar{height:18px;position:relative}
+#inv-hud .xp-fill{transition:width .3s ease-out}
+#inv-xptext{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
+#inv-gold{flex:none;font-weight:900;font-size:14px;color:#fde047;background:rgba(2,6,23,.6);border:1px solid rgba(250,204,21,.5);border-radius:999px;padding:3px 10px;min-width:84px;text-align:center}
+#inv-hud .lvup-banner{font-size:24px;z-index:10}
+#inv-hud-in{position:relative;display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:12px;background:linear-gradient(180deg,rgba(30,41,59,.97),rgba(15,23,42,.97));border:1px solid rgba(250,204,21,.5);box-shadow:0 4px 14px rgba(0,0,0,.5)}
+#inv-hud .lv-badge{min-width:42px;height:26px;font-size:13px;flex:none}
+#inv-xp{flex:1;min-width:0}
+#inv-hud .xp-bar{height:18px;position:relative}
+#inv-hud .xp-fill{transition:width .3s ease-out}
+#inv-xptext{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
+#inv-gold{flex:none;font-weight:900;font-size:14px;color:#fde047;background:rgba(2,6,23,.6);border:1px solid rgba(250,204,21,.5);border-radius:999px;padding:3px 10px;min-width:84px;text-align:center}
+#inv-hud .lvup-banner{font-size:24px;z-index:10}
+#inv-gold{position:relative;isolation:isolate;background:none!important;border:0!important;border-radius:0!important;padding:4px 20px!important}
+#inv-gold::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;border:solid transparent;border-width:0 20px 0 21px;border-image-source:var(--u-n_gold_frame);border-image-slice:0 67 0 70 fill;border-image-width:0 20px 0 21px}
+#inv-hud-in{isolation:isolate;background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;padding-left:12px!important;padding-right:12px!important}
+#inv-hud-in::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;border:solid transparent;border-width:0 23px;border-image-source:var(--u-n_guide);border-image-slice:0 43 0 42 fill;border-image-width:0 23px}
+#inv-gold{color:#5b3a14!important;text-shadow:none!important;font-weight:800}
+#inv-hud-in::before{display:none!important}
+#inv-hud{background:none!important}
+#inv-hud-in{zoom:1.2;margin:4px 6px 0}
+#inv-hud-in::before{display:none!important}
+#inv-hud{background:none!important}
+#inv-hud-in{zoom:1.2;margin:4px 6px 0}
+#inv-gold{height:30px!important;box-sizing:border-box!important;display:flex!important;align-items:center;justify-content:center;padding-top:0!important;padding-bottom:0!important}
+#inv-screen>div{padding-top:0!important}
+#inv-hud{margin-top:0!important;padding-top:0!important}
+#inv-hud-in{position:relative!important;left:-15px;top:-2.5px}
+#inv-screen>div{animation:uiRise .3s ease-out both}
+#inv-gold{transition:scale .2s}
+#inv-screen>div{padding-bottom:calc(84px + env(safe-area-inset-bottom))!important}
+#inv-xp{flex:3 1 0!important;min-width:0}
+#inv-gold{flex:2 1 0;min-width:0;white-space:nowrap}
+#inv-lv{flex:none}
+#inv-hud-in{display:flex;align-items:center;gap:8px;padding-top:3px!important;padding-bottom:3px!important;left:0!important;top:-3.3px!important}
+#inv-screen>div{padding-top:0!important}
+#inv-hud{width:min(100vw,560px);margin:0 0 0 calc(50% - min(50vw,280px))!important;padding:calc(4px + env(safe-area-inset-top)) 0 2px!important;box-sizing:border-box}
+/* ---------- 가방 · 반지 ---------- */
+.inv-sec{padding:10px;border-radius:14px;background:rgba(15,23,42,.6);border:1px solid rgba(250,204,21,.3)}
+.inv-h{display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:13px;font-weight:900;color:#fde68a}.inv-h b{color:#fde047}.inv-h small{margin-left:auto;font-size:10px;font-weight:800;color:#94a3b8}
+.upg-inv-i.none{opacity:.35;filter:grayscale(.6)}
+.inv-rings{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px}
+.inv-ring{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:10px;background:rgba(2,6,23,.45)}
+.inv-ring>b{position:absolute;top:4px;right:6px;font-size:10px;color:#fde047}.inv-ring>span{font-size:9.5px;font-weight:800;color:#cbd5e1;text-align:center}
+.inv-ring .eqf{position:absolute;top:2px;left:2px}
+.rc-list{display:flex;flex-direction:column;gap:8px}
+.rc-card{padding:10px 12px!important}.rc-top{display:flex;align-items:center;gap:10px}.rc-top b{display:block;font-size:13px;color:#fde68a}.rc-top span{font-size:10.5px;color:#cbd5e1}
+.rc-top>.upg-btn{flex:none;width:88px;margin-left:auto}
+.ring{--gem:#38bdf8;position:relative;display:inline-block;flex:none;width:40px;height:40px;border-radius:50%;background:radial-gradient(circle at 50% 62%,transparent 0 30%,#92400e 31% 35%,#fde047 36% 48%,#f59e0b 49% 54%,#92400e 55% 58%,transparent 59%)}
+.ring::before{content:'';position:absolute;left:50%;top:4%;width:44%;height:38%;transform:translateX(-50%);border-radius:45% 45% 50% 50%;background:radial-gradient(circle at 35% 30%,#fff 0 12%,var(--gem) 42%,color-mix(in srgb,var(--gem) 50%,#000) 100%);box-shadow:0 0 0 2px #fde68a,0 2px 3px rgba(0,0,0,.45)}
+.ring>b{position:absolute;right:-5px;bottom:-1px;min-width:16px;padding:0 3px;border-radius:7px;font-size:9px;font-weight:900;line-height:14px;text-align:center;color:#451a03;background:linear-gradient(#fde047,#f59e0b);box-shadow:0 0 0 1.5px #fff}
+.ring.g2::before{box-shadow:0 0 0 2px #fde68a,0 0 10px var(--gem)}
+.ring.g3{filter:drop-shadow(0 0 7px #c084fc)}.ring.g3>b{background:linear-gradient(#f5d0fe,#a855f7);color:#fff}
+.ring.sm{width:24px;height:24px}.ring.sm>b{font-size:7px;line-height:10px;min-width:11px;right:-6px}
+.ring.xl{width:100px;height:100px}.ring.xl>b{font-size:16px;line-height:24px;min-width:30px;right:-8px}
+.ring.empty{background:radial-gradient(circle at 50% 62%,transparent 0 30%,#475569 31% 58%,transparent 59%);opacity:.7}.ring.empty::before{display:none}
+.upg-ringrow{display:flex;align-items:center;gap:8px;margin-top:8px}
+.upg-ring{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 6px;border-radius:999px;background:rgba(2,6,23,.55);border:1px dashed rgba(250,204,21,.45);font-size:11px;font-weight:800;color:#e2e8f0}
+.upg-ring.on{border-style:solid;border-color:rgba(250,204,21,.8);color:#fde68a}
+.rp-i{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:12px;background:rgba(2,6,23,.55);border:1px solid rgba(148,163,184,.3);text-align:left}
+.rp-i.on{border-color:#fde047}.rp-i div{flex:1;min-width:0;display:flex;flex-direction:column}.rp-i b{font-size:13px;color:#fde68a}.rp-i span{font-size:10.5px;color:#cbd5e1}.rp-i em{font-style:normal;font-weight:900;color:#fde047;font-size:12px}
 </style>
 <style id="item-art">/*ITEM-ART-START*/
 .itm-herb{background:none!important;box-shadow:none!important}.itm-herb::after{display:none!important}.itm-herb>i.ic{inset:0!important;background-image:url(data:image/webp;base64,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)!important;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))!important}
@@ -1613,7 +1682,7 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
       </div>
     </div>
     <div class="flex items-center justify-between mb-3">
-      <div><h2 class="title-font text-2xl text-amber-300">⚜ 병종 업그레이드</h2><p class="hidden">전투에 참가한 병종은 경험치를 받고(처치·피해·이동·회복할수록 더 많이) 레벨이 오르면 체력·공격력 +2.5%, Lv5·12·20에서 방어력 +1. 병종 레벨이 조건(★1 Lv5 · ★2 Lv10 · ★3 Lv15 · ★4 Lv20 · ★5 Lv25)에 닿으면, 승리 보상 슬롯에서 모은 재료를 조합식대로 내고 골드를 더해 ★ 등급을 올리세요. ★마다 능력치 +15%, ★1에서 전직합니다.</p></div>
+      <div><h2 class="title-font text-2xl text-amber-300">⚜ 병종 업그레이드</h2><p class="hidden">전투에 참가한 병종은 경험치를 받고(처치·피해·이동·회복할수록 더 많이) 레벨이 오르면 체력·공격력 +2.5%, Lv5·12·20에서 방어력 +1. 병종 레벨이 조건에 닿으면, 승리 보상 슬롯에서 모은 재료를 조합식대로 내고 골드를 더해 ★ 등급을 올리세요. ★마다 능력치 +15%, ★1에서 전직합니다.</p></div>
     </div>
     <div id="upg-list" class="flex flex-col gap-2.5"></div>
   </div>
@@ -1652,6 +1721,25 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
     </div>
     <button id="ach-all" onclick="achClaimAll()" class="w-full mb-3 py-3 rounded-xl font-black bg-amber-500 hover:bg-amber-400 text-slate-950 disabled:opacity-40 disabled:cursor-not-allowed"></button>
     <div id="ach-list" class="flex flex-col gap-2"></div>
+  </div>
+</div>
+<div id="inv-screen" class="hidden fixed inset-0 z-[74] overflow-y-auto bg-slate-950/95 backdrop-blur-md">
+  <div class="max-w-xl mx-auto p-4 sm:p-6">
+    <div id="inv-hud" class="sticky top-0 z-10 pb-2" style="background:linear-gradient(180deg,rgba(2,6,23,.98) 70%,rgba(2,6,23,0))">
+      <div id="inv-hud-in">
+        <div id="inv-lv" class="lv-badge">Lv 1</div>
+        <div id="inv-xp"><div class="xp-bar"><div class="xp-fill" id="inv-xpfill"></div><span id="inv-xptext">0 / 80</span></div></div>
+        <div id="inv-gold">💰 0</div>
+      </div>
+    </div>
+    <div class="mb-3"><h2 class="title-font text-2xl text-amber-300">📦 가방</h2></div>
+    <div id="inv-body" class="flex flex-col gap-3"></div>
+  </div>
+</div>
+<div id="ring-pick" class="hidden fixed inset-0 z-[82] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm" onclick="if(event.target===this)closeRingPick()">
+  <div class="panel border-2 border-amber-500 max-w-xs w-full p-4">
+    <div class="flex items-center justify-between mb-2"><h3 id="ring-pick-t" class="title-font text-lg text-amber-300"></h3><button onclick="closeRingPick()" class="sheet-x"><span class="xx">✕</span></button></div>
+    <div id="ring-pick-list" class="flex flex-col gap-2"></div>
   </div>
 </div>
 <div id="obj-modal" class="hidden fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
@@ -1697,6 +1785,7 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
   <button data-t="map" onclick="wmTab('map')" aria-label="월드맵"><span class="t-map">🗺<b>월드맵</b></span><span class="t-back">↩<b>돌아가기</b></span></button>
   <button data-t="ach" onclick="wmTab('ach')" aria-label="업적">🏆<b>업적</b><i id="ach-dot" class="hidden"></i></button>
   <button data-t="upg" onclick="wmTab('upg')" aria-label="병종 업그레이드">⚜<b>업그레이드</b></button>
+  <button data-t="inv" onclick="wmTab('inv')" aria-label="가방">📦<b>가방</b></button>
   <button data-t="set" onclick="openWmSet()" aria-label="게임 설정">⚙️<b>설정</b></button>
 </div>
 
@@ -2404,7 +2493,8 @@ function evadeParts(u) {
   if (u.typeKey === 'OBSTACLE') return { base: 0, bonus: 0, tk: terrainAt(u.r, u.c), total: 0 };
   const base = UNIT_TYPES[u.typeKey].evade, tk = terrainAt(u.r, u.c), bonus = terrainBonus(u.typeKey, tk);
   const mo = moEv(u.owner);
-  return { base, bonus, mo, tk, total: Math.max(0, Math.min(20, Math.round(clampEv(base + bonus) + mo))) };
+  const ring = u.ringEv || 0;                                       // 바람의 반지
+  return { base, bonus, mo, ring, tk, total: Math.max(0, Math.min(20 + ring, Math.round(clampEv(base + bonus) + mo + ring))) };
 }
 
 function getCompatibility(a, d) {
@@ -2645,7 +2735,7 @@ function dbgDo(a) {
   else if (a === 'allclear') { SAVE.cleared = Array.from({ length: TOTAL_STAGES }, (_, i) => i); SAVE.newUnlock = null; }
   else if (a === 'unclear') { SAVE.cleared = []; SAVE.best = {}; SAVE.newUnlock = null; SAVE.pos = 0; }
   else if (a === 'seen') SAVE.seenObj = {};
-  else if (a === 'promo') UNIT_ORDER.forEach(k => { SAVE.clv[k] = CLV_MAX; SAVE.cxp[k] = 0; SAVE.star[k] = STAR_MAX; SAVE.promo[k] = 1; });
+  else if (a === 'promo') UNIT_ORDER.forEach(k => { SAVE.clv[k] = CLV_MAX; SAVE.cxp[k] = 0; SAVE.tier[k] = TIER_MAX; SAVE.promo[k] = 1; });
   clearedStages = SAVE.cleared; persist(); refreshGold(); dbgInfo(); achCheck();
   if (a === 'upg' && !$('upgrade-screen').classList.contains('hidden')) renderUpgrade();
   if (a === 'allclear' || a === 'unclear') { try { wmInit(); } catch (e) {} }
@@ -2662,9 +2752,15 @@ const clv = k => (SAVE.clv && SAVE.clv[k]) || 1;
 const cxp = k => (SAVE.cxp && SAVE.cxp[k]) || 0;
 // ---------- 병종 업그레이드: 증표 + 골드로 ★ 등급을 올린다 (★1 = 전직) ----------
 const PROMO_NAME = { SWORDSMAN: '검성', SPEARMAN: '용창병', KNIGHT: '근위기사', ARCHER: '신궁', MAGE: '대마법사', HEALER: '성녀' };
-const STAR_MAX = 5, STAR_GOLD = [800, 1600, 3000, 5000, 8000], STAR_LV = [5, 10, 15, 20, 25];   // ★마다 필요한 병종 레벨
-const starOf = k => (SAVE.star && SAVE.star[k]) || 0;
-const isPromo = k => starOf(k) >= 1;
+// 단계(tier) 0~11: 1~5 = 기본 병종 ★1~★5, 6 = 전직(모습이 바뀌고 이동력 +1), 7~11 = 전직 병종 ★1~★5
+const TIER_MAX = 11, PROMO_TIER = 6;
+const TIER_LV = [5, 8, 11, 14, 17, 20, 22, 24, 26, 28, 30];                       // 다음 단계로 가는 데 필요한 병종 레벨
+const TIER_GOLD = [500, 900, 1400, 2000, 2800, 4000, 5000, 6500, 8000, 10000, 12000];
+const tierOf = k => (SAVE.tier && SAVE.tier[k]) || 0;
+const isPromo = k => tierOf(k) >= PROMO_TIER;
+const tierStars = t => t >= PROMO_TIER ? t - PROMO_TIER : t;                       // 지금 단계에서 보이는 별 개수
+const tierStarsHtml = t => `<span class="stars${t >= PROMO_TIER ? ' promo' : ''}">${Array.from({ length: 5 }, (_, i) => `<i class="${i < tierStars(t) ? 'on' : ''}">★</i>`).join('')}</span>`;
+const tierNextLabel = t => t < 5 ? `★${t + 1}` : t === 5 ? '⚜ 전직' : `★${t - 5}`;
 // ---------- 재료 아이템: 지역마다 6종(일반 4 · 희귀 2), 총 30종 ----------
 // ic: 전용 그림이 없을 때 쓰는 임시 아이콘 (그림은 #item-art 스타일에 tools/embed_items.py로 넣는다)
 const ITEMS = {
@@ -2683,9 +2779,9 @@ const ITEM_IDS = Object.keys(ITEMS);
 const matOf = id => (SAVE.item && SAVE.item[id]) || 0;
 const matName = id => ITEMS[id] ? ITEMS[id].name : id;
 const matIcon = (id, cls = '') => { const it = ITEMS[id] || {}; return `<span class="itm itm-${id} reg-${it.reg}${it.rare ? ' rare' : ''} ${cls}"><i class="ic ic-${it.ic}"></i></span>`; };
-const starsHtml = (n, max = STAR_MAX) => `<span class="stars">${Array.from({ length: max }, (_, i) => `<i class="${i < n ? 'on' : ''}">★</i>`).join('')}</span>`;
+const starsHtml = (n, max = 5) => `<span class="stars">${Array.from({ length: max }, (_, i) => `<i class="${i < n ? 'on' : ''}">★</i>`).join('')}</span>`;
 // ★ 업그레이드 조합식: 병종 × 등급마다 재료 2~3종 (같은 재료를 여러 병종이 함께 쓴다)
-const STAR_RECIPE = {
+const STAR_RECIPE_BASE = {
   SWORDSMAN: [[['copper', 3], ['wool', 2]], [['copper', 4], ['wood', 3], ['clover', 2]], [['iron', 5], ['fang', 4], ['scarab', 2]], [['silver', 6], ['iron', 4], ['mithril', 3]], [['dscale', 8], ['silver', 5], ['dheart', 3]]],
   SPEARMAN: [[['copper', 3], ['feather', 2]], [['wood', 4], ['copper', 3], ['acorn', 2]], [['iron', 5], ['wood', 4], ['sunstone', 2]], [['fur', 6], ['iron', 4], ['mithril', 3]], [['obsidian', 8], ['fur', 5], ['dheart', 3]]],
   KNIGHT: [[['wool', 3], ['copper', 2]], [['fang', 4], ['wool', 3], ['honey', 2]], [['iron', 5], ['sting', 4], ['scarab', 2]], [['fur', 6], ['silver', 4], ['aurora', 3]], [['dscale', 8], ['silver', 5], ['phoenix', 3]]],
@@ -2693,8 +2789,10 @@ const STAR_RECIPE = {
   MAGE: [[['herb', 3], ['copper', 2]], [['mushroom', 4], ['herb', 3], ['clover', 2]], [['sand', 5], ['mushroom', 4], ['sunstone', 2]], [['pearl', 6], ['ice', 4], ['mithril', 3]], [['sulfur', 8], ['pearl', 5], ['dheart', 3]]],
   HEALER: [[['herb', 3], ['wool', 2]], [['mushroom', 4], ['resin', 3], ['honey', 2]], [['cactus', 5], ['sand', 4], ['scarab', 2]], [['pearl', 6], ['silver', 4], ['aurora', 3]], [['ember', 8], ['pearl', 5], ['phoenix', 3]]]
 };
-const recipeOf = (k, star) => STAR_RECIPE[k][star] || [];
-const recipeOk = (k, star) => recipeOf(k, star).every(([id, n]) => matOf(id) >= n);
+const TIER_FROM = [[0, 1], [0, 1.6], [1, 1], [1, 1.5], [2, 1], [2, 1.4], [3, 1], [3, 1.4], [4, .8], [4, 1], [4, 1.3]];   // [바탕 레시피, 수량 배율]
+const STAR_RECIPE = Object.fromEntries(Object.entries(STAR_RECIPE_BASE).map(([k, rs]) => [k, TIER_FROM.map(([i, m]) => rs[i].map(([id, n]) => [id, Math.max(1, Math.round(n * m))]))]));
+const recipeOf = (k, t) => STAR_RECIPE[k][t] || [];
+const recipeOk = (k, t) => recipeOf(k, t).every(([id, n]) => matOf(id) >= n);
 // 스테이지 보상: 그 지역 일반 재료 2종 + (희귀 재료 또는 이전 지역 재료) 1종 — 스테이지마다 조합이 다르다
 function stageMats(i) {
   const rng = mulberry32(48271 * (i + 1) + 11), reg = regionOf(i);
@@ -2720,13 +2818,16 @@ const ACH = [
   { id: 'barricade', icon: '🧱', name: '길 뚫는 자', fmt: n => `바리케이드 ${n}개 파괴`, val: () => achStat('barricade'), tiers: [5, 15, 30, 60], rew: [80, 200, 400, 800] },
   ...UNIT_ORDER.map(k => ({ id: 'clv_' + k, icon: UNIT_ICON[k], name: `${UNIT_TYPES[k].name} 단련`, fmt: n => `${UNIT_TYPES[k].name} 병종 Lv ${n} 달성`, val: () => clv(k), tiers: [5, 10, 15, 20, 30], rew: [100, 200, 400, 700, 1200] })),
   { id: 'clv_all', icon: '🛠️', name: '병종 마스터', fmt: n => `모든 병종 레벨 합계 ${n}`, val: () => UNIT_ORDER.reduce((x, k) => x + clv(k), 0), tiers: [30, 60, 90, 120, 180], rew: [200, 400, 800, 1400, 2400] },
-  { id: 'star', icon: '⭐', name: '★ 수집가', fmt: n => `모든 병종 ★ 합계 ${n}`, val: () => UNIT_ORDER.reduce((x, k) => x + starOf(k), 0), tiers: [3, 8, 15, 22, 30], rew: [300, 700, 1200, 2000, 3000] },
+  { id: 'star', icon: '⭐', name: '★ 수집가', fmt: n => `모든 병종 단계 합계 ${n}`, val: () => UNIT_ORDER.reduce((x, k) => x + tierOf(k), 0), tiers: [3, 8, 15, 30, 50], rew: [300, 700, 1200, 2000, 3000] },
   { id: 'jackpot', icon: '🎁', name: '행운의 손', fmt: n => `보상 슬롯 JACKPOT ${n}번`, val: () => achStat('jackpot'), tiers: [1, 5, 10, 25], rew: [200, 500, 1000, 2000] },
   { id: 'promo', icon: '⚜️', name: '전직의 길', fmt: n => `병종 ${n}개 전직`, val: () => UNIT_ORDER.filter(isPromo).length, tiers: [1, 3, 6], rew: [500, 1200, 3000] },
   { id: 'level', icon: '⭐', name: '단련하는 자', fmt: n => `플레이어 Lv ${n} 달성`, val: () => SAVE.lv, tiers: [5, 10, 20, 30, 40], rew: [200, 500, 1000, 1800, 3000] }
 ];
 SAVE.stat = SAVE.stat || {}; SAVE.achClaim = SAVE.achClaim || {}; SAVE.promo = SAVE.promo || {}; SAVE.upg2 = SAVE.upg2 || {};
-SAVE.clv = SAVE.clv || {}; SAVE.cxp = SAVE.cxp || {}; SAVE.star = SAVE.star || {}; SAVE.item = SAVE.item || {};
+SAVE.clv = SAVE.clv || {}; SAVE.cxp = SAVE.cxp || {}; SAVE.star = SAVE.star || {}; SAVE.item = SAVE.item || {}; SAVE.tier = SAVE.tier || {};
+SAVE.rings = SAVE.rings || {}; SAVE.equip = SAVE.equip || {};
+// ★ 체계 개편: 예전 ★n(★1부터 전직) → 단계 5+n (전직은 그대로 유지)
+if (!SAVE.v5) { SAVE.v5 = 1; UNIT_ORDER.forEach(k => { const st = SAVE.star[k] || 0; if (st) SAVE.tier[k] = Math.max(tierOf(k), Math.min(TIER_MAX, 5 + st)); }); persist(); }
 // 병종 증표 → 재료 아이템: 모아 둔 증표 수만큼 초원 일반 재료로 바꿔 준다
 if (SAVE.mat) { const t = Object.values(SAVE.mat).reduce((a, n) => a + (n || 0), 0); if (t) ['herb', 'wool', 'copper', 'feather'].forEach(id => { SAVE.item[id] = (SAVE.item[id] || 0) + Math.ceil(t / 4); }); delete SAVE.mat; }
 // 병종 개편: 골드 강화 레벨 → 병종 레벨, 전직·전직 강화 → ★ 등급으로 옮긴다 (골드는 그대로)
@@ -2734,7 +2835,7 @@ if (!SAVE.v3) {
   SAVE.v3 = 1;
   UNIT_ORDER.forEach(k => {
     if (upgLv(k)) SAVE.clv[k] = Math.max(clv(k), Math.min(CLV_MAX, 1 + 3 * upgLv(k)));
-    if (SAVE.promo[k]) SAVE.star[k] = Math.max(starOf(k), Math.min(4, 1 + Math.floor((SAVE.upg2[k] || 0) / 2)));
+    if (SAVE.promo[k]) SAVE.star[k] = Math.max(SAVE.star[k] || 0, Math.min(4, 1 + Math.floor((SAVE.upg2[k] || 0) / 2)));
   });
   persist();
 }
@@ -2830,13 +2931,13 @@ function closeAch() { $('ach-screen').classList.add('hidden'); refreshGold(); }
 function markCleared(i) { if (!SAVE.cleared.includes(i)) SAVE.cleared.push(i); persist(); }
 const isUnlocked = i => i === 0 || SAVE.cleared.includes(i - 1) || SAVE.cleared.includes(i);
 // 병종 레벨에 따른 능력치
-function statsAt(k, lv, star) {          // lv: 병종 레벨(1~30), star: ★ 등급(0~5)
+function statsAt(k, lv, tier) {          // lv: 병종 레벨(1~30), tier: 단계(0~11, 6부터 전직)
   const t = UNIT_TYPES[k];
-  const m = (1 + 0.025 * (lv - 1) + 0.01 * Math.min(40, SAVE.lv - 1)) * (1 + 0.15 * star);
-  const def = t.def + (lv >= 5) + (lv >= 12) + (lv >= 20) + (star >= 1) + (star >= 3) + (star >= 5);
+  const m = (1 + 0.025 * (lv - 1) + 0.01 * Math.min(40, SAVE.lv - 1)) * (1 + 0.07 * tier + (tier >= PROMO_TIER ? 0.1 : 0));
+  const def = t.def + (lv >= 5) + (lv >= 12) + (lv >= 20) + (tier >= 2) + (tier >= 4) + (tier >= 6) + (tier >= 8) + (tier >= 10);
   return { maxHp: Math.round(t.maxHp * m), atk: Math.round(t.atk * m), def, healPower: Math.round(t.healPower * m) };
 }
-const curStats = k => statsAt(k, clv(k), starOf(k));
+const curStats = k => statsAt(k, clv(k), tierOf(k));
 // 병종 경험치: 레벨이 오르면 전장에 있는 같은 병종 아군도 바로 강해진다
 const killXp = def => 8 + Math.round(def.maxHp * 0.08) + Math.floor(currentStage * 0.4);
 // 전투 기여도 (병종별): 처치·피해·이동·회복 — 전투가 끝나면 경험치로 바뀐다
@@ -2881,46 +2982,118 @@ function statGauge(ic, title, cur, nxt, max) {
 function renderUpgrade() {
   refreshGold(); renderUpgHud();
   const ks = UNIT_ORDER.filter(seenU);
-  const own = ITEM_IDS.filter(matOf);
-  const inv = `<div class="upg-inv">${own.length ? `<div class="upg-inv-g">${own.map(id => `<div class="upg-inv-i" title="${matName(id)}">${matIcon(id)}<b>${matOf(id)}</b></div>`).join('')}</div>` : '<div class="upg-empty">🎁 승리 보상 슬롯에서 재료를 모으세요</div>'}</div>`;
-  $('upg-list').innerHTML = inv + (ks.length ? ks.map(k => {
-    const t = UNIT_TYPES[k], lv = clv(k), star = starOf(k), heal = k === 'HEALER', cur = curStats(k), max = star >= STAR_MAX;
-    const nx = max ? cur : statsAt(k, lv, star + 1), top = statsAt(k, CLV_MAX, STAR_MAX);
-    const needG = max ? 0 : STAR_GOLD[star], okM = max || recipeOk(k, star), okG = SAVE.gold >= needG, needL = max ? 0 : STAR_LV[star], okL = lv >= needL;
+  $('upg-list').innerHTML = (ks.length ? ks.map(k => {
+    const t = UNIT_TYPES[k], lv = clv(k), star = tierOf(k), heal = k === 'HEALER', cur = curStats(k), max = star >= TIER_MAX, pro = star >= PROMO_TIER;
+    const nx = max ? cur : statsAt(k, lv, star + 1), top = statsAt(k, CLV_MAX, TIER_MAX);
+    const needG = max ? 0 : TIER_GOLD[star], okM = max || recipeOk(k, star), okG = SAVE.gold >= needG, needL = max ? 0 : TIER_LV[star], okL = lv >= needL;
     const xpPct = lv >= CLV_MAX ? 100 : Math.min(100, cxp(k) / clvNeed(lv) * 100);
     const cost = max ? '' : `<div class="upg-cost"><span class="rc-lv${okL ? '' : ' lack'}" title="필요 병종 레벨">${okL ? '✔' : '🔒'} Lv ${needL}</span>${recipeOf(k, star).map(([id, n]) => `<span class="rc-m${matOf(id) >= n ? '' : ' lack'}" title="${matName(id)}">${matIcon(id, 'md')}<b>${matOf(id)}/${n}</b></span>`).join('')}<span class="rc-g${okG ? '' : ' lack'}">💰<b>${needG.toLocaleString()}</b></span></div>`;
     const ok = okL && okM && okG;
     const btn = max ? '<div class="upg-max">MAX</div>'
-      : `<button onclick="starUp('${k}')" ${ok ? '' : 'disabled'} class="upg-btn ${ok ? (star ? 'bg-yellow-400 text-slate-950' : 'promo-btn') : 'bg-slate-700 text-slate-400'}">${star ? `★${star + 1}` : '⚜ 전직'}</button>`;
-    return `<div class="panel upg-card ${star ? 'promo-card' : ''}">
+      : `<button onclick="starUp('${k}')" ${ok ? '' : 'disabled'} class="upg-btn ${ok ? (star === 5 ? 'promo-btn' : 'bg-yellow-400 text-slate-950') : 'bg-slate-700 text-slate-400'}">${tierNextLabel(star)}</button>`;
+    return `<div class="panel upg-card ${pro ? 'promo-card' : ''}">
       <div class="upg-top">
         <div class="w-12 h-12 shrink-0">${portrait(k, 'player')}</div>
         <div class="flex-1 min-w-0">
-          <div class="upg-name"><span class="font-black ${t.color}">${star ? PROMO_NAME[k] : t.name}</span>${starsHtml(star)}${!star ? `<span class="upg-next" title="★1 전직">→ ⚜ ${PROMO_NAME[k]}</span>` : ''}</div>
+          <div class="upg-name"><span class="font-black ${t.color}">${pro ? PROMO_NAME[k] : t.name}</span>${tierStarsHtml(star)}${star === 5 ? `<span class="upg-next" title="다음: 전직">→ ⚜ ${PROMO_NAME[k]}</span>` : ''}</div>
           <div class="upg-lv"><b>Lv ${lv}</b><div class="upg-xp"><i style="width:${xpPct}%"></i></div><span>${lv >= CLV_MAX ? 'MAX' : `${cxp(k)}/${clvNeed(lv)}`}</span></div>
         </div>${btn}
       </div>
-      <div class="sgs">${statGauge('♥', '체력', cur.maxHp, nx.maxHp, top.maxHp)}${heal ? statGauge('✚', '회복력', cur.healPower, nx.healPower, top.healPower) : statGauge('⚔', '공격력', cur.atk, nx.atk, top.atk)}${statGauge('🛡', '방어력', cur.def, nx.def, top.def)}${!star ? '<div class="sg-mv" title="★1 전직 시 이동력 +1">↔ <u>+1</u></div>' : '<div class="sg-mv on" title="이동력 +1">↔ +1</div>'}</div>
+      <div class="sgs">${statGauge('♥', '체력', cur.maxHp, nx.maxHp, top.maxHp)}${heal ? statGauge('✚', '회복력', cur.healPower, nx.healPower, top.healPower) : statGauge('⚔', '공격력', cur.atk, nx.atk, top.atk)}${statGauge('🛡', '방어력', cur.def, nx.def, top.def)}${!pro ? `<div class="sg-mv" title="전직하면 이동력 +1">↔ ${star === 5 ? '<u>+1</u>' : '+0'}</div>` : '<div class="sg-mv on" title="이동력 +1">↔ +1</div>'}</div>
+      <div class="upg-ringrow"><button class="upg-ring${ringOf(k) ? ' on' : ''}" onclick="openRingPick('${k}')">${ringOf(k) ? `${ringIcon(ringOf(k), 'sm')}${ringEff(ringOf(k))}` : '<span class="ring empty sm"></span>반지 장착'}</button></div>
       ${cost}
     </div>`;
   }).join('') : '<div class="upg-empty">⚔ 출정해서 병종을 만나보세요</div>');
 }
+// ---------- 반지: 병종마다 1개 장착. 재료로 만들면 등급(I·II·III)이 무작위로 나오고 높은 등급일수록 드물다 ----------
+const RINGS = {
+  evade: { name: '바람의 반지', stat: '회피', unit: '%', gem: '#38bdf8', val: [3, 6, 10], recipe: [['feather', 6], ['wool', 3], ['clover', 1]] },
+  atk: { name: '힘의 반지', stat: '공격', unit: '%', gem: '#f87171', val: [5, 10, 16], recipe: [['copper', 6], ['fang', 3], ['honey', 1]] },
+  life: { name: '생명의 반지', stat: '체력', unit: '%', gem: '#4ade80', val: [8, 15, 25], recipe: [['herb', 6], ['mushroom', 3], ['honey', 1]] },
+  guard: { name: '수호의 반지', stat: '방어', unit: '', gem: '#a5b4fc', val: [1, 2, 3], recipe: [['wool', 4], ['wood', 4], ['acorn', 1]] }
+};
+const RING_GOLD = 600, RING_ODDS = [0.7, 0.25, 0.05], ROMAN = ['I', 'II', 'III'];
+const ringParse = id => ({ type: id.slice(0, -1), g: +id.slice(-1) });
+const ringName = id => { const r = ringParse(id); return `${RINGS[r.type].name} ${ROMAN[r.g - 1]}`; };
+const ringEff = id => { const r = ringParse(id), R = RINGS[r.type]; return `${R.stat} +${R.val[r.g - 1]}${R.unit}`; };
+const ringIcon = (id, cls = '') => { const r = ringParse(id); return `<span class="ring g${r.g} ${cls}" style="--gem:${RINGS[r.type].gem}"><b>${ROMAN[r.g - 1]}</b></span>`; };
+const ringOf = k => SAVE.equip[k] || null;
+const ringOwned = () => Object.keys(SAVE.rings).filter(id => SAVE.rings[id] > 0 && RINGS[ringParse(id).type]).sort();
+function ringBonus(k) { const id = ringOf(k); if (!id) return {}; const r = ringParse(id); return { [r.type]: RINGS[r.type].val[r.g - 1] }; }
+const ringCanCraft = t => RINGS[t].recipe.every(([id, n]) => matOf(id) >= n) && SAVE.gold >= RING_GOLD;
+function craftRing(t) {
+  if (!ringCanCraft(t)) return;
+  RINGS[t].recipe.forEach(([id, n]) => { SAVE.item[id] = matOf(id) - n; }); SAVE.gold -= RING_GOLD;
+  const x = Math.random(), g = x < RING_ODDS[2] ? 3 : x < RING_ODDS[2] + RING_ODDS[1] ? 2 : 1, id = t + g;
+  SAVE.rings[id] = (SAVE.rings[id] || 0) + 1; persist(); renderInv(); showRingResult(id);
+}
+function showRingResult(id) {
+  const g = ringParse(id).g; objQueue = [];
+  const img = $('obj-img'); img.style.cssText = 'position:relative;width:120px;height:120px;margin:8px auto;display:flex;align-items:center;justify-content:center';
+  img.innerHTML = ringIcon(id, 'xl');
+  $('obj-tag').textContent = g === 3 ? '✨ 최고 등급! ✨' : g === 2 ? '좋은 등급!' : '반지 완성';
+  $('obj-title').textContent = ringName(id);
+  $('obj-desc').style.whiteSpace = 'pre-line'; $('obj-desc').textContent = `${ringEff(id)}\n업그레이드 화면에서 병종에게 장착하세요.`;
+  $('obj-ok').textContent = '확인'; $('obj-modal').classList.remove('hidden');
+  try {
+    if (g === 3) { slotFlash('gold'); confettiBurst(img, 60); (sound.play('jingle_win') || 0); vibrate([60, 40, 140]); }
+    else if (g === 2) { confettiBurst(img, 30); (sound.play('levelup') || 0); }
+    else (sound.play('upgrade') || sound.playHeal());
+  } catch (e) {}
+}
+// 반지 고르기 (업그레이드 화면의 병종 카드에서)
+let ringPickK = null;
+function openRingPick(k) {
+  ringPickK = k; const cur = ringOf(k), own = ringOwned();
+  $('ring-pick-t').textContent = `${isPromo(k) ? PROMO_NAME[k] : UNIT_TYPES[k].name} 반지`;
+  $('ring-pick-list').innerHTML = (cur ? `<button class="rp-i on" onclick="equipRing(null)">${ringIcon(cur)}<div><b>${ringName(cur)}</b><span>${ringEff(cur)} · 장착 중</span></div><em>해제</em></button>` : '') +
+    (own.length ? own.map(id => `<button class="rp-i" onclick="equipRing('${id}')">${ringIcon(id)}<div><b>${ringName(id)}</b><span>${ringEff(id)}</span></div><em>×${SAVE.rings[id]}</em></button>`).join('')
+      : '<div class="upg-empty">📦 가방에서 반지를 만들어 보세요</div>');
+  $('ring-pick').classList.remove('hidden');
+}
+function closeRingPick() { $('ring-pick').classList.add('hidden'); }
+function equipRing(id) {
+  const k = ringPickK, cur = ringOf(k); if (!k) return;
+  if (cur) SAVE.rings[cur] = (SAVE.rings[cur] || 0) + 1;
+  if (id && SAVE.rings[id] > 0) { SAVE.rings[id]--; SAVE.equip[k] = id; } else delete SAVE.equip[k];
+  persist(); closeRingPick(); renderUpgrade(); (sound.play('upgrade') || 0);
+}
+// ---------- 가방 화면 ----------
+function renderInvHud() {
+  const need = xpNeed(SAVE.lv);
+  $('inv-lv').textContent = 'Lv ' + SAVE.lv; $('inv-xpfill').style.width = Math.min(100, SAVE.xp / need * 100) + '%';
+  $('inv-xptext').textContent = `${SAVE.xp} / ${need}`; $('inv-gold').textContent = '💰 ' + SAVE.gold.toLocaleString();
+}
+function openInv() { renderInv(); $('inv-screen').classList.remove('hidden'); }
+function closeInv() { $('inv-screen').classList.add('hidden'); refreshGold(); }
+function renderInv() {
+  renderInvHud();
+  const mats = `<div class="inv-sec"><div class="inv-h">재료 <b>${ITEM_IDS.filter(matOf).length}</b> / ${ITEM_IDS.length}</div><div class="upg-inv-g">${ITEM_IDS.map(id => `<div class="upg-inv-i${matOf(id) ? '' : ' none'}" title="${matName(id)}">${matIcon(id)}<b>${matOf(id)}</b></div>`).join('')}</div></div>`;
+  const own = ringOwned(), eq = UNIT_ORDER.filter(ringOf);
+  const rings = `<div class="inv-sec"><div class="inv-h">반지</div>${own.length || eq.length ? `<div class="inv-rings">${own.map(id => `<div class="inv-ring" title="${ringName(id)}">${ringIcon(id)}<b>×${SAVE.rings[id]}</b><span>${ringEff(id)}</span></div>`).join('')}${eq.map(k => `<div class="inv-ring" title="${ringName(ringOf(k))} · 장착 중">${ringIcon(ringOf(k))}<div class="eqf w-6 h-6">${portrait(k, 'player')}</div><span>${ringEff(ringOf(k))}</span></div>`).join('')}</div>` : '<div class="upg-empty">아직 반지가 없어요</div>'}</div>`;
+  const craft = `<div class="inv-sec"><div class="inv-h">반지 제작 <small>I ${RING_ODDS[0] * 100}% · II ${RING_ODDS[1] * 100}% · III ${RING_ODDS[2] * 100}%</small></div><div class="rc-list">${Object.entries(RINGS).map(([t, R]) => {
+    const ok = ringCanCraft(t);
+    return `<div class="panel rc-card"><div class="rc-top">${ringIcon(t + '3')}<div class="flex-1 min-w-0"><b>${R.name}</b><span>${R.stat} ${R.val.map((v, i) => `${ROMAN[i]} +${v}${R.unit}`).join(' · ')}</span></div><button class="upg-btn ${ok ? 'bg-yellow-400 text-slate-950' : 'bg-slate-700 text-slate-400'}" ${ok ? '' : 'disabled'} onclick="craftRing('${t}')">제작</button></div>
+      <div class="upg-cost">${R.recipe.map(([id, n]) => `<span class="rc-m${matOf(id) >= n ? '' : ' lack'}" title="${matName(id)}">${matIcon(id, 'md')}<b>${matOf(id)}/${n}</b></span>`).join('')}<span class="rc-g${SAVE.gold >= RING_GOLD ? '' : ' lack'}">💰<b>${RING_GOLD}</b></span></div></div>`;
+  }).join('')}</div></div>`;
+  $('inv-body').innerHTML = mats + rings + craft;
+}
 function starUp(k) {
-  const star = starOf(k); if (star >= STAR_MAX) return;
-  const needG = STAR_GOLD[star]; if (clv(k) < STAR_LV[star] || !recipeOk(k, star) || SAVE.gold < needG) return;
-  recipeOf(k, star).forEach(([id, n]) => { SAVE.item[id] = matOf(id) - n; }); SAVE.gold -= needG; SAVE.star[k] = star + 1;
-  if (star === 0) SAVE.promo[k] = 1;
+  const star = tierOf(k); if (star >= TIER_MAX) return;
+  const needG = TIER_GOLD[star]; if (clv(k) < TIER_LV[star] || !recipeOk(k, star) || SAVE.gold < needG) return;
+  recipeOf(k, star).forEach(([id, n]) => { SAVE.item[id] = matOf(id) - n; }); SAVE.gold -= needG; SAVE.tier[k] = star + 1;
+  if (star + 1 === PROMO_TIER) SAVE.promo[k] = 1;
   persist(); renderUpgrade(); achCheck(); showPromoPopup(k);
 }
 function showPromoPopup(k) {
-  const t = UNIT_TYPES[k], st = curStats(k), heal = k === 'HEALER', star = starOf(k), first = star === 1;
+  const t = UNIT_TYPES[k], st = curStats(k), heal = k === 'HEALER', star = tierOf(k), first = star === PROMO_TIER, pro = star >= PROMO_TIER;
   objQueue = [];
   const img = $('obj-img'); img.style.cssText = 'position:relative;width:120px;height:120px;margin:8px auto;border-radius:16px;overflow:hidden;--tile:100px;background:radial-gradient(circle,#78350f,#1c1917);box-shadow:0 0 0 3px #fcd34d,0 0 26px rgba(251,191,36,.8)';
-  img.innerHTML = `<div class="token relative" style="${teamStyle('player')};width:100%;height:100%"><div class="unit-art promo-art">${unitSvg(k, true, 'player')}</div></div>`;
-  $('obj-tag').innerHTML = first ? '⚜ 전직 완료!' : `${starsHtml(star)} 등급 상승!`;
-  $('obj-title').textContent = first ? `${t.name} → ${PROMO_NAME[k]}` : `${PROMO_NAME[k]} ★${star}`;
+  img.innerHTML = `<div class="token relative" style="${teamStyle('player')};width:100%;height:100%"><div class="unit-art${pro ? ' promo-art' : ''}">${unitSvg(k, pro, 'player')}</div></div>`;
+  $('obj-tag').innerHTML = first ? '⚜ 전직 완료!' : `${tierStarsHtml(star)} 등급 상승!`;
+  $('obj-title').textContent = first ? `${t.name} → ${PROMO_NAME[k]}` : `${pro ? PROMO_NAME[k] : t.name} ★${tierStars(star)}`;
   $('obj-desc').style.whiteSpace = 'pre-line';
-  $('obj-desc').textContent = `${first ? '새로운 모습으로 다시 태어났습니다!\n이동력 +1 · ' : ''}체력 ${st.maxHp} · ${heal ? '회복력 ' + st.healPower : '공격 ' + st.atk} · 방어 ${st.def}\n${star < STAR_MAX ? '재료를 모아 ★ 등급을 더 올릴 수 있어요.' : '최고 등급에 도달했습니다!'}`;
+  $('obj-desc').textContent = `${first ? '새로운 모습으로 다시 태어났습니다!\n이동력 +1 · ' : ''}체력 ${st.maxHp} · ${heal ? '회복력 ' + st.healPower : '공격 ' + st.atk} · 방어 ${st.def}\n${star >= TIER_MAX ? '최고 등급에 도달했습니다!' : star === 5 ? `★5 달성! 이제 ${PROMO_NAME[k]}(으)로 전직할 수 있어요.` : '재료를 모아 다음 단계로 올릴 수 있어요.'}`;
   $('obj-ok').textContent = '확인'; $('obj-modal').classList.remove('hidden');
   try { sound.play('promote'); confettiBurst(img, 40); } catch (e) {}
 }
@@ -3531,7 +3704,8 @@ function titleStart() {
 function wmTab(t) {
   if (t !== 'ach' && !$('ach-screen').classList.contains('hidden')) closeAch();
   if (t !== 'upg' && !$('upgrade-screen').classList.contains('hidden')) closeUpgrade();
-  if (t === 'ach') openAch(); else if (t === 'upg') openUpgrade();
+  if (t !== 'inv' && !$('inv-screen').classList.contains('hidden')) closeInv();
+  if (t === 'ach') openAch(); else if (t === 'upg') openUpgrade(); else if (t === 'inv') openInv();
 }
 function openWmSet() { $('wm-set-body').appendChild($('audio-set')); syncAudioUi(); $('wm-set').classList.remove('hidden'); }
 function closeWmSet() { $('menu-col').prepend($('audio-set')); $('wm-set').classList.add('hidden'); }
@@ -3553,10 +3727,17 @@ function createUnit(owner, typeKey, r, c) {
   const t = UNIT_TYPES[typeKey];
   const n = unitSeq[owner + typeKey] = (unitSeq[owner + typeKey] || 0) + 1;
   let st8 = { maxHp: t.maxHp, atk: t.atk, def: t.def, healPower: t.healPower };
-  if (owner === 'player') st8 = curStats(typeKey);                                                  // 병종 강화·전직 적용
+  let ringEv = 0;
+  if (owner === 'player') {
+    st8 = curStats(typeKey);
+    const rb = ringBonus(typeKey);                                                                     // 장착한 반지
+    st8 = { ...st8, maxHp: Math.round(st8.maxHp * (1 + (rb.life || 0) / 100)), atk: Math.round(st8.atk * (1 + (rb.atk || 0) / 100)), def: st8.def + (rb.guard || 0) };
+    ringEv = rb.evade || 0;
+  }                                                  // 병종 강화·전직 적용
   else { const bst = 1 + aiBoost(currentStage); st8 = { maxHp: Math.round(t.maxHp * bst), atk: Math.round(t.atk * bst), def: t.def, healPower: t.healPower }; } // 후반 스테이지 적 강화
   const promo = owner === 'player' && isPromo(typeKey);
   const u = { id: owner + typeKey + n, owner, typeKey, name: promo ? PROMO_NAME[typeKey] : t.name, promo, hp: st8.maxHp, maxHp: st8.maxHp, atk: st8.atk, def: st8.def, healPower: st8.healPower, r, c };
+  u.ringEv = ringEv;
   board[r][c] = u; units.push(u);
 }
 
@@ -4939,8 +5120,8 @@ async function playClassXp(list) {
         await wait(dur(520));
         bar.style.transition = 'none'; bar.style.width = lv >= CLV_MAX ? '100%' : '0%'; void bar.offsetWidth;
         txt.textContent = lv >= CLV_MAX ? 'MAX' : `0 / ${clvNeed(lv)}`;
-        if (lv < CLV_MAX && STAR_LV.includes(lv) && STAR_LV.indexOf(lv) === starOf(x.k)) {
-          const n = document.createElement('div'); n.className = 'cls-note'; n.textContent = `★${starOf(x.k) + 1} ${starOf(x.k) ? '업그레이드' : '전직'} 조건 달성!`; row.querySelector('.cls-mid').appendChild(n);
+        if (tierOf(x.k) < TIER_MAX && TIER_LV[tierOf(x.k)] === lv) {
+          const n = document.createElement('div'); n.className = 'cls-note'; n.textContent = `${tierNextLabel(tierOf(x.k))} 조건 달성!`; row.querySelector('.cls-mid').appendChild(n);
         }
       }
     }
@@ -5111,7 +5292,7 @@ function scHtml(unit) {
   const t = UNIT_TYPES[unit.typeKey], mine = unit.owner === 'player', heal = unit.typeKey === 'HEALER', ev = evadeParts(unit), mo = momentum[unit.owner] || 0;
   const atk = heal ? unit.healPower : unit.atk * DAMAGE_SCALE * castleBonus(unit, unit.r, unit.c);
   const ex = (mo ? `<span class="sc-st ${mo > 0 ? 'up' : 'down'}"><em>${mo > 0 ? '🔥' : '🧊'}</em><b>${mo > 0 ? '+' : ''}${mo}</b></span>` : '') + (castleBonus(unit, unit.r, unit.c) > 1 ? '<span class="sc-st up" title="성 수비"><em>🏰</em><b>×2</b></span>' : '') + (!heal && catapultActive(unit.r, unit.c) ? '<span class="sc-st up" title="투석기"><em>🪨</em><b>↗</b></span>' : '');
-  return `<div class="sc-face ${mine ? 'ally' : 'foe'}">${portrait(unit.typeKey, unit.owner, !!unit.promo)}</div><div class="sc-body"><div class="sc-top"><b class="sc-name">${unit.name}</b>${mine ? `<span class="sc-lv">Lv ${clv(unit.typeKey)}${starOf(unit.typeKey) ? ' ★' + starOf(unit.typeKey) : ''}</span>` : ''}<span class="sc-cls">🎯 ${t.tag}</span></div><div class="sc-hp">${bar(mine ? 'ally' : 'foe', unit.hp / unit.maxHp)}<b>${unit.hp}/${unit.maxHp}</b></div><div class="sc-stats">${stat(heal ? '💚' : '⚔', heal ? '회복' : '공격', atk)}${stat('🛡', '방어', unit.def)}${stat('💨', '회피', ev.total + '%')}${ex}</div></div>`;
+  return `<div class="sc-face ${mine ? 'ally' : 'foe'}">${portrait(unit.typeKey, unit.owner, !!unit.promo)}</div><div class="sc-body"><div class="sc-top"><b class="sc-name">${unit.name}</b>${mine ? `<span class="sc-lv">Lv ${clv(unit.typeKey)}${tierStars(tierOf(unit.typeKey)) ? ' ★' + tierStars(tierOf(unit.typeKey)) : ''}</span>` : ''}<span class="sc-cls">🎯 ${t.tag}</span></div><div class="sc-hp">${bar(mine ? 'ally' : 'foe', unit.hp / unit.maxHp)}<b>${unit.hp}/${unit.maxHp}</b></div><div class="sc-stats">${stat(heal ? '💚' : '⚔', heal ? '회복' : '공격', atk)}${stat('🛡', '방어', unit.def)}${stat('💨', '회피', ev.total + '%')}${ex}</div></div>`;
 }
 { const _udp = updateDetailPanel; updateDetailPanel = function (unit) { _udp(unit); const chip = $('unit-chip'); if (chip) chip.innerHTML = unit ? scHtml(unit) : ''; }; }
 function setInstruction(msg) { $('phase-instruction').innerText = msg; }
