@@ -1233,7 +1233,7 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
 .upg-lv{display:flex;align-items:center;gap:6px;margin-top:3px;font-size:10px;color:#94a3b8;white-space:nowrap}.upg-lv b{color:#fde68a;font-size:12px}
 .upg-xp{flex:1 1 40px;min-width:28px;max-width:120px;height:6px;border-radius:9px;background:#1e293b;box-shadow:inset 0 0 0 1px #334155;overflow:hidden}.upg-xp i{display:block;height:100%;background:linear-gradient(90deg,#38bdf8,#a5f3fc)}
 .upg-cost{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;padding-top:6px;border-top:1px dashed rgba(148,163,184,.3);font-size:11px;color:#cbd5e1}
-.upg-cost{align-items:flex-start}.upg-rc{display:flex;flex-wrap:wrap;gap:4px 10px;flex:1;min-width:0}
+.upg-cost{align-items:flex-start}.rc-lv{display:inline-flex;align-items:center;gap:3px;color:#cbd5e1}.rc-lv b{color:#7dd3fc}.rc-lv.lack b{color:#f87171}.upg-rc{display:flex;flex-wrap:wrap;gap:4px 10px;flex:1;min-width:0}
 .rc-m{display:inline-flex;align-items:center;gap:4px}.rc-m>span{color:#cbd5e1}.rc-m b,.rc-g b{color:#fde047}.rc-m.lack b,.rc-g.lack b{color:#f87171}.rc-g{flex:none;white-space:nowrap}
 /* 전투: 병종 경험치 · 레벨업 */
 .sc-lv{font-size:10px;font-weight:900;color:#fde047;margin-left:4px}
@@ -1336,6 +1336,34 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
 .slot-rain .ic{width:28px;height:28px;margin:0}
 @keyframes slotRain{from{transform:translateY(0) rotate(0)}to{transform:translateY(calc(100vh + 80px)) rotate(var(--rot))}}
 @media (prefers-reduced-motion:reduce){.slot-wrap.shake-small,.slot-wrap.shake-big,.reel.lock,.slot-wrap.jackpot .slot-machine{animation:none}.slot-rain{display:none}}
+/* ---------- 결과: 병종 경험치 ---------- */
+#res-cls{padding:2px 0 4px}
+.cls-head{text-align:center;margin-bottom:8px}
+.cls-title{font-size:26px;line-height:1.1;color:#7dd3fc;-webkit-text-stroke:1.5px #0c4a6e;paint-order:stroke fill;text-shadow:0 3px 0 #0c4a6e,0 0 14px rgba(56,189,248,.5)}
+.cls-sub{font-size:11px;color:#94a3b8;margin-top:2px}
+.cls-list{display:flex;flex-direction:column;gap:6px;max-height:min(52dvh,420px);overflow-y:auto;padding:2px}
+.cls-row{position:relative;display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:12px;background:rgba(2,6,23,.5);border:1px solid rgba(148,163,184,.2);text-align:left;opacity:.55;transition:opacity .25s,border-color .25s,box-shadow .25s,transform .25s}
+.cls-row.on{opacity:1;border-color:rgba(125,211,252,.8);box-shadow:0 0 14px rgba(56,189,248,.35);transform:scale(1.02)}
+.cls-row.done{opacity:1}
+.cls-row.lvup{animation:clsLvup .6s ease-out}
+@keyframes clsLvup{0%{box-shadow:0 0 0 0 rgba(253,224,71,.9),inset 0 0 30px rgba(253,224,71,.6);border-color:#fde047}100%{box-shadow:0 0 0 14px rgba(253,224,71,0),inset 0 0 0 rgba(253,224,71,0)}}
+.cls-face{width:40px;height:40px;flex:none}
+.cls-mid{flex:1;min-width:0}
+.cls-top{display:flex;align-items:center;gap:6px;font-size:13px}.cls-top b{color:#fde68a}
+.cls-lv{font-size:11px;font-weight:900;color:#94a3b8}.cls-lv i{display:inline-block;font-style:normal;font-size:14px;color:#fde047;min-width:14px}
+.cls-lv i.pop{animation:lvNumPop .6s cubic-bezier(.2,1.8,.4,1)}
+@keyframes lvNumPop{0%{transform:scale(1)}35%{transform:scale(2.1);color:#fff;text-shadow:0 0 10px #fde047}100%{transform:scale(1)}}
+.cls-gain{margin-left:auto;font-style:normal;font-size:12px;font-weight:900;color:#7dd3fc}.cls-gain i{font-style:normal}
+.cls-bar{position:relative;height:12px;margin-top:4px;border-radius:9px;background:#0f172a;box-shadow:inset 0 0 0 1px #334155;overflow:hidden}
+.cls-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:9px;background:linear-gradient(90deg,#0ea5e9,#7dd3fc,#e0f2fe);box-shadow:0 0 8px rgba(125,211,252,.8)}
+.cls-row.lvup .cls-bar i{background:linear-gradient(90deg,#f59e0b,#fde047,#fff7ae)}
+.cls-bar span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff;text-shadow:0 1px 2px #000}
+.cls-parts{display:flex;flex-wrap:wrap;gap:3px 8px;margin-top:3px;font-size:9.5px;color:#94a3b8}.cls-parts b{color:#cbd5e1}
+.cls-note{margin-top:3px;font-size:10px;font-weight:900;color:#fde047;animation:missDrop .4s cubic-bezier(.3,1.5,.5,1) both}
+.cls-lvtag{position:absolute;right:10px;top:-10px;z-index:3;pointer-events:none;font-family:'Black Han Sans',sans-serif;font-size:18px;color:#fde047;-webkit-text-stroke:1.2px #7c2d12;paint-order:stroke fill;text-shadow:0 0 12px #f59e0b;animation:clsTag 1.5s cubic-bezier(.2,1.4,.4,1) forwards}
+.cls-lvtag small{font-size:11px;color:#fff;-webkit-text-stroke:0}
+@keyframes clsTag{0%{opacity:0;transform:scale(.3) translateY(10px)}18%{opacity:1;transform:scale(1.25)}30%{transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-16px)}}
+#cls-next{margin-top:10px}
 </style>
 <style id="item-art">/*ITEM-ART-START*/
 .itm-herb{background:none!important;box-shadow:none!important}.itm-herb::after{display:none!important}.itm-herb>i.ic{inset:0!important;background-image:url(data:image/webp;base64,UklGRiomAABXRUJQVlA4WAoAAAAQAAAAfwAAfwAAQUxQSLcOAAAd8LVt2/K21bZt+3FdkkwxBeoyM2Oa0d7MzDh73z/o/geMDw5mZqZ0UDlUiOuQHUm+pOvYJySLrAenImIC+P9UFZD4f1Gi8NItR+v3zvbT/4sRBrm19uJvrfXNy39/If2/DgFGEK37fnVtt90uj50s/+eVnDsCD9MIFmCGR+vkL11sdzKSpV+/+PXa80UYkEF4BJkRo/mLL3SqytQRbL34hbeZowIDyAIz4fBDP9/umbRwoQc6Z3tzxGKqMezoH7d7dUKQcrF29FU8P+SBgJxAQAoo1/7gSpUJkYC8dMvrfXluDIYSwpDEQA4DFUZFcepot2eGBmRj7WoP4fkgQ2j9kbtaO+fP7tRZDwwNHM0j64u9vZUn9ypyGCAd6fQT5EMnC0MUj/7Z2tX+yhFe+/5L2720BBmp5r2//vCi5ct7vbpm5OV+ZUD4cMkyBN76/Yu7e3Vz/eZH7uh/+Tvt2kCkGu/7xbf3ulWxQK9ORg2XWUdyiGUZYYaquGNjtwK5WNp85Jnz77/UlwV6+Jd32lXflOlkTAkrAeFDICwLM+Ji9hNCoOYtv3vLv7/UlimWf+vd3ezLkYzfKOraSgB51oQSKGqGBra70QgigZAWTj375W/0jTe2rvQzTDLB2069+nKnVnIIJa3cvtU/f6ZPHYAN3isXiUSAlM2nX/jc98JqaVdKJhqbf33/q/96qVYCAs+QXD7+VzfsR3P7Y6evdAdkaGvZRiZIws2Hf++jp5P9XlNmwkXrpt9ofODSftbUzLRcbP3+u7t7cfyRJy9/+XQ7ksF+lgEEyaCKh1/85Bu+vrsZmhQFjV+/7dp7F87sUs+STPm8dvcRjVtOPvXmx94gE6jrJhDJ0MhoPX37x69ce+u25uSg2PqF29dbb77/rbpGeEaAjQd22rJF0bj5T+79/EeuuoYFuiBzsIojv8xHO2/csNKPiQVqxeLWL239j9P7gDwrsbG6209kEeLh36o/8WObrV6bZMRIitVf/Ombt13qMs1wEXW+787PXKzBzKpWyz0lEImIY792zye+rvLu9zpm5ADuum9nqVORU4BwqPnE9us1yLPCWr+TMjJBKpae/N2Pfa3x8F5Vy6MAReNXH9it0kw1A4pVX2FmZWKl08NhBiNR3PNH37ngTi1HjkYcXa16yqlEQuRVt2YH0GKvbxmIhACXj/5G92qVIhmzkPpKppoB1OeKUjMiTLhR14weNO7a6tVOxg9Ipm3l7vc3i1k5MGMMCDk5vP7BO60CQJ6SwEOqRngcwspDU7/zwaVyCMJTOdhXFxsxFpEc1vqNf1hqlkQys8przUWscQ6v3/7wsQUCImclksvlUsG89JUPbC4vRAqUgPDUQJf3t+qw5kL91n9bXloQARAkIE9I4IFIuH71RsRczN7Xyuc2lHWv3el0azNFmaGRkrsXbmrNh4zi1O+uS2Wh+vruzsV3zm7v9W08iaEhkpDq08duYC5Glrce7e7LUR45duLmo0eal1/94etX2/Z4MoQyFpc3144s+8xLZMwDkAuHZQA1V7buvP8Wn/7Y2/Y4Mo1Y3Lr1ptuPtdS5rveudsw8zDJlGTQARLl47K6nNt7/3cpjQOvWpx46Ue+223t7vbpH1XfOg+iXyZgitPjzJ9//XUYWOvbCyes7e51ON4IEMpmPkUSOBih45LZPVKMoVp//tWq3U3WtNGaocOThm7DUvO3M/ghafvx3j7Y7Vb8OW0Z4ACKZh5GRY7nwfkM+QPHsL+y0O1ELTCRYIBzJvIwch+z/rBQHxsrfXG33nBiCjEQWZq4GOZLV/9rl4iDFb11q18mIkchA5BwZ3VQXv/izUgdx5IFuO4ZFAgQkQTJXIw+wL337uzQlDi4WumQMGTFI5myWOcTVuf+8dqSU8DD5+tt3FWYw8qA5HMmg9775iYVWKTHq/ufuulsEkDHHhpq9D7+yXCoEHoGfffyX7m0hxDzUgCcT6dz+yE6rLG2BfFDd/8jXn37f8WZAxiEQHkGWB5AngX3xv/SaZQGRjF7v/+RjvVMnN6xIMmbN4mBZZlBm/Izk0r+tNcsAUmNQ55VvfG/jd25upIiMGcNCFmba6bffv9osw4ih8hALSO2f/+RP3vf8rQqUxEwJY1lM3Rc+sNwqA9kaMmZS73/v850XHt9sBZiYIUAGa0rpC//9RKssmKTF0Drf+95nqwdO3brcDEzMjJHFUOsga5ysf/TBzYWmGJoabcR0bv/k2+dueuHxxTJwzIgsy8NGtBgz9fL/PLHQcoARYxsNgXT2XvvemYeeOd4qOJQWWFiMna6LggNT4yAfANTRfe0Tvd9+eHYcluVhGGTE+HHv737pO/WwFEM9gpF1wGC1stSpZwYLowMmHm49/ssf+pESK8WgxagyI2YUP/9Eu1d7ZgCBp0RQPvTb//NnaaUY7pEMWMMib/v1TtUnclZkZlPNZx794DuZYrhGAywPo3nqUlUTyawaYTQ9tHiq/oI52ExcK/fuVpAQMwIWs1kce/7T10eQR5JH8fKR3bowImNWsKaREMMoT147PcKYBoyGUPeK0iBIEbMx+QQCMoZIy89/rn+QRxtuWcDexRNlGbhgLhpAGQy989wI8gQwQO599pabW41GiQrrcGUYkUTdyGG9BiMKj6Uh1Kc/dWxzdWVpc7MsONQZFpmBZSTw/g9KjYAZ2wzvv3T6ci9bN57aKqeRxNQGk0tVY7FVBGT0vrmnkcaWESkgs91pd/U03fTksiSnFtjw7f9xvd/YOHHHDcvvfONyU0zRgBlq4+XfpV31mXxkxtTIIHjqzMcuXtvefvtqtbJQliN5LMAcmCofvbNd9Ymc2GxGyrH5Gz87XWWv3amLssiRJis8JLz6/NVuSsnEMyKnNzQefOGTbyaEVUtM22JQxB1L7dpKJh/JLAZG5ck7/3MfoxQjezJYA2jr/rPdZB5GKuJ3Xv6RIxEzKDP0tt+5tldZOQeIlI4+8/m2xUyawVj9nV6n6pn5GJhn3j7PrMqAHr+tU6Uj5wOgm8vz/TEsT0gGKF+8UqVI5mas3/BaNYaSycoAsXJzp6dkbmbQOnGxl6NNVmCGLqxWNZOUDwlW0aiSWY7oMxcTiCSo6921YobC/aoVGROwZo32pY2FwrVi+/ySNJqnEFKsXeuKjCTGmHrGeNv/2Xn0juMrefmLN5ZiNoso1u5/5qYrVU1kkLOTQCQxzpr+7ptXY7norheanjBF6MQDj27ttKueyWB2k8ACkhht+b7X39x+d8elJEa1PAmg0Vt/6sXWdrtb1SLJmJ3hllESo8QN7cuhzBAjGmEmGq21X3ie3Xa3SisJyBnJAIwsC4uMEdjQJackRpWtiUgnHj/Z2O10nSkz20lYAElgcXBGNIvrYDG6bCao8v4/KXY6VR8yTM5ShkEASdQO6YAMS0U/g3GtSWjlV39jd7dTJc4ymeGMFFWtxsD+me21rSOtMmMIyO43mKAZX/H801fbkWmCZIYzMqi+s3NsZWkx6td+2Nbm7Q8dL4GEwNqvFrDGmmj5x5fafdlEMtORWP1XLu626/TewmPHr71+YeHZe0ohGVRfr1tiXE/miY32ftTMYsZogzVF3bl2dWe/efNWw/uXvvH9u37zWBlSYr+52kIeY8IPtduANQOQMUqGrapYyCgKZNd13c8zn79w8rGNgsLeP73cFEDkQZ5QmSkz/YTIIOMgwHmtuWpFoVKin65o/+AH66eOCuLMOwsFyIxoJnxm84gdRE4lI5LByBFs9d7eWAcpaJYqyNiv2+e/fuWZ2xt57lOrC4xpJlz8oLgvlJExjSyToRmM6v7Va7cXQEhEqCxp1PX13a+/1Fq+/O7qQkkMpIZN/sqXnzsawkVOgYQYIOOAlPP6O5tHAxSWHIKIZlPt3Zd/tr14ZKEhRvfE+vpI++dPFFIdU4iMZGj0Y0jKve2zR+5cCsKWCJMBUTRbvfa1/WKxYNA6wEy+u/25a79wd6tgqtGPYRkZCSi7b7+zcctyZGEpMhIKQ6JYKN3up3AAiQbMNDuXvtn9leNoKqNnGLL/9rXNo6UoMjCRITOYcjRLd4wDbDFopup2N0705OlZGCBF9i5e3dgsJblIBcqwIEGWiZoQGItBM+3+8f2OmbqFbQyu21euHVttKQsJR0KZCIcTwnU3WiZsxKCZule6NZFTibRw7cTOau9adXytoZBSLhwGZJQyZNWpF8rCiIPlafHu2gIZU0kJ6t3zFv26Vy8fW26WISOIFKqDSNlytdcpF8oSEh2gZNo6vXxryfQzL3TqGmiuLDcahXAYlGFlkcIZdXb2WGhFMLqZen3hzSdXNJUMSK7vru2niyiLUADIAhnkSKtfVd3e4kILAakRZtDXPr7+i02REBPCSqqLSyuZokRAAC4MBlmZ3W7Vi3KhVaAMLA70LFC99aEbT55ohDHEREi8u3t8v1EgAMnCYSUiXFfVfi+azWYrSBEexcyke2/+j/37Hl5r3iCRMSyJUazOzlIzWw4ZKQkcaYm+q26/UrnYKptKFGAjhppZ7e/vfO+75/fv+tubCpSA5SBFDKSs3pXu2s6JKNOECWPbdb9XZS+jsdRolRIuMGAx3Mxwt+pc6b27/etrhQHkXtVsQgZD6+rK4v4qqgPqSOjXWfczo2iUjWYoUgiBEsSgmfV+P9vv7/3RMSLS7uzs3bhWiCQySF/trl5bt4u67vcrZ21F2WiUZcMhBJLBgBhqcQhdXfovP/79x1bJvbPvHjlW3rEUiAzbV3eOXDreyLqz30sVUQ5GoYIMsIysRIzqwwB175ufKY+1dvfixpUTl/O5G0oD5tKZWGwsZZ2UzbKMQgVGlhNAFoA42BxaZ/36y+90Vpeazfp69+X2C4+vA703vlhvLawfUbNRFhHIgCAjNTC2OdRmb4+hu53qq5/0z98Z2z98dXm5LMuiJKSESIYqxQTN/PS+2j/87HYsrS80awWDSkFq2CTNnHWv7uz1y1KScghidAs8RGDmsWsEYuJKxKCS+W1kYU3EgIeYuW4M1gjWgGUOOwBWUDggTBcAAJBRAJ0BKoAAgAA+SRyLRCKhoRp7DxQoBIS2AGSlE38r55TanhvyH/I75Rau/fv7F/Zf9fxFBpO1X9d9y3w0/3Xsj/Uf+w9wD9WP9x6WPrC/tX/P9Qv7K/sd7vv+2/Y73Zf2//Vewr/Nf7V6YHsi/tP7B37GerR/y/+7/qPg4/Z//yf5X4Bv5r/a//D1gHoAdhB/Jfwr/U3yF/pP1Y+p/ic9rfuP7cesdif6hdTL5P+Af2H+D89P+T4P/DrUC/IP5v/pfRN+n/WTvB7Sf8j1CPdT7N/yP8H492rd4V/5vuCfzz+4/7bym/Dt8x9gT+i/23/S/dJ8mH+1/pv8z+1HuS+mv+z/nPgG/ln9Q/2f96/zH/w/x3zkexL9qfY6/Uj783p69yoz2i91bz+tfItd9mSivDndP/zWKppYwusm9OHcSlTqhFbfDIcfgffPBH9NidNkOlyli+ZyoyyfJisxX/YIv4FJl4wPkibP/9DjN28uEuNc/Wbpmk+/LdwWanUhPUC/d2BmF42ioS4d+R0v8Dde/6ne74Mi3SBsINlb+OF3vtVDN63766Pbddntk9/wDUKEeU+9x0+VBDyJvg8wK/42S7MsWlJzEqXOqKn+8vU6WPjKHDmwzh0sptcznOppVoF/nzlO6uAFpWdAi3B0zpNxWUqnfqUacB+0bPoe4oeXqmAMT1B6UKe/ZYb5EW3cq2lj7WH7L1xpWnUqQg0zBcdVIver4eDN3cok34Gg5SQWv1IOllCJOzXKqgh55ZV8ysvhPVoTgB9MHW3C5zcld3f+SZ5Bdmiq+L19UtVEqmzox0gtM6kSdk3Ue2RqBUljWnieoAPqWIuzAANu6QQMfsFZ1qTyyb8/keeA9NoWOTYdvzjXNwAA/v8NZAzfEayLztz627aENRZNuMHP92bHr6BfPascvf/Bz6IZ7oMrIVXlmfaDVuHNFhenCXir8mne8R4wSa0lvWdr3YIqMD+xfONd3cNtnSd+znIi+T9N972+5AF/4l2ytaSHvKVQ4G+69jgZpk9iCAhah+2rEwudwfIyyFPH7tkPFxG1wCSBI2lT5o4xu3zjMO+qR5lYpxrj9qCk2/ZNN2yCol8Nt+GJDZnH0vG5LL/8iqzrmJEP7mSUx/dEVAtEAf1kUCq0VJgLsoaqeCnOMK6O4vRubGoSpBBScqg7VT4vmM/G6ZM0TEz7vH8riGe/GwU9CvH6SDhxAstsuS3XdcTDnDCM9KAiinE0mBkcbWbR73jnHAYTWLXgb6gWHYNQzGYDnxpUcsvpSnTAvjQyTzFXvtjykvjfdX3ofVfolrVRcdl6H7Xz0rdRlTfLHpNRX3K95UKMlEfNuncFihkBk9ow9n+Lf7LSH0GZJdVhRYibSZqsn00rwaKBr+bjF/XsiwjkKA77oOg0KON2ukSHb620We44ZaK0i0V4FK5M5mgBaRqy5DeiT5nhk0dHAn8T6+DvNogsGyYiDvBPRgl+OTYP39j9fChNXJvm4NxbBQrSHqM6/kiBmBNK6c5ZBYtSaJuHtSjYy8BJeOJ9Hab5GgKoqc7VXatgSjARZQNNDOMWzekhnDhlaRxfTYm6X97PkCnpkS8zOv/SAhk/mll6HGQBC/heKyVEEgsnibISG7AQclnLj/F87MfLpL4ObjoGoq3KS96Ku7TKMxJyOa/sL0qmkpoEhLT1nBo2mv1fE/re2NVjSuKIqlIKQTJQD+0RyWElBH7ajIrPRQDvc9YJGPxmcF+0e1NmygKxMnE0JbSLR23+KA7CfiBqHUgxHUCQy1zW9dX0FxAmFCFarXJGgA6AQ+0DSXKqYAoUkvLJYDzOg1ki7JzoZdwOb65ubpzdDXzrHoNFvSoRF3yfEsfYuZ7Rt3p2lNLIKvWOmHHUioyWx8jzGjCX44P1CgKOGf0wVKSvKAzypftPYvAL0nX0Pw/CwgUSRa4kXTvxboyBL1mUf5hhmrZth/J4n2V6cY7rb4UuBvuWoI1J/obNBRogPJ3BSTMsvKFs3nYWpI36anZMjiH0WWiLmo+gQga02oHPHX1xB2BSeP0tw9khEnSQ0Qemqom3OlZnv+KlhsEuyNPjkzZmpeGyq2i0fwWOme96OAl3l2qvq7CTj7rSgLmFjDVvFZkQu3iFq7tFKRB0n+LOgKTMRkGMzKe5AfNd/jvVKFKHmsd64PcXxl5WVuOhKe3BL/eTrMahezjPTikdru1feN1Eqp/vVxvsk0Bgpv7I4/AB6U9nt1VtvFwd2rjKS297EzbUqei/RzWLyOyWrG8oFdOUi1WPRZhTUc8Zube1G6Z0YxsKX7sv5+mVcAFrOKT4Tt5LZMgCQKH+9slabsc+PswNWneOESkBQeALhYz/c3f/+qgf/6rr//+qgp2KLzwQsARb+H/7ECvKSCgLONmSsXpQA69e1XP+wzCIYNFL0ISJ7QLDNz5L8v10KQYgWyOipMXaLLe5Zy7BpgVdQjcQ/u4CuujNtaK6+dAnTyaaqv49Hiwt8Vt+H9WT0f4wA/AMRMMrnWsy7YxGLNFTOfJZ1+8LT0SyAnSPus2MpPrJc9SO8YAYcAwEa54Uw7oBXwfFsUzHeIdlNu+sqo70+D0keAZ3iATCkWYNN2+nPZCt6BBldrTiavLYLCRJtSqTjKmvoLyTKAs9mIo0HjbWgc4YoZT271Bhn+vAq5B5nlCCqsbHDcMxF1igp20FG7rjJhRjq/v7z69sDrDvE7EdoRUVbV2KeS/ApYWcyNJyuFrb859m3jXEh37Y5eri8R5/sKdaYMabz+bRLfHlKQqCujSxebkguBR/VXCeZpVmgoU8qug/IpP0fWbdi82N+rjQXT0DXE6+N2ufYCdYlQQ7FnbabHuSLTGPSUJU3ReHGJTKvd30Vm9TbXZiFdvKG7dzqKaeezusow9q9bXuansyhCD8IzQWkH9+D/OiAs8o6w4lBQYC/+FSIzzIH2GZ1yufDXjkUrcPlnEQzk6/d+kBjzjTxkBO22xSNLUtYaj8W473eTtaGL07aB38KK+Pc037sgSPsGevblJ3154J800XzjK+ht4lYy7/NzugX1N1DRmjE9vOylWCuqTl4BFDqW6sufehPGwiSPBt3jpbnAW4pMaZdJn8KS1sGBkhNOUvYhtkygeklofyVS5PbQrhHaLKMYHER1OoeKiQQvpt8ow7g3CqcYMMdknVlJg72i28f7I4sWCIqdbitn7OUF9eHmg5g65ojEeqeZVWNvTXCzCrT/V0Zc3L0Dc9+85QVTbOBf+bS+qzOzYVvrOe5gpOAHO5230HjiqGW+J61RbjL71Akii4GUyascVUxi2O+DyRQo3Sp0zzTySDL1MrdbfIKzf20InMZHinCtgemkeZEmJYN6tHkzSDsPBUGXyRWHCud44pDmDhC1KBXaCUJL4+EgPFDG4fz/6hocCsYf8GEUUd6chZ/7rFZZz8iEg2S+woR/j5dXKB9fkGIOmpqDgvM1de9TA21/dASGdPAEQCdGECRfiM/5FON32WnwhgeLDtc/bIGPAiUF8RVRf4tapwVhP//Axyy5vrk22Xn7vBieqS/h2QcJkmGCONXqO5CG77UCH/kbZ1IKlhcr8yoXlFrUgPPjjaPqD3W8exjLEjqbRuJycZ+D73IoG1om6KwX+vh45yiqfUnSgGW+Ap3lmqjfTs9v7Ham0YuthpU5aj6fuv74ZJU2eMOo8A0mkZvszvbxQ2CAY7Z32DBg89rAdc5tZVJ56ZnYnJL287lm64cOe2aRY3scLMIr4vR7rcNmiqKAKVxFDimZVYuXeI88zzxois2OH5onykJqFcOUUoNEte/gbUb7ixdMRddid+dW/+Idv2DXtX1YKPzXd1LGbQfzCQ/AsWIaESwmR6naQ1+b//5M530Hpjg4YMtJTuIe3Q8uel/R4SyEjlD0tBYnhqzqX+0vY3rrQzILB+tafm0w02YLz0dn7BsfKSkJtqEmv7+CS+dUOSgvk7VcJkA1HFsE/OTAUXEffMhjSUAico2GgL9MIW43zfz4EIxs/9bz4XSAlEILzlqvcrzNsVSIkDylYq/LsmaA6tvZgCMli66h1bKShBoYJGCZYCVbfRiScoU91JLmn/3te3uyQtjnfPD6der6ApaR4vTOdmqB5jpoKjFU698nqRFYEFH1ThKh4EvnGc5hJVs72DOa/wOgtMU4WEOBuyLL3d2AuFlWCP7VwE6iCh3EAdqZmskjfCC4mQphnc4PQj6Uj5RHLENWJxvdhT5o90f3yGe8oQd2ay+kCwEyjkqG1/FkbnQH93E7t4bvfxmxlfEb6jVrIYsI7JZlvfA6SmWTORj2z1ZhLTPCtDEfnpSwvJW71SAdKRD1xt5BMOwy8tr+PLD3wYs59lkCeduGMOFIPHehmlK2w2pgvd2HlpVn66Xww/W1MLavYUchpslXhLWb+TzSUX/8Nbtr6wcbEg9ek4YVkGsP/+OlFCvhpxEsINbg2pHOWDkf+D2wwEVezCMfBfyI/hNGuZ915Hau8civ9fkpGC8nu9XOQL+wdX6GMR9DHRKegTLxGvgea5xti6oFbi/3/za+YgAT2KV8E4gmYyQGfhDOqWI8XxACkxmzfL6f/n3igRG2UWMnb0BM7hRDUEOXX576df6IHsoodGFA+5LCPpzQxpl2Fk3TapROHw3lFCJPFgMqe1pm7ezQ6QE+XwpD4UOf1UB9GjqN2TW1CO+UCZcdZXYSM6dTAdYXHDcbZAacSCgl5NfxQ4GGGkQ/PP4A+95NE9a4sfaKsOPPrAj40ZawGoSPDXSqpDMuyJugZOmxt7Bq9ixaGcQH/6VgihDbqA+PHGcEng/OQ4nL8KufMTkiJ0pcCTWeip9thSsL1sPhhkRpKWJYwAFqLk3ExEk5KcZXlvarNqKtMnZMFCUQVexjxnHohB7IyWJnjJlHshJqtyzu/z21KQg/hFm6ErD18tOtYGIUQHnc3uyweE6f11KZgR2DdSIl5Lq3x7etlKMTYuv1xxGd4rkkmrtV0t6rFosTwegV6xUPucpZf2zfDe5YXCz6+dShaKaoRRlLBGKc4AqmSYR6CW0YCtn5OUjyxeoQmq/+5qDCz1VXY2Uf5VRPGV2HidVcD2huEblX4f437lbLUOg8Uq73y3e5uDr/MRCIO3v2DEhM91JW19P++1wnPeY2Hl5WJQGjudb6dzCuugeHCCuNp9vZrV23dgejx6ituX+4hVfCd43AVnMz4Ad2h2yFkqBY+abP5XVAzpm+jog3kYywIszz6mC0//DCL9UhZkfSr8PtyxZGxT5RDExXePO6ww4YnI4Cirxj+tGD7cN474X6gbF3+oyN7f0EOIfSootVpj3A0kUn7WUru9rgcLDBmPUwfSQo0JRF98u4K7EdSM0ElKoJMGuwr6TCcPfE1vhkQs9CSrbYRyvXXG6F/oL8z+RJom8MzJeQI4urfJMyhgjoJHIPbAaaecPkSGefi5pUQ8dAFpnTNtTMfOlOILKGbTUYao4GesRxeUHMREc4pj13hVXyX4kYS4hiUh4r2SIeqnBDjfsUL++y6AeTbT4jpHezKRosEKM4713uib6nlV06owGjaVxt6mdeGTouyW3FfOJgFPb/kXHq3R0K/G/H1+dGg2/1TZRfvD1VXKDjVl/NWDbixT9+3U6WxsnCoVNONaaZJuj1haFFzK2TuTEghAeGP6BQFfioG74rXUhEHJOl/jzmmkMwnCCWny50bcwxQw4DGX+Z8WGkJBZlnedCdrqcUxg7dW0LLtJRck237on3VrP1OAZMDyoxQJFeWRJFyLcBZRj1bm4LW3XHW6ViUPJxr2AKF69fCuM4Ih6fv80g8IA4yV93nYsNueg4oSkRQ3LZuvZefkzFzFeIj5sbxQuKIYwYHFmgdgKEzdcAxkfvIwqK7T+kkdZgoRvKrM2a3qrt/Y88zAz1TH5Fk+/LDR3b6WSP5g5ws0ItTkQZdEqv6UHIOFGV2z7ehdmzDtyK8s0izHvjQY/nYpOHdflf6KVbz9Z7B6sfkK7pHpEOBdx8/UzvILm7fWc7Uf1npUtm+56y1HzFSZuINIZ+9ITJaPc2BE+1/ide0JlKHscUaHjbz/zTKVp0HWpBGSv6tT80/KAg1FG53NZ+LPFLijP7zkdT/uVURnCIXZd/ckeS97+TpuZQ3sUDRMLl83VbJXrPSJvIt2dLcaez7Hzs87IuI+cBBx7Ur2rABjMA5Y7FXe7wUg3ib+z2+kmJELjLxflObPHZHrPXHm9r5lNsRNNHN6rVzhGPQlO2SCXX3vQRV63r13LykFwzY8/5NpmcZ1zXpVTQlcfNjjb58zhLeF4/Rjfv3fww7sPBr4wQnDm4/ITZGv+ZxVvXkoOpRcQZkWx6AtbWzJl7h+rVjKXVCrXUR948Tfg5OLXb1+2WQn+bCk/xJqDOcgqW3GNgblKyxuKaGRB1BSZjKxYVlPb5tFMFuuFt4MeRvVYslQpJVOvU9sUYxJCMycrvzWDojSDervzPOQOqwn/VY19uur2TstNVVGsqJ1Ykups8tkTgaS8nm2nHudt6/y9gTz/KeZCWqi6B6XpAMyc7frl5Zb9pDVRb7kKOWozLAoTGQiPywa7crbXSveJ1jk/YlaZnOaGUmu5/FMLn3PY4C0rEAYkaAeEBivvYDUpEra2aRSUmZruMDeaQVJLjPtgSpJgDz4+xrq19R24UFu3R7/OdVVEc7UdEAS8qt5brFLXjtfkaTm8S1C9XpierOktv8fQ4nAPcOqpIE5c1qJzIhbypCor2H1eO/v9oyFtyjB2XEtSSWXQYv4ZdLDLqYkBB1t7s2ejmU1qlDbea6in9D9Qq3zi9vTUDjgNbUmYAxwP2wwYQEsWUaOyrE7D/mm8zBYTV88+VyGxjoSIePAkIHRGVE3cpQNnQ2Dm2A82v2yDiQaamPcrHFMk+/FlZlksfP/S2UOISYB5wXuIjcTwBrcv8hrd7kzuZM8rnlPDiFNXJ2YebFCL/vPoPvktyq640MWRSI+bLbmNlvhrN17MzrNxXI8iL8C6ivQK7NmDDe16ApdOSRxNu1AhRFs5qUClAJATpUH9toRis2PEWF5ttgd2STEGEBNeWs5ICwGRyJtpqzT5Et5gBknpx+yhqo+vYQhBBJ79eyZOWD0RrtWaWpnd63ii19USx46yxwnBFy8IjhN3e8twyUIjoeyoyPr3JHaotSh+H8AHz4tgxnFgYGDgnTy7aLhnA3RIbztucTU73TzQdiuOnyeBp1jYfkCZY1BDJpoTHTdizsdWb+e7bVNzSjhGJZK1C0ys4P+rT+OLUpGRcwYTcGqyw7/wXM1N8C8GV8TIyexVkitQqI++dSm/mVHcGotuABJyeE7EiZN+jxZSEExTwXEfUiSLeoGQVUM4nNjz71YCVwK49p98/THKEDXMowB1mcnve/jQDv+5gOlpXX0fOXEEn+bokmRRnrAEjOo03zzxik4QxNabNIYVjaSKWBMI1w7yh7iQbu3BMbYcPv+n4JI6c8UZhkB2Bsk0gJ4lfWT2hHy3o/1rumredGIDVsr/T/j4TCLhHqRUBHdrVsE0ljOA+kxrSpZOcswfSzgbYzKRZZfJxvU48D+wr07oWo3TCbIcf0HQB2rkK5o1K3qdMI42CxeUJMa4q+FdK+8DxLaoN66fKpjszYMz20Pg0bqaae32hJ2B1fNkPiRf4F2gjpX8BA7Hkj1/TiDJk0EIHaJ+Mvy45BVU/IX+GuJrj3+/uAL6LReu8+KiyCcrsgu7j9R1uTe4/3CR0TxyBFodTTXKiIUkJrLOT2/nmIRMli+dV2mTP0oV5UBwDWGWcJ1eKqGmlTW2S8M0Ajx7L7SovQEBeGOUhG8w/hUX958cbJdERCtTWcJmlaJ1MQvA+8e+TvZV2epg3oLZuLJUvP2jPkjWrBwISUmIDudUbnxyZG9L/66f//1UD//VHP//1OjwLn5i3Br/jJoeiY9UHSE0Y3npzakC4AAAAAAAA==)!important;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))!important}
@@ -1472,11 +1500,11 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
       <p id="modal-desc" class="text-slate-300 text-sm mb-3"></p>
       <div id="modal-rating" class="mb-3"></div>
     </div>
+    <div id="res-cls" class="hidden"></div>
     <div id="res-slot" class="hidden"></div>
     <div id="res-d2" class="hidden">
       <div class="text-[11px] font-black tracking-[.3em] text-amber-300 mb-1">BATTLE RESULT</div>
       <div id="res-rank" style="display:none"></div>
-      <div id="res-cxp"></div>
       
     <div id="res-btns" class="flex flex-col gap-2 res-hidden mt-4">
       <button id="modal-next" onclick="nextStage()" class="hidden w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl">▶ 진행</button>
@@ -1497,7 +1525,7 @@ button:has(>.xx)::before,button:has(>.xx)::after,button.sheet-x::before,button.s
       </div>
     </div>
     <div class="flex items-center justify-between mb-3">
-      <div><h2 class="title-font text-2xl text-amber-300">⚜ 병종 업그레이드</h2><p class="text-[11px] text-slate-400 mt-1">적을 처치하면(힐러는 회복하면) 병종 레벨이 올라 체력·공격력 +2.5%, Lv5·12·20에서 방어력 +1. 승리 보상 슬롯에서 모은 재료를 조합식대로 내고 골드를 더해 ★ 등급을 올리세요. ★마다 능력치 +15%, ★1에서 전직합니다.</p></div>
+      <div><h2 class="title-font text-2xl text-amber-300">⚜ 병종 업그레이드</h2><p class="text-[11px] text-slate-400 mt-1">전투에 참가한 병종은 경험치를 받고(처치·피해·이동·회복할수록 더 많이) 레벨이 오르면 체력·공격력 +2.5%, Lv5·12·20에서 방어력 +1. 병종 레벨이 조건(★1 Lv5 · ★2 Lv10 · ★3 Lv15 · ★4 Lv20 · ★5 Lv25)에 닿으면, 승리 보상 슬롯에서 모은 재료를 조합식대로 내고 골드를 더해 ★ 등급을 올리세요. ★마다 능력치 +15%, ★1에서 전직합니다.</p></div>
     </div>
     <div id="upg-list" class="flex flex-col gap-2.5"></div>
   </div>
@@ -2414,6 +2442,7 @@ function loadStage(i) {
   resizeBoard();
   updateTurnBadge();
   st.player.forEach(([t, r, c]) => createUnit('player', t, r, c));
+  stats.part = UNIT_ORDER.filter(k => st.player.some(x => x[0] === k));   // 이번 전투에 참가한 병종
   st.ai.forEach(([t, r, c]) => createUnit('ai', t, r, c));
   (st.obstacles || []).forEach(([r, c]) => createObstacle(r, c, th));
   setupHazards(st);
@@ -2522,7 +2551,7 @@ function dbgDo(a) {
   if (a === 'gold1') SAVE.gold += 1000;
   else if (a === 'gold2') SAVE.gold += 100000;
   else if (a === 'xp1') dbgAddXp(500);
-  else if (a === 'slot') { stats = { chests: 0 }; $('stage-select').classList.add('hidden'); showResult(true); }
+  else if (a === 'slot') { stats = { chests: 0, part: UNIT_ORDER.slice(0, 4), ct: { SWORDSMAN: { kills: 2, kxp: 22, dmg: 70, moves: 9, heal: 0 }, ARCHER: { kills: 1, kxp: 11, dmg: 40, moves: 5, heal: 0 }, HEALER: { kills: 0, kxp: 0, dmg: 0, moves: 6, heal: 40 } } }; $('stage-select').classList.add('hidden'); showResult(true); }
   else if (a === 'lv1') dbgAddXp(xpNeed(SAVE.lv) - SAVE.xp);
   else if (a === 'upg') ITEM_IDS.forEach(id => { SAVE.item[id] = matOf(id) + 20; });
   else if (a === 'allclear') { SAVE.cleared = Array.from({ length: TOTAL_STAGES }, (_, i) => i); SAVE.newUnlock = null; }
@@ -2544,7 +2573,7 @@ const clv = k => (SAVE.clv && SAVE.clv[k]) || 1;
 const cxp = k => (SAVE.cxp && SAVE.cxp[k]) || 0;
 // ---------- 병종 업그레이드: 증표 + 골드로 ★ 등급을 올린다 (★1 = 전직) ----------
 const PROMO_NAME = { SWORDSMAN: '검성', SPEARMAN: '용창병', KNIGHT: '근위기사', ARCHER: '신궁', MAGE: '대마법사', HEALER: '성녀' };
-const STAR_MAX = 5, STAR_GOLD = [800, 1600, 3000, 5000, 8000];
+const STAR_MAX = 5, STAR_GOLD = [800, 1600, 3000, 5000, 8000], STAR_LV = [5, 10, 15, 20, 25];   // ★마다 필요한 병종 레벨
 const starOf = k => (SAVE.star && SAVE.star[k]) || 0;
 const isPromo = k => starOf(k) >= 1;
 // ---------- 재료 아이템: 지역마다 6종(일반 4 · 희귀 2), 총 30종 ----------
@@ -2720,43 +2749,27 @@ function statsAt(k, lv, star) {          // lv: 병종 레벨(1~30), star: ★ �
 }
 const curStats = k => statsAt(k, clv(k), starOf(k));
 // 병종 경험치: 레벨이 오르면 전장에 있는 같은 병종 아군도 바로 강해진다
-function gainClassXp(k, n, unit) {
-  if (!UNIT_TYPES[k] || clv(k) >= CLV_MAX || n <= 0) return;
+const killXp = def => 8 + Math.round(def.maxHp * 0.08) + Math.floor(currentStage * 0.4);
+// 전투 기여도 (병종별): 처치·피해·이동·회복 — 전투가 끝나면 경험치로 바뀐다
+function contrib(k) { stats.ct = stats.ct || {}; return stats.ct[k] = stats.ct[k] || { kills: 0, kxp: 0, dmg: 0, moves: 0, heal: 0 }; }
+function addClassXp(k, n) {
   SAVE.cxp[k] = cxp(k) + n;
-  const lv0 = clv(k);
   while (clv(k) < CLV_MAX && SAVE.cxp[k] >= clvNeed(clv(k))) { SAVE.cxp[k] -= clvNeed(clv(k)); SAVE.clv[k] = clv(k) + 1; }
   if (clv(k) >= CLV_MAX) SAVE.cxp[k] = 0;
-  persist();
-  stats.cxp = stats.cxp || {}; stats.cxp[k] = (stats.cxp[k] || 0) + n;
-  if (clv(k) > lv0) { stats.clvUp = stats.clvUp || {}; stats.clvUp[k] = clv(k); }
-  classXpFx(unit, n, clv(k) > lv0 ? clv(k) : 0);
-  if (clv(k) > lv0) {
-    const st = curStats(k);
-    units.forEach(u => {
-      if (u.owner !== 'player' || u.typeKey !== k || u.hp <= 0) return;
-      u.hp = Math.min(st.maxHp, u.hp + Math.max(0, st.maxHp - u.maxHp));
-      u.maxHp = st.maxHp; u.atk = st.atk; u.def = st.def; u.healPower = st.healPower;
-    });
-    addLog('성장', `<b>${UNIT_TYPES[k].name}</b> 병종 <b class="text-yellow-300">Lv ${clv(k)}</b> 달성! 체력·${k === 'HEALER' ? '회복력' : '공격력'}이 올랐습니다.`, 'text-yellow-300 font-bold');
-    achCheck();
-  }
 }
-const killXp = def => 8 + Math.round(def.maxHp * 0.08) + Math.floor(currentStage * 0.4);
-function classXpFx(unit, n, newLv) {
-  try {
-    const t = unit && document.querySelector(`#chessboard .tile[data-r="${unit.r}"][data-c="${unit.c}"]`); if (!t) return;
-    const b = t.getBoundingClientRect(), x = b.left + b.width / 2, y = b.top + b.height * 0.15;
-    setTimeout(() => {
-      const tag = document.createElement('div'); tag.className = 'cxp-tag'; tag.textContent = `+${n} EXP`;
-      tag.style.left = x + 'px'; tag.style.top = y + 'px'; document.body.appendChild(tag); setTimeout(() => tag.remove(), 1200);
-    }, 450);
-    if (newLv) setTimeout(() => {
-      const lu = document.createElement('div'); lu.className = 'clv-up'; lu.innerHTML = `<b>LEVEL UP!</b><span>${UNIT_TYPES[unit.typeKey].name} Lv ${newLv}</span>`;
-      lu.style.left = x + 'px'; lu.style.top = (y - 6) + 'px'; document.body.appendChild(lu); setTimeout(() => lu.remove(), 1700);
-      addUnitFx(unit, 'fx-heal', 0, 0, 0, 600); addTileFx(unit.r, unit.c, '✨', 'fx-burst', 0, 700);
-      (sound.play('levelup') || sound.tone('triangle', 520, 1040, 0.3, 0.2)); vibrate([30, 40, 60]);
-    }, 900);
-  } catch (e) {}
+// 참가한 병종마다: 참전 기본 + 처치 + 피해의 25% + 이동 칸 수(최대 30) + 회복량의 30%. 패배하면 절반.
+function battleClassXp(win) {
+  const base = 10 + Math.floor(currentStage * 0.5), mul = win ? 1 : 0.5;
+  const out = (stats.part || []).map(k => {
+    const c = (stats.ct && stats.ct[k]) || { kills: 0, kxp: 0, dmg: 0, moves: 0, heal: 0 };
+    const parts = [['참전', base], ['처치', c.kxp], ['피해', c.dmg * 0.25], ['이동', Math.min(30, c.moves)], ['회복', c.heal * 0.3]]
+      .map(([n, v]) => [n, Math.round(v * mul)]).filter(x => x[1] > 0);
+    const total = parts.reduce((a, x) => a + x[1], 0), lv0 = clv(k), xp0 = cxp(k);
+    if (lv0 < CLV_MAX) addClassXp(k, total);
+    return { k, parts, total, lv0, xp0, lv1: clv(k), xp1: cxp(k), kills: c.kills };
+  });
+  persist(); if (out.some(x => x.lv1 > x.lv0)) setTimeout(achCheck, 1500);
+  return out;
 }
 function refreshGold() {
   if (!hudFlying) syncHud();
@@ -2780,11 +2793,11 @@ function renderUpgrade() {
     const t = UNIT_TYPES[k], lv = clv(k), star = starOf(k), heal = k === 'HEALER', cur = curStats(k), max = star >= STAR_MAX;
     const nx = max ? null : statsAt(k, lv, star + 1);
     const d = (a, b) => nx && b > a ? ` <b class="text-green-400">→ ${b}</b>` : '';
-    const needG = max ? 0 : STAR_GOLD[star], okM = max || recipeOk(k, star), okG = SAVE.gold >= needG;
+    const needG = max ? 0 : STAR_GOLD[star], okM = max || recipeOk(k, star), okG = SAVE.gold >= needG, needL = max ? 0 : STAR_LV[star], okL = lv >= needL;
     const xpPct = lv >= CLV_MAX ? 100 : Math.min(100, cxp(k) / clvNeed(lv) * 100);
-    const cost = max ? '' : `<div class="upg-cost"><div class="upg-rc">${recipeOf(k, star).map(([id, n]) => `<span class="rc-m${matOf(id) >= n ? '' : ' lack'}">${matIcon(id, 'sm')}<span>${matName(id)}</span><b>${matOf(id)}/${n}</b></span>`).join('')}</div><span class="rc-g${okG ? '' : ' lack'}">💰 <b>${needG.toLocaleString()}</b></span></div>`;
+    const cost = max ? '' : `<div class="upg-cost"><div class="upg-rc"><span class="rc-lv${okL ? '' : ' lack'}">병종 <b>Lv ${needL}</b></span>${recipeOf(k, star).map(([id, n]) => `<span class="rc-m${matOf(id) >= n ? '' : ' lack'}">${matIcon(id, 'sm')}<span>${matName(id)}</span><b>${matOf(id)}/${n}</b></span>`).join('')}</div><span class="rc-g${okG ? '' : ' lack'}">💰 <b>${needG.toLocaleString()}</b></span></div>`;
     const btn = max ? '<div class="shrink-0 px-3 py-2 font-black text-sm text-amber-300">MAX</div>'
-      : `<button onclick="starUp('${k}')" ${okM && okG ? '' : 'disabled'} class="shrink-0 px-3 py-2 rounded-lg font-black text-sm ${okM && okG ? (star ? 'bg-yellow-400 text-slate-950' : 'promo-btn') : 'bg-slate-700 text-slate-400'}">${star ? '★ 업그레이드' : '⚜ 전직'}</button>`;
+      : `<button onclick="starUp('${k}')" ${okL && okM && okG ? '' : 'disabled'} class="shrink-0 px-3 py-2 rounded-lg font-black text-sm ${okL && okM && okG ? (star ? 'bg-yellow-400 text-slate-950' : 'promo-btn') : 'bg-slate-700 text-slate-400'}">${!okL ? `Lv ${needL} 필요` : star ? '★ 업그레이드' : '⚜ 전직'}</button>`;
     return `<div class="panel p-3 ${star ? 'promo-card' : ''}">
       <div class="flex items-center gap-3">
         <div class="w-12 h-12 shrink-0">${portrait(k, 'player')}</div>
@@ -2800,7 +2813,7 @@ function renderUpgrade() {
 }
 function starUp(k) {
   const star = starOf(k); if (star >= STAR_MAX) return;
-  const needG = STAR_GOLD[star]; if (!recipeOk(k, star) || SAVE.gold < needG) return;
+  const needG = STAR_GOLD[star]; if (clv(k) < STAR_LV[star] || !recipeOk(k, star) || SAVE.gold < needG) return;
   recipeOf(k, star).forEach(([id, n]) => { SAVE.item[id] = matOf(id) - n; }); SAVE.gold -= needG; SAVE.star[k] = star + 1;
   if (star === 0) SAVE.promo[k] = 1;
   persist(); renderUpgrade(); achCheck(); showPromoPopup(k);
@@ -3811,6 +3824,7 @@ function selectUnitForMove(r, c) {
 
 function executeMoveTo(toR, toC) {
   const { r: fr, c: fc } = originalUnitPos;
+  if (selectedUnit.owner === 'player') contrib(selectedUnit.typeKey).moves += Math.max(Math.abs(toR - fr), Math.abs(toC - fc));
   board[fr][fc] = null; board[toR][toC] = selectedUnit;
   selectedUnit.r = toR; selectedUnit.c = toC;
   addUnitFx(selectedUnit, 'fx-move', fc - toC, fr - toR, 0, 280);
@@ -4143,6 +4157,7 @@ function executeAttack(att, def) {
     if (att.owner === 'player') critStreak = crit ? 0 : critStreak + 1;
   }
   const damage = crit ? Math.round(dmgInfo.damage * CRIT_MULT) : dmgInfo.damage;
+  if (att.owner === 'player' && def.owner === 'ai') contrib(att.typeKey).dmg += Math.min(damage, Math.max(0, def.hp));
   def.hp -= damage;
   addUnitFx(def, 'fx-hit', 0, 0, 160, 450);
   addTileFx(def.r, def.c, '', 'fx-flash', 160, 400);
@@ -4160,7 +4175,7 @@ function executeAttack(att, def) {
     units = units.filter(u => u !== def);
     if (def.typeKey !== 'OBSTACLE') setTimeout(() => sound.play('unit_down'), 260);
     if (def.owner === 'ai') rewardKill(def);
-    if (def.owner === 'ai' && att.owner === 'player') gainClassXp(att.typeKey, killXp(def), att);
+    if (def.owner === 'ai' && att.owner === 'player') { const c = contrib(att.typeKey); c.kills++; c.kxp += killXp(def); }
     if (def.typeKey === 'OBSTACLE' && !def.bomb && att.owner === 'player') achAdd('barricade');
     addLog('전투', `<b>${def.name}</b>(이)가 ${def.typeKey === 'OBSTACLE' ? '파괴되었습니다! 길이 열렸습니다.' : '쓰러졌습니다!'}`, 'text-amber-400 font-bold');
     if (def.bomb) setTimeout(() => explodeBomb(def), 300);
@@ -4205,7 +4220,7 @@ function executeHeal(healer, target) {
   const prev = target.hp;
   target.hp = Math.min(target.maxHp, target.hp + healer.healPower);
   const healed = target.hp - prev;
-  if (healer.owner === 'player' && healed > 0) { achAdd('heal'); gainClassXp('HEALER', 4 + Math.round(healed * 0.15), healer); }
+  if (healer.owner === 'player' && healed > 0) { achAdd('heal'); contrib('HEALER').heal += healed; }
   const hx = target.c - healer.c, hy = target.r - healer.r, hl = Math.hypot(hx, hy) || 1;
   addUnitFx(healer, 'fx-lunge', hx / hl, hy / hl, 0, 350);
   addUnitFx(target, 'fx-heal', 0, 0, 100, 500);
@@ -4665,11 +4680,57 @@ function slotCoins(anchor, n) {
     }
   } catch (e) {}
 }
-// 결과 2뎁스: 이번 전투에서 오른 병종 경험치
-function cxpHtml() {
-  const g = stats.cxp || {}, ks = UNIT_ORDER.filter(k => g[k]);
-  if (!ks.length) return '';
-  return `<div class="res-cxp"><div class="res-cxp-t">병종 경험치</div><div class="res-cxp-l">${ks.map(k => `<div class="rc-i${stats.clvUp && stats.clvUp[k] ? ' up' : ''}"><div class="w-9 h-9">${portrait(k, 'player')}</div><b>Lv ${clv(k)}</b><span>+${g[k]}</span>${stats.clvUp && stats.clvUp[k] ? '<i>UP!</i>' : ''}</div>`).join('')}</div></div>`;
+// ---------- 결과: 병종 경험치가 차오르고 레벨업 ----------
+async function playClassXp(list) {
+  const box = $('res-cls'), d1 = $('res-d1'), pct = (lv, xp) => lv >= CLV_MAX ? 100 : Math.min(100, xp / clvNeed(lv) * 100);
+  const dur = ms => resSkip ? 0 : ms;
+  if (!d1.classList.contains('hidden')) { d1.classList.add('res-out'); await wait(280); d1.classList.add('hidden'); d1.classList.remove('res-out'); }
+  box.innerHTML = `<div class="cls-head"><div class="cls-title title-font">병종 경험치</div><div class="cls-sub">전투에 참가한 병종이 경험치를 받았습니다</div></div>
+    <div class="cls-list">${list.map((x, j) => `<div class="cls-row" id="cls-${j}">
+      <div class="cls-face">${portrait(x.k, 'player')}</div>
+      <div class="cls-mid">
+        <div class="cls-top"><b>${isPromo(x.k) ? PROMO_NAME[x.k] : UNIT_TYPES[x.k].name}</b><span class="cls-lv">Lv <i>${x.lv0}</i></span><em class="cls-gain">+<i>0</i> EXP</em></div>
+        <div class="cls-bar"><i style="width:${pct(x.lv0, x.xp0)}%"></i><span>${x.lv0 >= CLV_MAX ? 'MAX' : `${x.xp0} / ${clvNeed(x.lv0)}`}</span></div>
+        <div class="cls-parts">${x.parts.map(p => `<span>${p[0]} <b>+${p[1]}</b></span>`).join('')}</div>
+      </div></div>`).join('')}</div>
+    <button id="cls-next" class="slot-lever done" style="visibility:hidden">계속</button>`;
+  box.classList.remove('hidden'); box.classList.add('res-in');
+  await wait(dur(350));
+  for (let j = 0; j < list.length; j++) {
+    const x = list[j], row = $('cls-' + j), bar = row.querySelector('.cls-bar i'), txt = row.querySelector('.cls-bar span'), lvEl = row.querySelector('.cls-lv i'), gEl = row.querySelector('.cls-gain i');
+    row.classList.add('on'); row.scrollIntoView({ block: 'nearest', behavior: resSkip ? 'auto' : 'smooth' });
+    resCount(gEl, x.total, Math.max(1, dur(500)));
+    let lv = x.lv0, xp = x.xp0, left = lv >= CLV_MAX ? 0 : x.total;
+    while (left > 0 && lv < CLV_MAX) {
+      const need = clvNeed(lv), step = Math.min(left, need - xp), d = dur(260 + 520 * step / need);
+      bar.style.transition = `width ${d}ms cubic-bezier(.3,.7,.4,1)`; bar.style.width = pct(lv, xp + step) + '%';
+      const tk = d ? setInterval(() => sound.tone('sine', 600 + (xp / need) * 700, 900 + (xp / need) * 700, 0.03, 0.05), 70) : 0;
+      await wait(d); clearInterval(tk);
+      xp += step; left -= step; txt.textContent = `${xp} / ${need}`;
+      if (xp >= need) {
+        // ---- 레벨업: 바가 번쩍이고 배지가 튀어나온 뒤 0부터 다시 찬다 ----
+        lv++; xp = 0;
+        row.classList.remove('lvup'); void row.offsetWidth; row.classList.add('lvup');
+        lvEl.textContent = lv; lvEl.classList.remove('pop'); void lvEl.offsetWidth; lvEl.classList.add('pop');
+        const tag = document.createElement('div'); tag.className = 'cls-lvtag'; tag.innerHTML = `LEVEL UP! <small>Lv ${lv}</small>`; row.appendChild(tag); setTimeout(() => tag.remove(), 1500);
+        (sound.play('levelup') || sound.tone('triangle', 520, 1040, 0.3, 0.2)); vibrate([30, 40, 70]);
+        try { confettiBurst(row, 22); } catch (e) {}
+        await wait(dur(520));
+        bar.style.transition = 'none'; bar.style.width = lv >= CLV_MAX ? '100%' : '0%'; void bar.offsetWidth;
+        txt.textContent = lv >= CLV_MAX ? 'MAX' : `0 / ${clvNeed(lv)}`;
+        if (lv < CLV_MAX && STAR_LV.includes(lv) && STAR_LV.indexOf(lv) === starOf(x.k)) {
+          const n = document.createElement('div'); n.className = 'cls-note'; n.textContent = `★${starOf(x.k) + 1} ${starOf(x.k) ? '업그레이드' : '전직'} 조건 달성!`; row.querySelector('.cls-mid').appendChild(n);
+        }
+      }
+    }
+    if (lv >= CLV_MAX) txt.textContent = 'MAX';
+    row.classList.remove('on'); row.classList.add('done');
+    await wait(dur(180));
+  }
+  const nx = $('cls-next'); nx.style.visibility = 'visible';
+  resSkip = false;
+  await new Promise(go => { let t = 0; const f = () => { clearTimeout(t); nx.onclick = null; go(); }; nx.onclick = f; t = setTimeout(f, 2600); });
+  box.classList.add('res-out'); await wait(280); box.classList.add('hidden'); box.classList.remove('res-out', 'res-in');
 }
 async function playResultSeq(o) {
   resSkip = false; resBusy = true;
@@ -4705,7 +4766,8 @@ async function playResultSeq(o) {
     }), wait(5000)]);
     await resWait(o.ups ? 1500 : 500);
     if (o.ups) { const n = document.createElement('div'); n.className = 'text-[11px] text-yellow-200 mt-1 text-center'; n.textContent = `플레이어 레벨 ${SAVE.lv}: 전 병종 체력·공격력 +${SAVE.lv - 1}% 적용 중`; $('res-rewards').appendChild(n); }
-    // ---- 승리하면 보상 슬롯 ----
+    // ---- 병종 경험치 → 승리하면 보상 슬롯 ----
+    if (o.cls && o.cls.length) await playClassXp(o.cls);
     if (o.slot) await playSlot(o.slot);
     // ---- 1뎁스(보상) 연출이 끝나면 자동으로 2뎁스(랭크·상세·언락·버튼)로 넘어간다 ----
     resSkip = false;
@@ -4731,7 +4793,7 @@ async function playResultSeq(o) {
   finally {
     panel.removeEventListener('pointerdown', onTap);
     try {
-      $('res-d1').classList.add('hidden'); $('res-slot').classList.add('hidden'); $('res-d2').classList.remove('hidden');
+      $('res-d1').classList.add('hidden'); $('res-cls').classList.add('hidden'); $('res-slot').classList.add('hidden'); $('res-d2').classList.remove('hidden');
       if (o.rankHtml) $('res-rank').style.display = 'block';
       if (o.unlockHtml && !$('res-unlock').innerHTML && !$('res-unlock').dataset.done) $('res-unlock').innerHTML = o.unlockHtml;
       rs.lv = SAVE.lv; rs.xp = SAVE.xp; rs.gold = SAVE.gold; renderResHud();
@@ -4780,6 +4842,7 @@ function showResult(win, reason) {
   }
   // 저장은 즉시 (연출 도중 닫혀도 보상은 반영), 화면의 헤더 값은 연출에 맞춰 천천히 따라간다
   SAVE.gold += gold; const ups = grant(SAVE, 0, xpGain);
+  const cls = battleClassXp(win);
   const slot = win ? rollSlot(currentStage, rateGrade) : null;           // 증표는 결과가 뜨는 즉시 저장 (연출을 건너뛰어도 받음)
   if (slot) { Object.entries(slot.gain).forEach(([k, n]) => { SAVE.item[k] = matOf(k) + n; }); if (slot.kind === 'jackpot') SAVE.stat.jackpot = (SAVE.stat.jackpot || 0) + 1; }
   persist(); setTimeout(achCheck, 1200);
@@ -4793,7 +4856,7 @@ function showResult(win, reason) {
       <div id="res-hint" class="text-[10px] text-slate-500 mt-1.5">터치하면 건너뜁니다</div>
     </div>
     `;
-  $('res-cxp').innerHTML = cxpHtml();
+  $('res-cls').classList.add('hidden'); $('res-cls').innerHTML = '';
   $('res-slot').classList.add('hidden'); $('res-slot').innerHTML = '';
   $('res-rank').innerHTML = rankHtml; $('res-rank').style.display = 'none'; $('res-rank').classList.remove('res-pop'); $('res-unlock').innerHTML = ''; delete $('res-unlock').dataset.done;
   $('res-d1').classList.remove('hidden', 'res-out'); $('res-d2').classList.add('hidden'); $('res-d2').classList.remove('res-in');
@@ -4801,7 +4864,7 @@ function showResult(win, reason) {
   $('res-btns').classList.add('res-hidden');
   $('modal-next').classList.toggle('hidden', !(win && !last));
   $('game-over-modal').classList.remove('hidden');
-  playResultSeq({ rows, gold, xp: xpGain, ups, rankHtml, unlockHtml, grade: rateGrade, slot });
+  playResultSeq({ rows, gold, xp: xpGain, ups, rankHtml, unlockHtml, grade: rateGrade, slot, cls });
 }
 
 function updateTurnBadge(deferDim) {
